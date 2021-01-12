@@ -15,5 +15,7 @@ namespace DL444.Ucqu.Library.Models
         public string Year { get; set; }
         public string Major { get; set; }
         public string Class { get; set; }
+        public string PasswordHash { get; set; }
+        public string Iv { get; set; }
     }
 }

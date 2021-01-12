@@ -14,7 +14,7 @@ namespace DL444.Ucqu.Library.Models
 
         public string CurrentTerm { get; set; }
         public DateTimeOffset TermStartDate { get; set; }
-        public List<ScheduleTime> Schedule { get; set; }
+        public List<ScheduleTime> Schedule { get; set; } = new List<ScheduleTime>();
     }
 
     public struct ScheduleTime
