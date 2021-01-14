@@ -44,6 +44,7 @@ namespace DL444.Ucqu.Library.Client
                 }
                 else if (responseString.StartsWith("", StringComparison.OrdinalIgnoreCase))
                 {
+                    signedInUser = username;
                     return new SignInResult(true, "登录成功");
                 }
                 else
@@ -114,14 +115,16 @@ namespace DL444.Ucqu.Library.Client
 
         private string? GetSignInPageProperty(string page, string name)
         {
-            Regex regex = new Regex($"name=\"{name}\" value=\"(.*)\"");
+            Regex regex = new Regex($"name=\"{name}\" value=\"(.*)\"", RegexOptions.CultureInvariant);
             Match match = regex.Match(page);
             if (!match.Success)
             {
                 return null;
             }
-            return match.Groups[1].Value;
+            return match.FirstGroupValue();
         }
+
+        private string signedInUser = string.Empty;
     }
 
     public class SignInResult

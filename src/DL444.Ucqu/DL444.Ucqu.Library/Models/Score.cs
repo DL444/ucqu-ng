@@ -9,10 +9,10 @@ namespace DL444.Ucqu.Library.Models
         public string StudentId { get; set; }
         public string Name { get; set; }
         public int AdmissionYear { get; set; }
-        public string Major { get; set; }
-        public string ManagementClass { get; set; }
-        public bool IsMajor { get; set; }
-        public SortedList<int, Term> Terms { get; set; } = new SortedList<int, Term>();
+        public string? Major { get; set; }
+        public string? ManagementClass { get; set; }
+        public bool IsSecondMajor { get; set; }
+        public List<Term> Terms { get; set; } = new List<Term>();
 
         public static void Diff(ScoreSet prev, ScoreSet current)
         {
@@ -63,7 +63,7 @@ namespace DL444.Ucqu.Library.Models
         public string Category { get; set; }
         public bool IsInitialTake { get; set; }
         public int Score { get; set; }
-        public bool IsMajor { get; set; }
+        public bool IsSecondMajor { get; set; }
         public string Comment { get; set; }
         public string Lecturer { get; set; }
         [JsonInclude]
