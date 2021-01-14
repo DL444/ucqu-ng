@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-namespace DL444.Ucqu.Library.Models
+namespace DL444.Ucqu.Models
 {
     public class StudentInfo
     {

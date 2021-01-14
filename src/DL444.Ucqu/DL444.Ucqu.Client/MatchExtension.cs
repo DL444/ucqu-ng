@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace DL444.Ucqu.Library.Client
+namespace DL444.Ucqu.Client
 {
     internal static class MatchExtension
     {

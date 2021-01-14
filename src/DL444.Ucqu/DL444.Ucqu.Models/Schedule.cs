@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DL444.Ucqu.Library.Models
+namespace DL444.Ucqu.Models
 {
     public class Schedule
     {

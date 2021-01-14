@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace DL444.Ucqu.Library.Client
+namespace DL444.Ucqu.Client
 {
     public class ClientCookieContainer
     {

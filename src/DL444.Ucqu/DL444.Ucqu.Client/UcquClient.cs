@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 
-namespace DL444.Ucqu.Library.Client
+namespace DL444.Ucqu.Client
 {
     public partial class UcquClient
     {
