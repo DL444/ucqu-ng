@@ -5,11 +5,18 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using DL444.Ucqu.Models;
 
 namespace DL444.Ucqu.Client
 {
     public partial class UcquClient
     {
+        /// <summary>
+        /// Sign a user in.
+        /// </summary>
+        /// <param name="username">The username.</param>
+        /// <param name="passwordHash">The hashed password.</param>
+        /// <returns>A object containing the sign in result.</returns>
         public async Task<SignInResult> SignInAsync(string username, string passwordHash)
         {
             string sessionId = GetRandomSessionId();
@@ -63,29 +70,6 @@ namespace DL444.Ucqu.Client
 
         }
 
-        public string GetPasswordHash(string username, string password)
-        {
-            MD5 md5 = MD5.Create();
-            byte[] passwordBytes = Encoding.ASCII.GetBytes(password);
-            byte[] hash = md5.ComputeHash(passwordBytes);
-            StringBuilder builder = new StringBuilder(username.Length + 30 + schoolCode.Length);
-            builder.Append(username);
-            for (int i = 0; i < 15; i++)
-            {
-                builder.Append(hash[i].ToString("X2"));
-            }
-            builder.Append(schoolCode);
-            string hashStr = builder.ToString();
-            passwordBytes = Encoding.ASCII.GetBytes(hashStr);
-            hash = md5.ComputeHash(passwordBytes);
-            builder = new StringBuilder(30);
-            for (int i = 0; i < 15; i++)
-            {
-                builder.Append(hash[i].ToString("X2"));
-            }
-            return builder.ToString();
-        }
-
         private string GetRandomSessionId()
         {
             StringBuilder builder = new StringBuilder(24);
@@ -125,17 +109,5 @@ namespace DL444.Ucqu.Client
         }
 
         private string signedInUser = string.Empty;
-    }
-
-    public class SignInResult
-    {
-        public SignInResult(bool success, string message)
-        {
-            Success = success;
-            Message = message;
-        }
-
-        public bool Success { get; set; }
-        public string Message { get; set; }
     }
 }
