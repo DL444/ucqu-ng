@@ -77,8 +77,8 @@ namespace DL444.Ucqu.Client
             }
             substring = substring.Substring(startIndex + 1);
             Regex tableStartRegex = new Regex("<table.*?<table.*?>(.*?)</table(.*)", RegexOptions.CultureInvariant);
-            Regex trRegex = new Regex("<tr .*?>(.*?)</tr>");
-            Regex tdRegex = new Regex("<td .*?>(.*?)<br></td>");
+            Regex trRegex = new Regex("<tr .*?>(.*?)</tr>", RegexOptions.CultureInvariant);
+            Regex tdRegex = new Regex("<td .*?>(.*?)<br></td>", RegexOptions.CultureInvariant);
             foreach (Term term in set.Terms)
             {
                 Match tableMatch = tableStartRegex.Match(substring);
@@ -145,7 +145,7 @@ namespace DL444.Ucqu.Client
 
         private string? GetScorePageProperty(string page, string name, string ending)
         {
-            Regex regex = new Regex($"{name}：(.*?){ending}");
+            Regex regex = new Regex($"{name}：(.*?){ending}", RegexOptions.CultureInvariant);
             Match match = regex.Match(page);
             if (!match.Success)
             {
