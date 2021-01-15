@@ -10,39 +10,31 @@ namespace DL444.Ucqu.Client
     public partial class UcquClient
     {
         /// <summary>
-        /// Get a student's scores.
+        /// Get current signed in user's scores.
         /// </summary>
-        /// <param name="username">Username of the target.</param>
-        /// <param name="isMajor">Whether to get major or second major scores.</param>
-        /// <returns>Student's score.</returns>
+        /// <param name="isSecondMajor">Whether to get major or second major scores.</param>
+        /// <returns>User's scores.</returns>
         /// <exception cref="FormatException">Thrown when page responsed by server cannot be correctly parsed.</exception>
-        public async Task<ScoreSet?> GetScoreAsync(string username, bool isSecondMajor)
+        public async Task<ScoreSet?> GetScoreAsync(bool isSecondMajor)
         {
-            if (!signedInUser.Equals(username))
+            if (string.IsNullOrEmpty(signedInUser))
             {
-                throw new InvalidOperationException("The target user is not the user currently signed in.");
+                throw new InvalidOperationException("Currently not signed in.");
             }
-            HttpRequestMessage request = CreateScoreRequest();
+            var request = new HttpRequestMessage(HttpMethod.Post, "XSCJ/f_xsgrcj_rpt.aspx");
             Dictionary<string, string> content = new Dictionary<string, string>()
             {
                 { "SJ", "0" },
                 { "SelXNXQ", "0" },
-                { "txt_xm", username },
-                { "txt_xs", username },
-                { "sel_xs", username },
+                { "txt_xm", signedInUser },
+                { "txt_xs", signedInUser },
+                { "sel_xs", signedInUser },
                 { "zfx_flag", isSecondMajor ? "1" : "0" }
             };
             request.Content = new FormUrlEncodedContent((IEnumerable<KeyValuePair<string?, string?>>)content);
             HttpResponseMessage response = await httpClient.SendAsync(request);
             string page = await response.Content.ReadAsStringAsync();
             return ParsePage(page, isSecondMajor);
-        }
-
-        private HttpRequestMessage CreateScoreRequest()
-        {
-            var request = new HttpRequestMessage(HttpMethod.Post, "XSCJ/f_xsgrcj_rpt.aspx");
-            request.Headers.Accept.ParseAdd("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-            return request;
         }
 
         private ScoreSet? ParsePage(string page, bool isSecondMajor)

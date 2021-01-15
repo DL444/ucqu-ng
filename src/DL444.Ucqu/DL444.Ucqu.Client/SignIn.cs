@@ -16,58 +16,45 @@ namespace DL444.Ucqu.Client
         /// </summary>
         /// <param name="username">The username.</param>
         /// <param name="passwordHash">The hashed password.</param>
-        /// <returns>A object containing the sign in result.</returns>
+        /// <returns>Sign in result.</returns>
         public async Task<SignInResult> SignInAsync(string username, string passwordHash)
         {
             string sessionId = GetRandomSessionId();
             cookieContainer.SetSessionId(sessionId);
 
-            HttpRequestMessage initRequest = CreateSignInRequest(HttpMethod.Get);
-            try
+            HttpResponseMessage response = await httpClient.GetAsync("_data/index_login.aspx");
+            string responseString = await response.Content.ReadAsStringAsync();
+            string? viewState = GetSignInPageProperty(responseString, "__VIEWSTATE");
+            string? viewStateGen = GetSignInPageProperty(responseString, "__VIEWSTATEGENERATOR");
+            if (string.IsNullOrEmpty(viewState) || string.IsNullOrEmpty(viewStateGen))
             {
-                HttpResponseMessage response = await httpClient.SendAsync(initRequest);
-                string responseString = await response.Content.ReadAsStringAsync();
-                string? viewState = GetSignInPageProperty(responseString, "__VIEWSTATE");
-                string? viewStateGen = GetSignInPageProperty(responseString, "__VIEWSTATEGENERATOR");
-                if (string.IsNullOrEmpty(viewState) || string.IsNullOrEmpty(viewStateGen))
-                {
-                    return new SignInResult(false, "应用或教务系统发生未知异常");
-                }
-                HttpRequestMessage signInRequest = CreateSignInRequest(HttpMethod.Post);
-                Dictionary<string, string> content = new Dictionary<string, string>()
-                {
-                    { "__VIEWSTATE", viewState },
-                    { "__VIEWSTATEGENERATOR", viewStateGen },
-                    { "Sel_Type", "STU" },
-                    { "txt_dsdsdsdjkjkjc", username },
-                    { "efdfdfuuyyuuckjg", passwordHash }
-                };
-                signInRequest.Content = new FormUrlEncodedContent((IEnumerable<KeyValuePair<string?, string?>>)content);
-                response = await httpClient.SendAsync(signInRequest);
-                responseString = await response.Content.ReadAsStringAsync();
-                if (responseString.Contains("您尚未报到注册成功，请到学院咨询并办理相关手续！"))
-                {
-                    return new SignInResult(false, "本学期教务系统暂未开放，将展示最近的缓存信息");
-                }
-                else if (responseString.StartsWith("", StringComparison.OrdinalIgnoreCase))
-                {
-                    signedInUser = username;
-                    return new SignInResult(true, "登录成功");
-                }
-                else
-                {
-                    return new SignInResult(false, "帐户信息不正确");
-                }
+                throw new FormatException("Unable to extract view state parameters.");
             }
-            catch (HttpRequestException)
+            var signInRequest = new HttpRequestMessage(HttpMethod.Post, "_data/index_login.aspx");
+            Dictionary<string, string> content = new Dictionary<string, string>()
             {
-                return new SignInResult(false, "教务系统发生网络异常");
-            }
-            catch (TaskCanceledException)
+                { "__VIEWSTATE", viewState },
+                { "__VIEWSTATEGENERATOR", viewStateGen },
+                { "Sel_Type", "STU" },
+                { "txt_dsdsdsdjkjkjc", username },
+                { "efdfdfuuyyuuckjg", passwordHash }
+            };
+            signInRequest.Content = new FormUrlEncodedContent((IEnumerable<KeyValuePair<string?, string?>>)content);
+            response = await httpClient.SendAsync(signInRequest);
+            responseString = await response.Content.ReadAsStringAsync();
+            if (responseString.Contains("您尚未报到注册成功，请到学院咨询并办理相关手续！", StringComparison.Ordinal))
             {
-                return new SignInResult(false, "教务系统发生网络异常");
+                return SignInResult.NotRegistered;
             }
-
+            else if (responseString.Contains("账号或密码不正确！请重新输入", StringComparison.Ordinal))
+            {
+                return SignInResult.InvalidCredentials;
+            }
+            else
+            {
+                signedInUser = username;
+                return SignInResult.Success;
+            }
         }
 
         private string GetRandomSessionId()
@@ -86,15 +73,6 @@ namespace DL444.Ucqu.Client
                 builder.Append((char)transformed);
             }
             return builder.ToString();
-        }
-
-        private HttpRequestMessage CreateSignInRequest(HttpMethod method)
-        {
-            string signInUri = "_data/index_login.aspx";
-            HttpRequestMessage request = new HttpRequestMessage(method, signInUri);
-            request.Headers.Accept.ParseAdd("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-            request.Headers.Referrer = new Uri($"http://{host}/home.aspx");
-            return request;
         }
 
         private string? GetSignInPageProperty(string page, string name)

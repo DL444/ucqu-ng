@@ -10,6 +10,7 @@ namespace DL444.Ucqu.Client
         public UcquClient(HttpClient httpClient, ClientCookieContainer cookieContainer, string host)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            httpClient.DefaultRequestHeaders.Accept.ParseAdd("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
 
             this.httpClient = httpClient;
             this.cookieContainer = cookieContainer;
