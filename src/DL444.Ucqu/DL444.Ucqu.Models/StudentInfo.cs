@@ -14,9 +14,10 @@ namespace DL444.Ucqu.Models
 
         public string StudentId { get; set; }
         public string Name { get; set; }
-        public string Year { get; set; }
+        public int Year { get; set; }
         public string Major { get; set; }
-        public string Class { get; set; }
+        public int Class { get; set; }
+        public string? SecondMajor { get; set; }
         public string PasswordHash { get; set; }
         public string Iv { get; set; }
 
