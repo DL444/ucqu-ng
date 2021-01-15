@@ -93,8 +93,8 @@ namespace DL444.Ucqu.Client
                         Name = cols[1].FirstGroupValue(),
                         Credit = double.Parse(cols[2].FirstGroupValue()),
                         Category = cols[3].FirstGroupValue(),
-                        IsInitialTake = !"重修".Equals(cols[5].FirstGroupValue()),
-                        IsSecondMajor = "辅修".Equals(cols[7].FirstGroupValue()),
+                        IsInitialTake = !"重修".Equals(cols[5].FirstGroupValue(), StringComparison.Ordinal),
+                        IsSecondMajor = "辅修".Equals(cols[7].FirstGroupValue(), StringComparison.Ordinal),
                         Comment = cols[8].FirstGroupValue(),
                         Lecturer = cols[9].FirstGroupValue(),
                         ObtainedTime = DateTimeOffset.Parse($"{cols[10].FirstGroupValue()} +8")

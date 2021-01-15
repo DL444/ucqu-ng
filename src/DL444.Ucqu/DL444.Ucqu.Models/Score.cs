@@ -94,6 +94,9 @@ namespace DL444.Ucqu.Models
             }
         }
 
-        private bool GradePointTruncated => IsInitialTake == false || "补考".Equals(Comment) || "缺考".Equals(Comment) || "补考(缺考)".Equals(Comment);
+        private bool GradePointTruncated => IsInitialTake == false
+            || "补考".Equals(Comment, StringComparison.Ordinal)
+            || "缺考".Equals(Comment, StringComparison.Ordinal)
+            || "补考(缺考)".Equals(Comment, StringComparison.Ordinal);
     }
 }

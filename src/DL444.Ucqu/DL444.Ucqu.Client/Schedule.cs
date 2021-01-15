@@ -88,7 +88,7 @@ namespace DL444.Ucqu.Client
                     }
                     else
                     {
-                        if (GetCellValue(cells[7]).Equals("实践"))
+                        if (GetCellValue(cells[7]).Equals("实践", StringComparison.Ordinal))
                         {
                             continue;
                         }
