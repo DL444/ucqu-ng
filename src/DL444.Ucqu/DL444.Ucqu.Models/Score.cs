@@ -58,7 +58,7 @@ namespace DL444.Ucqu.Models
     {
         public string Name { get; set; }
         [JsonInclude]
-        public string ShortName => GetShortformName(Name);
+        public string ShortName => Utilities.GetShortformName(Name);
         public double Credit { get; set; }
         public string Category { get; set; }
         public bool IsInitialTake { get; set; }
@@ -67,7 +67,7 @@ namespace DL444.Ucqu.Models
         public string Comment { get; set; }
         public string Lecturer { get; set; }
         [JsonInclude]
-        public string ShortLecturer => GetShortformName(Lecturer);
+        public string ShortLecturer => Utilities.GetShortformName(Lecturer);
         public DateTimeOffset ObtainedTime { get; set; }
         [JsonInclude]
         public double GradePoint
@@ -95,15 +95,5 @@ namespace DL444.Ucqu.Models
         }
 
         private bool GradePointTruncated => IsInitialTake == false || "补考".Equals(Comment) || "缺考".Equals(Comment) || "补考(缺考)".Equals(Comment);
-
-        private string GetShortformName(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                return string.Empty;
-            }
-            string[] segments = name.Split(']');
-            return segments.Length < 2 ? name : segments[1];
-        }
     }
 }
