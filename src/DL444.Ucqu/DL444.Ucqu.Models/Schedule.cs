@@ -14,8 +14,7 @@ namespace DL444.Ucqu.Models
             {
                 Weeks.Add(week, new ScheduleWeek(week));
             }
-            ScheduleWeek scheduleWeek = Weeks[week];
-            scheduleWeek.Entries.Add(entry);
+            Weeks[week].Entries.Add(entry);
         }
 
         public List<ScheduleEntry> GetDaySchedule(int day)
