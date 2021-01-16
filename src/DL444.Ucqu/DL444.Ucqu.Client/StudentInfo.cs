@@ -14,7 +14,8 @@ namespace DL444.Ucqu.Client
             {
                 throw new InvalidOperationException("Currently not signed in.");
             }
-            HttpResponseMessage response = await httpClient.GetAsync("xsxj/Stu_MyInfo_RPT.aspx");
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "xsxj/Stu_MyInfo_RPT.aspx").AddSessionCookie(sessionId);
+            HttpResponseMessage response = await httpClient.SendAsync(request);
             string page = await response.Content.ReadAsStringAsync();
             return ParseStudentInfo(page, signedInUser);
         }

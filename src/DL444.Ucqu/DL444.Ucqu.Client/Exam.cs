@@ -15,7 +15,7 @@ namespace DL444.Ucqu.Client
             {
                 throw new InvalidOperationException("Currently not signed in.");
             }
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "KSSW/stu_ksap_rpt.aspx");
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "KSSW/stu_ksap_rpt.aspx").AddSessionCookie(sessionId);
             Dictionary<string, string> content = new Dictionary<string, string>()
             {
                 { "sel_xnxq", $"{beginningYear}{term}" }

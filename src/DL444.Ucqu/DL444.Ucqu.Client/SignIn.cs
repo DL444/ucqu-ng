@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
@@ -20,9 +21,8 @@ namespace DL444.Ucqu.Client
         public async Task<SignInResult> SignInAsync(string username, string passwordHash)
         {
             string sessionId = GetRandomSessionId();
-            cookieContainer.SetSessionId(sessionId);
-
-            HttpResponseMessage response = await httpClient.GetAsync("_data/index_login.aspx");
+            HttpRequestMessage initRequest = new HttpRequestMessage(HttpMethod.Get, "_data/index_login.aspx").AddSessionCookie(sessionId);
+            HttpResponseMessage response = await httpClient.SendAsync(initRequest);
             string responseString = await response.Content.ReadAsStringAsync();
             string? viewState = GetSignInPageProperty(responseString, "__VIEWSTATE");
             string? viewStateGen = GetSignInPageProperty(responseString, "__VIEWSTATEGENERATOR");
@@ -30,7 +30,7 @@ namespace DL444.Ucqu.Client
             {
                 throw new FormatException("Unable to extract view state parameters.");
             }
-            var signInRequest = new HttpRequestMessage(HttpMethod.Post, "_data/index_login.aspx");
+            var signInRequest = new HttpRequestMessage(HttpMethod.Post, "_data/index_login.aspx").AddSessionCookie(sessionId);
             Dictionary<string, string> content = new Dictionary<string, string>()
             {
                 { "__VIEWSTATE", viewState },
@@ -52,6 +52,7 @@ namespace DL444.Ucqu.Client
             }
             else
             {
+                this.sessionId = sessionId;
                 signedInUser = username;
                 return SignInResult.Success;
             }
@@ -86,6 +87,7 @@ namespace DL444.Ucqu.Client
             return match.FirstGroupValue();
         }
 
+        private string sessionId = string.Empty;
         private string signedInUser = string.Empty;
     }
 }
