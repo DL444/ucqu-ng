@@ -19,8 +19,9 @@ namespace DL444.Ucqu.Backend
         {
             var functionsBuilder = new FunctionsHostBuilder(builder.Services, context);
             Configure(functionsBuilder);
-            var serviceProvider = builder.Services.BuildServiceProvider();
-            builder.AddExtension(new Bindings.UserIdentityExtensionConfigProvider(serviceProvider.GetService<ITokenService>()));
+            ServiceProvider serviceProvider = builder.Services.BuildServiceProvider();
+            var tokenService = serviceProvider.GetService<ITokenService>() ?? throw new NullReferenceException("Token service not returned by service provider.");
+            builder.AddExtension(new Bindings.UserIdentityExtensionConfigProvider(tokenService));
         }
 
         public void Configure(WebJobsBuilderContext context, IWebJobsConfigurationBuilder builder)
@@ -35,8 +36,14 @@ namespace DL444.Ucqu.Backend
             var config = context.Configuration;
             var tokenSigningKey = config.GetValue<string>("Token:SigningKey");
             var tokenIssuer = config.GetValue<string>("Token:Issuer");
-            var tokenValidMins = config.GetValue<int>("Token:ValidMinutes");
+            var tokenValidMins = config.GetValue<int>("Token:ValidMinutes", 60);
             builder.Services.AddSingleton<ITokenService>(new TokenService(tokenSigningKey, tokenIssuer, tokenValidMins));
+            var host = config.GetValue<string>("Upstream:Host");
+            bool useTls = config.GetValue<bool>("Upstream:UseTls", false);
+            builder.Services.AddHttpClient<DL444.Ucqu.Client.IUcquClient, DL444.Ucqu.Client.UcquClient>(httpClient =>
+            {
+                httpClient.BaseAddress = new Uri($"{(useTls ? "https" : "http")}://{host}/");
+            });
         }
 
         public void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)
