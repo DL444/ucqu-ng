@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DL444.Ucqu.Models", "DL444.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DL444.Ucqu.Client", "DL444.Ucqu.Client\DL444.Ucqu.Client.csproj", "{A8D18280-7A4A-42D2-B1C2-B940BFC5AA00}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DL444.Ucqu.Backend", "DL444.Ucqu.Backend\DL444.Ucqu.Backend.csproj", "{1EDCA2E9-EC18-44F4-8751-25B60B3AF9BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{A8D18280-7A4A-42D2-B1C2-B940BFC5AA00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8D18280-7A4A-42D2-B1C2-B940BFC5AA00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8D18280-7A4A-42D2-B1C2-B940BFC5AA00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EDCA2E9-EC18-44F4-8751-25B60B3AF9BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EDCA2E9-EC18-44F4-8751-25B60B3AF9BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EDCA2E9-EC18-44F4-8751-25B60B3AF9BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EDCA2E9-EC18-44F4-8751-25B60B3AF9BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
