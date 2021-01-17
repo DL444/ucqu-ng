@@ -40,7 +40,18 @@ namespace DL444.Ucqu.Client
                 { "efdfdfuuyyuuckjg", passwordHash }
             };
             signInRequest.Content = new FormUrlEncodedContent((IEnumerable<KeyValuePair<string?, string?>>)content);
-            response = await httpClient.SendAsync(signInRequest);
+            try
+            {
+                response = await httpClient.SendAsync(signInRequest);
+            }
+            catch (HttpRequestException)
+            {
+                // Sometimes upstream server returns empty response. Retry for once.
+                await Task.Delay(2000);
+                signInRequest = new HttpRequestMessage(HttpMethod.Post, "_data/index_login.aspx").AddSessionCookie(sessionId);
+                signInRequest.Content = new FormUrlEncodedContent((IEnumerable<KeyValuePair<string?, string?>>)content);
+                response = await httpClient.SendAsync(signInRequest);
+            }
             responseString = await response.Content.ReadAsStringAsync();
             if (responseString.Contains("您尚未报到注册成功，请到学院咨询并办理相关手续！", StringComparison.Ordinal))
             {
