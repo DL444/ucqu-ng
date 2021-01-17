@@ -11,6 +11,7 @@
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.8.0" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.11" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.11" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
@@ -20,5 +21,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DL444.Ucqu.Client\DL444.Ucqu.Client.csproj" />
+    <ProjectReference Include="..\DL444.Ucqu.Models\DL444.Ucqu.Models.csproj" />
   </ItemGroup>
 </Project>

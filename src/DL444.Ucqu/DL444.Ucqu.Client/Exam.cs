@@ -37,8 +37,12 @@ namespace DL444.Ucqu.Client
             Regex tdRegex = new Regex("<td .*?>(.*?)<br></td>", RegexOptions.CultureInvariant);
             Regex timeRegex = new Regex("(.*?)\\((.*?)周 星期(.)\\)(.*)-(.*)", RegexOptions.CultureInvariant);
             MatchCollection rows = trRegex.Matches(page);
-            foreach (Match row in rows)
+            foreach (Match? row in rows)
             {
+                if (row == null)
+                {
+                    continue;
+                }
                 MatchCollection cols = tdRegex.Matches(row.Value);
                 Exam exam = new Exam(
                     name: cols[1].FirstGroupValue(),

@@ -59,8 +59,12 @@ namespace DL444.Ucqu.Client
             for (int i = 0; i < tableMatches.Count; i++)
             {
                 MatchCollection rows = trRegex.Matches(tableMatches[i].Value);
-                foreach (Match row in rows)
+                foreach (Match? row in rows)
                 {
+                    if (row == null)
+                    {
+                        continue;
+                    }
                     MatchCollection cells = tdRegex.Matches(row.Value);
                     ScheduleEntry entry;
                     string weeksStr, sessionsStr;
@@ -115,8 +119,12 @@ namespace DL444.Ucqu.Client
                         entry.EndSession = int.Parse(sessionMatch.Groups[4].Value);
                     }
                     MatchCollection weeksMatch = weeksRegex.Matches(weeksStr);
-                    foreach (Match weekItem in weeksMatch)
+                    foreach (Match? weekItem in weeksMatch)
                     {
+                        if (weekItem == null)
+                        {
+                            continue;
+                        }
                         if (weekItem.Groups[2].Captures.Count == 0)
                         {
                             int startWeek = int.Parse(weekItem.Groups[3].Value);
