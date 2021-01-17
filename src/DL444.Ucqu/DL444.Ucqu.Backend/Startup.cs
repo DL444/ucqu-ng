@@ -1,4 +1,5 @@
 using System;
+using Azure.Cosmos;
 using DL444.Ucqu.Backend.Services;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.WebJobs;
@@ -34,16 +35,33 @@ namespace DL444.Ucqu.Backend
         {
             var context = builder is FunctionsHostBuilder fnBuilder ? fnBuilder.Context : builder.GetContext();
             var config = context.Configuration;
+
             var tokenSigningKey = config.GetValue<string>("Token:SigningKey");
             var tokenIssuer = config.GetValue<string>("Token:Issuer");
             var tokenValidMins = config.GetValue<int>("Token:ValidMinutes", 60);
-            builder.Services.AddSingleton<ITokenService>(new TokenService(tokenSigningKey, tokenIssuer, tokenValidMins));
+            builder.Services.AddTransient<ITokenService>(_ => new TokenService(tokenSigningKey, tokenIssuer, tokenValidMins));
+
+            var credentialKey = config.GetValue<string>("Credential:EncryptionKey");
+            builder.Services.AddTransient<ICredentialEncryptionService>(_ => new CredentialEncryptionService(credentialKey));
+
             var host = config.GetValue<string>("Upstream:Host");
             bool useTls = config.GetValue<bool>("Upstream:UseTls", false);
             builder.Services.AddHttpClient<DL444.Ucqu.Client.IUcquClient, DL444.Ucqu.Client.UcquClient>(httpClient =>
             {
                 httpClient.BaseAddress = new Uri($"{(useTls ? "https" : "http")}://{host}/");
+            }).ConfigurePrimaryHttpMessageHandler(() => new System.Net.Http.HttpClientHandler()
+            {
+                UseCookies = false
             });
+
+            var dbConnection = config.GetValue<string>("Database:ConnectionString");
+            builder.Services.AddSingleton(new CosmosClient(dbConnection));
+
+            var databaseId = config.GetValue<string>("Database:Database");
+            var containerId = config.GetValue<string>("Database:Container");
+            builder.Services.AddTransient<IDataAccessService>(
+                services => new DataAccessService(services.GetService<CosmosClient>(), databaseId, containerId, services.GetService<ICredentialEncryptionService>())
+            );
         }
 
         public void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)
