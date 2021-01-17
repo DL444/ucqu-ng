@@ -5,12 +5,12 @@ using System.Text.Json.Serialization;
 
 namespace DL444.Ucqu.Models
 {
-    public class WellknownData
+    public class WellknownData : ICosmosResource
     {
-        [JsonPropertyName("id")]
+        [JsonIgnore]
         public string Id => "Wellknown";
-        [JsonPropertyName("pk")]
-        public string Pk => "Wellknown";
+        [JsonIgnore]
+        public string PartitionKey => "Wellknown";
 
         public string CurrentTerm { get; set; } = string.Empty;
         public DateTimeOffset TermStartDate { get; set; }

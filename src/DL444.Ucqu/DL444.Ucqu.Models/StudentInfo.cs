@@ -2,12 +2,12 @@
 
 namespace DL444.Ucqu.Models
 {
-    public class StudentInfo
+    public class StudentInfo : ICosmosResource
     {
-        [JsonPropertyName("id")]
+        [JsonIgnore]
         public string Id => $"Student-{StudentId}";
-        [JsonPropertyName("pk")]
-        public string Pk => StudentId;
+        [JsonIgnore]
+        public string PartitionKey => StudentId;
         public RecordStatus RecordStatus { get; set; }
 
         public string StudentId { get; set; } = string.Empty;

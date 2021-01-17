@@ -4,23 +4,22 @@ using System.Text.Json.Serialization;
 
 namespace DL444.Ucqu.Models
 {
-    public class StudentCredential
+    public class StudentCredential : ICosmosResource
     {
-        public StudentCredential(string studentId, string passwordHash, string iv)
+        public StudentCredential(string studentId, string passwordHash)
         {
             StudentId = studentId;
             PasswordHash = passwordHash;
-            Iv = iv;
         }
 
-        [JsonPropertyName("id")]
-        public string Id => $"Student-{StudentId}";
-        [JsonPropertyName("pk")]
-        public string Pk => StudentId;
+        [JsonIgnore]
+        public string Id => $"Credential-{StudentId}";
+        [JsonIgnore]
+        public string PartitionKey => StudentId;
 
         public string StudentId { get; set; }
         public string PasswordHash { get; set; }
-        public string Iv { get; set; }
+        public string? Iv { get; set; }
 
         /// <summary>
         /// Compute password hash for given username and password.

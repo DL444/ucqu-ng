@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace DL444.Ucqu.Models
 {
-    public class ScoreSet
+    public class ScoreSet : ICosmosResource
     {
         public ScoreSet(string studentId, string name, int admissionYear)
         {
@@ -13,10 +13,10 @@ namespace DL444.Ucqu.Models
             AdmissionYear = admissionYear;
         }
 
-        [JsonPropertyName("id")]
+        [JsonIgnore]
         public string Id => $"Score-{StudentId}-{(IsSecondMajor ? "S" : "M")}";
-        [JsonPropertyName("pk")]
-        public string Pk => StudentId;
+        [JsonIgnore]
+        public string PartitionKey => StudentId;
         public RecordStatus RecordStatus { get; set; }
 
         public string StudentId { get; set; }

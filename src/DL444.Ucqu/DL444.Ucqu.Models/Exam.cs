@@ -4,14 +4,14 @@ using System.Text.Json.Serialization;
 
 namespace DL444.Ucqu.Models
 {
-    public class ExamSchedule
+    public class ExamSchedule : ICosmosResource
     {
         public ExamSchedule(string studentId) => StudentId = studentId;
 
-        [JsonPropertyName("id")]
+        [JsonIgnore]
         public string Id => $"Exams-{StudentId}";
-        [JsonPropertyName("pk")]
-        public string Pk => StudentId;
+        [JsonIgnore]
+        public string PartitionKey => StudentId;
         public RecordStatus RecordStatus { get; set; }
 
         public string StudentId { get; set; }
