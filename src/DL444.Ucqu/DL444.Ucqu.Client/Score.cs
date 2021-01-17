@@ -50,11 +50,8 @@ namespace DL444.Ucqu.Client
                 return null;
             }
             _ = int.TryParse(GetScorePageProperty(page, "年级", "&"), out int admissionYear);
-            ScoreSet set = new ScoreSet()
+            ScoreSet set = new ScoreSet(studentId, name, admissionYear)
             {
-                StudentId = studentId,
-                Name = name,
-                AdmissionYear = admissionYear,
                 Major = GetScorePageProperty(page, "专业", "&"),
                 ManagementClass = GetScorePageProperty(page, "行政班级", "<"),
                 IsSecondMajor = isSecondMajor,
@@ -88,9 +85,8 @@ namespace DL444.Ucqu.Client
                     {
                         throw new FormatException("Encountered unexpected score table format: too few columns.");
                     }
-                    Course course = new Course()
+                    Course course = new Course(name: cols[1].FirstGroupValue())
                     {
-                        Name = cols[1].FirstGroupValue(),
                         Credit = double.Parse(cols[2].FirstGroupValue()),
                         Category = cols[3].FirstGroupValue(),
                         IsInitialTake = !"重修".Equals(cols[5].FirstGroupValue(), StringComparison.Ordinal),

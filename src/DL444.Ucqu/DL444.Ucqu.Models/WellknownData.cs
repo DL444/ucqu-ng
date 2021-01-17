@@ -12,7 +12,7 @@ namespace DL444.Ucqu.Models
         [JsonPropertyName("pk")]
         public string Pk => "Wellknown";
 
-        public string CurrentTerm { get; set; }
+        public string CurrentTerm { get; set; } = string.Empty;
         public DateTimeOffset TermStartDate { get; set; }
         public List<ScheduleTime> Schedule { get; set; } = new List<ScheduleTime>();
     }

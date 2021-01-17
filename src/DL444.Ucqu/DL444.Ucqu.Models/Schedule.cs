@@ -1,11 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace DL444.Ucqu.Models
 {
     public class Schedule
     {
+        public Schedule(string studentId) => StudentId = studentId;
+
+        [JsonPropertyName("id")]
+        public string Id => $"Schedule-{StudentId}";
+        [JsonPropertyName("pk")]
+        public string Pk => StudentId;
+        public RecordStatus RecordStatus { get; set; }
+
+        public string StudentId { get; set; }
         public SortedList<int, ScheduleWeek> Weeks { get; set; } = new SortedList<int, ScheduleWeek>();
 
         public void AddEntry(int week, ScheduleEntry entry)
@@ -40,6 +50,13 @@ namespace DL444.Ucqu.Models
 
     public class ScheduleEntry
     {
+        public ScheduleEntry(string name, string lecturer, string room)
+        {
+            Name = name;
+            Lecturer = lecturer;
+            Room = room;
+        }
+
         public string Name { get; set; }
         public string Lecturer { get; set; }
         public string Room { get; set; }

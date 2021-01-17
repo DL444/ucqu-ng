@@ -49,7 +49,7 @@ namespace DL444.Ucqu.Client
                     expTable = i;
                 }
             }
-            Schedule schedule = new Schedule();
+            Schedule schedule = new Schedule(signedInUser);
             Regex tableRegex = new Regex("<tbody>.*?</tbody>", RegexOptions.CultureInvariant);
             Regex trRegex = new Regex("<tr >.*?</tr>", RegexOptions.CultureInvariant);
             Regex tdRegex = new Regex("<td .*?>(.*?)<br></td>", RegexOptions.CultureInvariant);
@@ -66,23 +66,21 @@ namespace DL444.Ucqu.Client
                     string weeksStr, sessionsStr;
                     if (i == peTable)
                     {
-                        entry = new ScheduleEntry()
-                        {
-                            Name = GetCellValue(cells[6]),
-                            Lecturer = GetCellValue(cells[7]),
-                            Room = GetCellValue(cells[10])
-                        };
+                        entry = new ScheduleEntry(
+                            name: GetCellValue(cells[6]),
+                            lecturer: GetCellValue(cells[7]),
+                            room: GetCellValue(cells[10])
+                        );
                         weeksStr = $"{GetCellValue(cells[8])},";
                         sessionsStr = GetCellValue(cells[9]);
                     }
                     else if (i == expTable)
                     {
-                        entry = new ScheduleEntry()
-                        {
-                            Name = $"{GetCellValue(cells[1]).Split(']')[1]}实验",
-                            Lecturer = GetCellValue(cells[7]),
-                            Room = GetCellValue(cells[11])
-                        };
+                        entry = new ScheduleEntry(
+                            name: $"{GetCellValue(cells[1]).Split(']')[1]}实验",
+                            lecturer: GetCellValue(cells[7]),
+                            room: GetCellValue(cells[11])
+                        );
                         weeksStr = $"{GetCellValue(cells[9])},";
                         sessionsStr = GetCellValue(cells[10]);
                     }
@@ -92,12 +90,11 @@ namespace DL444.Ucqu.Client
                         {
                             continue;
                         }
-                        entry = new ScheduleEntry()
-                        {
-                            Name = GetCellValue(cells[1]).Split(']')[1],
-                            Lecturer = GetCellValue(cells[9]),
-                            Room = GetCellValue(cells[12])
-                        };
+                        entry = new ScheduleEntry(
+                            name: GetCellValue(cells[1]).Split(']')[1],
+                            lecturer: GetCellValue(cells[9]),
+                            room: GetCellValue(cells[12])
+                        );
                         weeksStr = $"{GetCellValue(cells[10])},";
                         sessionsStr = GetCellValue(cells[11]);
                     }

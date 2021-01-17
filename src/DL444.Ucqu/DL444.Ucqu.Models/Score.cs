@@ -6,6 +6,19 @@ namespace DL444.Ucqu.Models
 {
     public class ScoreSet
     {
+        public ScoreSet(string studentId, string name, int admissionYear)
+        {
+            StudentId = studentId;
+            Name = name;
+            AdmissionYear = admissionYear;
+        }
+
+        [JsonPropertyName("id")]
+        public string Id => $"Score-{StudentId}-{(IsSecondMajor ? "S" : "M")}";
+        [JsonPropertyName("pk")]
+        public string Pk => StudentId;
+        public RecordStatus RecordStatus { get; set; }
+
         public string StudentId { get; set; }
         public string Name { get; set; }
         public int AdmissionYear { get; set; }
@@ -56,16 +69,18 @@ namespace DL444.Ucqu.Models
 
     public class Course
     {
+        public Course(string name) => Name = name;
+        
         public string Name { get; set; }
         [JsonInclude]
         public string ShortName => Utilities.GetShortformName(Name);
         public double Credit { get; set; }
-        public string Category { get; set; }
+        public string? Category { get; set; }
         public bool IsInitialTake { get; set; }
         public int Score { get; set; }
         public bool IsSecondMajor { get; set; }
-        public string Comment { get; set; }
-        public string Lecturer { get; set; }
+        public string? Comment { get; set; }
+        public string? Lecturer { get; set; }
         [JsonInclude]
         public string ShortLecturer => Utilities.GetShortformName(Lecturer);
         public DateTimeOffset ObtainedTime { get; set; }

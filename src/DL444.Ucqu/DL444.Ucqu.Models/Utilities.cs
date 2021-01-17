@@ -2,7 +2,7 @@ namespace DL444.Ucqu.Models
 {
     internal static class Utilities
     {
-        public static string GetShortformName(string name)
+        public static string GetShortformName(string? name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {

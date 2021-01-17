@@ -32,8 +32,7 @@ namespace DL444.Ucqu.Client
             {
                 return null;
             }
-            ExamSchedule examSchedule = new ExamSchedule();
-            examSchedule.StudentId = signedInUser;
+            ExamSchedule examSchedule = new ExamSchedule(signedInUser);
             Regex trRegex = new Regex("<tr class=.>.*?</tr>", RegexOptions.CultureInvariant);
             Regex tdRegex = new Regex("<td .*?>(.*?)<br></td>", RegexOptions.CultureInvariant);
             Regex timeRegex = new Regex("(.*?)\\((.*?)周 星期(.)\\)(.*)-(.*)", RegexOptions.CultureInvariant);
@@ -41,14 +40,15 @@ namespace DL444.Ucqu.Client
             foreach (Match row in rows)
             {
                 MatchCollection cols = tdRegex.Matches(row.Value);
-                Exam exam = new Exam()
+                Exam exam = new Exam(
+                    name: cols[1].FirstGroupValue(),
+                    location: cols[6].FirstGroupValue(),
+                    seating: int.Parse(cols[7].FirstGroupValue())
+                )
                 {
-                    Name = cols[1].FirstGroupValue(),
                     Credit = double.Parse(cols[2].FirstGroupValue()),
                     Category = cols[3].FirstGroupValue(),
                     Type = cols[4].FirstGroupValue(),
-                    Location = cols[6].FirstGroupValue(),
-                    Seating = int.Parse(cols[7].FirstGroupValue())
                 };
                 string timeStr = cols[5].FirstGroupValue();
                 Match timeMatch = timeRegex.Match(timeStr);
