@@ -1,8 +1,22 @@
 namespace DL444.Ucqu.Models
 {
-    public class AccessToken
+    public struct AccessToken
     {
-        public AccessToken(string token) => Token = token;
-        public string Token { get; set; }
+        public bool Completed { get; set; }
+        public string? Location { get; set; }
+        public string? Token { get; set; }
+
+        public static AccessToken CompletedToken(string token) => new AccessToken()
+        {
+            Completed = true,
+            Token = token
+        };
+
+        public static AccessToken IncompleteToken(string token, string location) => new AccessToken()
+        {
+            Completed = false,
+            Location = location,
+            Token = token
+        };
     }
 }
