@@ -9,8 +9,12 @@ namespace DL444.Ucqu.Client
 {
     public partial class UcquClient
     {
-        public async Task<ExamSchedule> GetExamScheduleAsync(SignInContext signInContext, int beginningYear, int term)
+        public async Task<ExamSchedule> GetExamScheduleAsync(SignInContext signInContext, string term)
         {
+            if (term == null || term.Length != 5)
+            {
+                throw new ArgumentException("Term null or invalid.", nameof(term));
+            }
             if (!signInContext.IsValid)
             {
                 throw new InvalidOperationException("Currently not signed in.");
@@ -18,7 +22,7 @@ namespace DL444.Ucqu.Client
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "KSSW/stu_ksap_rpt.aspx").AddSessionCookie(signInContext.SessionId!);
             Dictionary<string, string> content = new Dictionary<string, string>()
             {
-                { "sel_xnxq", $"{beginningYear}{term}" }
+                { "sel_xnxq", term }
             };
             request.Content = new FormUrlEncodedContent((IEnumerable<KeyValuePair<string?, string?>>)content);
             HttpResponseMessage response = await httpClient.SendAsync(request);

@@ -8,7 +8,7 @@ namespace DL444.Ucqu.Client
         Task<SignInContext> SignInAsync(string username, string passwordHash);
         Task<StudentInfo> GetStudentInfoAsync(SignInContext signInContext);
         Task<ScoreSet> GetScoreAsync(SignInContext signInContext, bool isSecondMajor);
-        Task<Schedule> GetScheduleAsync(SignInContext signInContext, int beginningYear, int term);
-        Task<ExamSchedule> GetExamScheduleAsync(SignInContext signInContext, int beginningYear, int term);
+        Task<Schedule> GetScheduleAsync(SignInContext signInContext, string term);
+        Task<ExamSchedule> GetExamScheduleAsync(SignInContext signInContext, string term);
     }
 }

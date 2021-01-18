@@ -9,8 +9,12 @@ namespace DL444.Ucqu.Client
 {
     public partial class UcquClient
     {
-        public async Task<Schedule> GetScheduleAsync(SignInContext signInContext, int beginningYear, int term)
+        public async Task<Schedule> GetScheduleAsync(SignInContext signInContext, string term)
         {
+            if (term == null || term.Length != 5)
+            {
+                throw new ArgumentException("Term null or invalid.", nameof(term));
+            }
             if (!signInContext.IsValid)
             {
                 throw new InvalidOperationException("Currently not signed in.");
@@ -18,7 +22,7 @@ namespace DL444.Ucqu.Client
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "znpk/Pri_StuSel_rpt.aspx").AddSessionCookie(signInContext.SessionId!);
             Dictionary<string, string> content = new Dictionary<string, string>()
             {
-                { "Sel_XNXQ", $"{beginningYear}{term}" },
+                { "Sel_XNXQ", term },
                 { "rad", "on" },
                 { "px", "1" }
             };
