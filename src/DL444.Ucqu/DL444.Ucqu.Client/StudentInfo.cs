@@ -8,16 +8,16 @@ namespace DL444.Ucqu.Client
 {
     public partial class UcquClient
     {
-        public async Task<StudentInfo?> GetStudentInfoAsync()
+        public async Task<StudentInfo?> GetStudentInfoAsync(SignInContext signInContext)
         {
-            if (string.IsNullOrEmpty(signedInUser))
+            if (!signInContext.IsValid)
             {
                 throw new InvalidOperationException("Currently not signed in.");
             }
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "xsxj/Stu_MyInfo_RPT.aspx").AddSessionCookie(sessionId);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "xsxj/Stu_MyInfo_RPT.aspx").AddSessionCookie(signInContext.SessionId!);
             HttpResponseMessage response = await httpClient.SendAsync(request);
             string page = await response.Content.ReadAsStringAsync();
-            return ParseStudentInfo(page, signedInUser);
+            return ParseStudentInfo(page, signInContext.SignedInUser!);
         }
 
         private StudentInfo? ParseStudentInfo(string page, string studentId)

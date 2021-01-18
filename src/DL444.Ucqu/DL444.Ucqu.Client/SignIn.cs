@@ -18,7 +18,7 @@ namespace DL444.Ucqu.Client
         /// <param name="username">The username.</param>
         /// <param name="passwordHash">The hashed password.</param>
         /// <returns>Sign in result.</returns>
-        public async Task<SignInResult> SignInAsync(string username, string passwordHash)
+        public async Task<SignInContext> SignInAsync(string username, string passwordHash)
         {
             string sessionId = GetRandomSessionId();
             HttpRequestMessage initRequest = new HttpRequestMessage(HttpMethod.Get, "_data/index_login.aspx").AddSessionCookie(sessionId);
@@ -55,17 +55,15 @@ namespace DL444.Ucqu.Client
             responseString = await response.Content.ReadAsStringAsync();
             if (responseString.Contains("您尚未报到注册成功，请到学院咨询并办理相关手续！", StringComparison.Ordinal))
             {
-                return SignInResult.NotRegistered;
+                return new SignInContext(SignInResult.NotRegistered, null, null);
             }
             else if (responseString.Contains("账号或密码不正确！请重新输入", StringComparison.Ordinal))
             {
-                return SignInResult.InvalidCredentials;
+                return new SignInContext(SignInResult.InvalidCredentials, null, null);
             }
             else
             {
-                this.sessionId = sessionId;
-                signedInUser = username;
-                return SignInResult.Success;
+                return new SignInContext(SignInResult.Success, sessionId, username);
             }
         }
 
@@ -97,8 +95,5 @@ namespace DL444.Ucqu.Client
             }
             return match.FirstGroupValue();
         }
-
-        private string sessionId = string.Empty;
-        private string signedInUser = string.Empty;
     }
 }

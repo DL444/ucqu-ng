@@ -9,13 +9,13 @@ namespace DL444.Ucqu.Client
 {
     public partial class UcquClient
     {
-        public async Task<Schedule?> GetScheduleAsync(int beginningYear, int term)
+        public async Task<Schedule?> GetScheduleAsync(SignInContext signInContext, int beginningYear, int term)
         {
-            if (string.IsNullOrEmpty(signedInUser))
+            if (!signInContext.IsValid)
             {
                 throw new InvalidOperationException("Currently not signed in.");
             }
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "znpk/Pri_StuSel_rpt.aspx").AddSessionCookie(sessionId);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "znpk/Pri_StuSel_rpt.aspx").AddSessionCookie(signInContext.SessionId!);
             Dictionary<string, string> content = new Dictionary<string, string>()
             {
                 { "Sel_XNXQ", $"{beginningYear}{term}" },
@@ -25,10 +25,10 @@ namespace DL444.Ucqu.Client
             request.Content = new FormUrlEncodedContent((IEnumerable<KeyValuePair<string?, string?>>)content);
             HttpResponseMessage response = await httpClient.SendAsync(request);
             string page = await response.Content.ReadAsStringAsync();
-            return ParseSchedule(page);
+            return ParseSchedule(page, signInContext.SignedInUser!);
         }
 
-        private Schedule? ParseSchedule(string page)
+        private Schedule? ParseSchedule(string page, string signedInUser)
         {
             if (string.IsNullOrWhiteSpace(page))
             {

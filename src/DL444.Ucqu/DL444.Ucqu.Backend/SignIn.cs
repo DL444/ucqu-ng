@@ -41,17 +41,17 @@ namespace DL444.Ucqu.Backend
                 return new BadRequestResult();
             }
 
-            Models.SignInResult signInResult;
+            SignInContext signInContext;
             try
             {
-                signInResult = await client.SignInAsync(credential.StudentId, credential.PasswordHash);
+                signInContext = await client.SignInAsync(credential.StudentId, credential.PasswordHash);
             }
             catch (Exception ex)
             {
                 log.LogError(ex, "Exception encountered while signing in to upstream server.");
                 return await HandleUpstreamFailoverAsync(credential, locService.GetString("UpstreamErrorShowCached"), locService.GetString("UpstreamErrorCannotSignIn"), log);
             }
-            if (signInResult == Models.SignInResult.Success)
+            if (signInContext.Result == Client.SignInResult.Success)
             {
                 DataAccessResult credentialUpdateResult = await dataService.SetCredentialAsync(credential);
                 if (!credentialUpdateResult.Success)
@@ -61,15 +61,15 @@ namespace DL444.Ucqu.Backend
                 string token = tokenService.CreateToken(credential.StudentId);
                 return new OkObjectResult(new BackendResult<AccessToken>(new AccessToken(token)));
             }
-            else if (signInResult == Models.SignInResult.InvalidCredentials)
+            else if (signInContext.Result == Client.SignInResult.InvalidCredentials)
             {
                 return new UnauthorizedResult();
             }
             else
             {
-                if (signInResult != Models.SignInResult.NotRegistered)
+                if (signInContext.Result != Client.SignInResult.NotRegistered)
                 {
-                    log.LogError("Unexpected sign in result from client. Got {signInResult}", signInResult.ToString());
+                    log.LogError("Unexpected sign in result from client. Got {signInResult}", signInContext.ToString());
                 }
                 return await HandleUpstreamFailoverAsync(credential, locService.GetString("UpstreamUnregisteredShowCached"), locService.GetString("UpstreamErrorCannotSignIn"), log);
             }

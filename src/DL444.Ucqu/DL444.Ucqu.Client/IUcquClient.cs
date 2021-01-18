@@ -5,10 +5,10 @@ namespace DL444.Ucqu.Client
 {
     public interface IUcquClient
     {
-        Task<SignInResult> SignInAsync(string username, string passwordHash);
-        Task<StudentInfo?> GetStudentInfoAsync();
-        Task<ScoreSet?> GetScoreAsync(bool isSecondMajor);
-        Task<Schedule?> GetScheduleAsync(int beginningYear, int term);
-        Task<ExamSchedule?> GetExamScheduleAsync(int beginningYear, int term);
+        Task<SignInContext> SignInAsync(string username, string passwordHash);
+        Task<StudentInfo?> GetStudentInfoAsync(SignInContext signInContext);
+        Task<ScoreSet?> GetScoreAsync(SignInContext signInContext, bool isSecondMajor);
+        Task<Schedule?> GetScheduleAsync(SignInContext signInContext, int beginningYear, int term);
+        Task<ExamSchedule?> GetExamScheduleAsync(SignInContext signInContext, int beginningYear, int term);
     }
 }

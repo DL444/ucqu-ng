@@ -9,13 +9,13 @@ namespace DL444.Ucqu.Client
 {
     public partial class UcquClient
     {
-        public async Task<ExamSchedule?> GetExamScheduleAsync(int beginningYear, int term)
+        public async Task<ExamSchedule?> GetExamScheduleAsync(SignInContext signInContext, int beginningYear, int term)
         {
-            if (string.IsNullOrEmpty(signedInUser))
+            if (!signInContext.IsValid)
             {
                 throw new InvalidOperationException("Currently not signed in.");
             }
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "KSSW/stu_ksap_rpt.aspx").AddSessionCookie(sessionId);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "KSSW/stu_ksap_rpt.aspx").AddSessionCookie(signInContext.SessionId!);
             Dictionary<string, string> content = new Dictionary<string, string>()
             {
                 { "sel_xnxq", $"{beginningYear}{term}" }
@@ -23,10 +23,10 @@ namespace DL444.Ucqu.Client
             request.Content = new FormUrlEncodedContent((IEnumerable<KeyValuePair<string?, string?>>)content);
             HttpResponseMessage response = await httpClient.SendAsync(request);
             string page = await response.Content.ReadAsStringAsync();
-            return ParseExams(page);
+            return ParseExams(page, signInContext.SignedInUser!);
         }
 
-        private ExamSchedule? ParseExams(string page)
+        private ExamSchedule? ParseExams(string page, string signedInUser)
         {
             if (string.IsNullOrEmpty(page))
             {

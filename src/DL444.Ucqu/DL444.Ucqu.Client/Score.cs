@@ -15,13 +15,14 @@ namespace DL444.Ucqu.Client
         /// <param name="isSecondMajor">Whether to get major or second major scores.</param>
         /// <returns>User's scores.</returns>
         /// <exception cref="FormatException">Thrown when page responsed by server cannot be correctly parsed.</exception>
-        public async Task<ScoreSet?> GetScoreAsync(bool isSecondMajor)
+        public async Task<ScoreSet?> GetScoreAsync(SignInContext signInContext, bool isSecondMajor)
         {
-            if (string.IsNullOrEmpty(signedInUser))
+            if (!signInContext.IsValid)
             {
                 throw new InvalidOperationException("Currently not signed in.");
             }
-            var request = new HttpRequestMessage(HttpMethod.Post, "XSCJ/f_xsgrcj_rpt.aspx").AddSessionCookie(sessionId);
+            var request = new HttpRequestMessage(HttpMethod.Post, "XSCJ/f_xsgrcj_rpt.aspx").AddSessionCookie(signInContext.SessionId!);
+            string signedInUser = signInContext.SignedInUser!;
             Dictionary<string, string> content = new Dictionary<string, string>()
             {
                 { "SJ", "0" },
@@ -34,10 +35,10 @@ namespace DL444.Ucqu.Client
             request.Content = new FormUrlEncodedContent((IEnumerable<KeyValuePair<string?, string?>>)content);
             HttpResponseMessage response = await httpClient.SendAsync(request);
             string page = await response.Content.ReadAsStringAsync();
-            return ParsePage(page, isSecondMajor);
+            return ParsePage(page, isSecondMajor, signedInUser);
         }
 
-        private ScoreSet? ParsePage(string page, bool isSecondMajor)
+        private ScoreSet? ParsePage(string page, bool isSecondMajor, string signedInUser)
         {
             if (string.IsNullOrWhiteSpace(page))
             {
