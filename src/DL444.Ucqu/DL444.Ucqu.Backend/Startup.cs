@@ -63,8 +63,9 @@ namespace DL444.Ucqu.Backend
                 services => new DataAccessService(services.GetService<CosmosClient>(), databaseId, containerId, services.GetService<ICredentialEncryptionService>())
             );
 
-            IConfigurationSection localizationSection = config.GetSection("Localization");
-            builder.Services.AddSingleton<ILocalizationService>(new LocalizationService(localizationSection));
+            builder.Services.AddSingleton((ILocalizationService)new LocalizationService(config.GetSection("Localization")));
+
+            builder.Services.AddSingleton((IWellknownDataService)new WellKnownDataService(config));
         }
 
         public void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)
@@ -73,6 +74,7 @@ namespace DL444.Ucqu.Backend
             builder.ConfigurationBuilder
                 .AddJsonFile(System.IO.Path.Combine(context.ApplicationRootPath, "local.settings.json"), true)
                 .AddJsonFile(System.IO.Path.Combine(context.ApplicationRootPath, "localization.json"))
+                .AddJsonFile(System.IO.Path.Combine(context.ApplicationRootPath, "wellknown.json"))
                 .AddEnvironmentVariables()
                 .Build();
         }
