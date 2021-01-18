@@ -11,6 +11,12 @@ namespace DL444.Ucqu.Backend.Services
         Task<DataAccessResult<UserInitializeStatus>> GetUserInitializeStatusAsync(string id);
         Task<DataAccessResult> SetUserInitializeStatusAsync(UserInitializeStatus status);
         Task<DataAccessResult> PurgeUserInitializeStatusAsync();
+        Task<DataAccessResult<StudentInfo>> GetStudentInfoAsync(string username);
+        Task<DataAccessResult> SetStudentInfoAsync(StudentInfo info);
+        Task<DataAccessResult<Schedule>> GetScheduleAsync(string username);
+        Task<DataAccessResult> SetScheduleAsync(Schedule schedule);
+        Task<DataAccessResult<ExamSchedule>> GetExamsAsync(string username);
+        Task<DataAccessResult> SetExamsAsync(ExamSchedule exams);
         Task<DataAccessResult<ScoreSet>> GetScoreAsync(string username, bool isSecondMajor);
         Task<DataAccessResult> SetScoreAsync(ScoreSet scoreSet);
     }
@@ -74,6 +80,15 @@ namespace DL444.Ucqu.Backend.Services
             }
             return new DataAccessResult(!hasError, 0);
         }
+
+        public async Task<DataAccessResult<StudentInfo>> GetStudentInfoAsync(string username) => await GetResource<StudentInfo>($"Student-{username}", username);
+        public async Task<DataAccessResult> SetStudentInfoAsync(StudentInfo info) => await SetResource(info);
+
+        public async Task<DataAccessResult<Schedule>> GetScheduleAsync(string username) => await GetResource<Schedule>($"Schedule-{username}", username);
+        public async Task<DataAccessResult> SetScheduleAsync(Schedule schedule) => await SetResource(schedule);
+
+        public async Task<DataAccessResult<ExamSchedule>> GetExamsAsync(string username) => await GetResource<ExamSchedule>($"Exams-{username}", username);
+        public async Task<DataAccessResult> SetExamsAsync(ExamSchedule exams) => await SetResource(exams);
 
         public async Task<DataAccessResult<ScoreSet>> GetScoreAsync(string username, bool isSecondMajor)
             => await GetResource<ScoreSet>($"Score-{username}-{(isSecondMajor ? "S" : "M")}", username);

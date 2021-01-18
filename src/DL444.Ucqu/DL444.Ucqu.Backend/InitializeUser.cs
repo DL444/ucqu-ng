@@ -12,11 +12,12 @@ namespace DL444.Ucqu.Backend
 {
     public class InitializeUser
     {
-        public InitializeUser(IUcquClient client, IDataAccessService dataService, IConfiguration config)
+        public InitializeUser(IUcquClient client, IDataAccessService dataService, IConfiguration config, IWellknownDataService wellknownData)
         {
             this.client = client;
             this.dataService = dataService;
             serviceBaseAddress = config.GetValue<string>("Host:ServiceBaseAddress");
+            currentTerm = wellknownData.CurrentTerm;
         }
 
         [FunctionName("InitializeUser")]
@@ -25,9 +26,40 @@ namespace DL444.Ucqu.Backend
             // Avoid concurrent requests to upstream server to reduce risks of IP ban.
             SignInContext signInContext = command.SignInContext;
             List<Task<DataAccessResult>> updateTasks = new List<Task<DataAccessResult>>(5);
+            
             try
             {
-                ScoreSet? majorScore = await client.GetScoreAsync(signInContext, false);
+                StudentInfo studentInfo = await client.GetStudentInfoAsync(signInContext);
+                updateTasks.Add(dataService.SetStudentInfoAsync(studentInfo));
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, "Exception occured when initializing user. Step: Fetch user info. User {user}", signInContext.SignedInUser);
+            }
+
+            try
+            {
+                Schedule schedule = await client.GetScheduleAsync(signInContext, currentTerm);
+                updateTasks.Add(dataService.SetScheduleAsync(schedule));
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, "Exception occured when initializing user. Step: Fetch schedule. User {user}", signInContext.SignedInUser);
+            }
+
+            try
+            {
+                ExamSchedule exams = await client.GetExamScheduleAsync(signInContext, currentTerm);
+                updateTasks.Add(dataService.SetExamsAsync(exams));
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, "Exception occured when initializing user. Step: Fetch exams. User {user}", signInContext.SignedInUser);
+            }
+
+            try
+            {
+                ScoreSet majorScore = await client.GetScoreAsync(signInContext, false);
                 updateTasks.Add(dataService.SetScoreAsync(majorScore));
             }
             catch (Exception ex)
@@ -37,15 +69,13 @@ namespace DL444.Ucqu.Backend
 
             try
             {
-                ScoreSet? secondMajorScore = await client.GetScoreAsync(signInContext, true);
+                ScoreSet secondMajorScore = await client.GetScoreAsync(signInContext, true);
                 updateTasks.Add(dataService.SetScoreAsync(secondMajorScore));
             }
             catch (Exception ex)
             {
                 log.LogError(ex, "Exception occured when initializing user. Step: Fetch second major score. User {user}", signInContext.SignedInUser);
             }
-
-            // TODO: Fetch student info, schedule, exams here.
 
             try
             {
@@ -55,6 +85,7 @@ namespace DL444.Ucqu.Backend
             {
                 log.LogError(ex, "Exception occured when initializing user. Step: Database update. User {user}", signInContext.SignedInUser);
             }
+
             UserInitializeStatus newStatus = new UserInitializeStatus(command.StatusId, true, null);
             DataAccessResult statusUpdateResult = await dataService.SetUserInitializeStatusAsync(newStatus);
             if (!statusUpdateResult.Success)
@@ -66,5 +97,6 @@ namespace DL444.Ucqu.Backend
         private IUcquClient client;
         private IDataAccessService dataService;
         private string serviceBaseAddress;
+        private string currentTerm;
     }
 }
