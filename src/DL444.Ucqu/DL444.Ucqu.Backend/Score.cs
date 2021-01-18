@@ -77,17 +77,31 @@ namespace DL444.Ucqu.Backend
                     try
                     {
                         SignInContext signInContext = await client.SignInAsync(credentialResult.Resource.StudentId, credentialResult.Resource.PasswordHash);
-                        ScoreSet scoreSet = await client.GetScoreAsync(signInContext, isSecondMajor);
-                        if (scoreSet.Terms.Count > 0)
+                        if (signInContext.Result == Client.SignInResult.InvalidCredentials)
                         {
-                            // Be conservative here, since we do not have access to the old to see if the score could actually be empty.
-                            DataAccessResult scoreUpdateResult = await dataService.SetScoreAsync(scoreSet);
-                            if (!scoreUpdateResult.Success)
-                            {
-                                log.LogError("Unable to update score store. Status {statusCode}", scoreUpdateResult.StatusCode);
-                            }
+                            // Cached credential is outdated.
+                            return new UnauthorizedResult();
                         }
-                        return new OkObjectResult(new BackendResult<ScoreSet>(true, scoreSet, null));
+                        else if (signInContext.Result == Client.SignInResult.NotRegistered)
+                        {
+                            // Upstream service is not accessible.
+                            return new OkObjectResult(new BackendResult<ScoreSet>(false, null, locService.GetString("UpstreamUnregisteredCannotFetch")));
+                        }
+                        else
+                        {
+                            // Upstream OK.
+                            ScoreSet scoreSet = await client.GetScoreAsync(signInContext, isSecondMajor);
+                            if (scoreSet.Terms.Count > 0)
+                            {
+                                // Be conservative here, since we do not have access to the old to see if the score could actually be empty.
+                                DataAccessResult scoreUpdateResult = await dataService.SetScoreAsync(scoreSet);
+                                if (!scoreUpdateResult.Success)
+                                {
+                                    log.LogError("Unable to update score store. Status {statusCode}", scoreUpdateResult.StatusCode);
+                                }
+                            }
+                            return new OkObjectResult(new BackendResult<ScoreSet>(true, scoreSet, null));
+                        }
                     }
                     catch (Exception ex)
                     {
