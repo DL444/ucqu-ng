@@ -9,7 +9,7 @@ namespace DL444.Ucqu.Client
 {
     public partial class UcquClient
     {
-        public async Task<ExamSchedule?> GetExamScheduleAsync(SignInContext signInContext, int beginningYear, int term)
+        public async Task<ExamSchedule> GetExamScheduleAsync(SignInContext signInContext, int beginningYear, int term)
         {
             if (!signInContext.IsValid)
             {
@@ -26,11 +26,11 @@ namespace DL444.Ucqu.Client
             return ParseExams(page, signInContext.SignedInUser!);
         }
 
-        private ExamSchedule? ParseExams(string page, string signedInUser)
+        private ExamSchedule ParseExams(string page, string signedInUser)
         {
             if (string.IsNullOrEmpty(page))
             {
-                return null;
+                throw new FormatException("Page is empty.");
             }
             ExamSchedule examSchedule = new ExamSchedule(signedInUser);
             Regex trRegex = new Regex("<tr class=.>.*?</tr>", RegexOptions.CultureInvariant);

@@ -15,7 +15,7 @@ namespace DL444.Ucqu.Client
         /// <param name="isSecondMajor">Whether to get major or second major scores.</param>
         /// <returns>User's scores.</returns>
         /// <exception cref="FormatException">Thrown when page responsed by server cannot be correctly parsed.</exception>
-        public async Task<ScoreSet?> GetScoreAsync(SignInContext signInContext, bool isSecondMajor)
+        public async Task<ScoreSet> GetScoreAsync(SignInContext signInContext, bool isSecondMajor)
         {
             if (!signInContext.IsValid)
             {
@@ -38,23 +38,24 @@ namespace DL444.Ucqu.Client
             return ParsePage(page, isSecondMajor, signedInUser);
         }
 
-        private ScoreSet? ParsePage(string page, bool isSecondMajor, string signedInUser)
+        private ScoreSet ParsePage(string page, bool isSecondMajor, string signedInUser)
         {
             if (string.IsNullOrWhiteSpace(page))
             {
-                return null;
+                throw new FormatException("Page is empty.");
             }
             string studentId = GetScorePageProperty(page, "学号", "&") ?? signedInUser;
             string? name = GetScorePageProperty(page, "姓名", "&");
             if (name == null)
             {
-                return null;
+                return new ScoreSet(signedInUser)
+                {
+                    IsSecondMajor = isSecondMajor
+                };
             }
             _ = int.TryParse(GetScorePageProperty(page, "年级", "&"), out int admissionYear);
-            ScoreSet set = new ScoreSet(studentId, name, admissionYear)
+            ScoreSet set = new ScoreSet(studentId)
             {
-                Major = GetScorePageProperty(page, "专业", "&"),
-                ManagementClass = GetScorePageProperty(page, "行政班级", "<"),
                 IsSecondMajor = isSecondMajor,
                 Terms = GetTerms(page)
             };

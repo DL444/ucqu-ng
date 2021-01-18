@@ -9,7 +9,7 @@ namespace DL444.Ucqu.Client
 {
     public partial class UcquClient
     {
-        public async Task<Schedule?> GetScheduleAsync(SignInContext signInContext, int beginningYear, int term)
+        public async Task<Schedule> GetScheduleAsync(SignInContext signInContext, int beginningYear, int term)
         {
             if (!signInContext.IsValid)
             {
@@ -28,11 +28,11 @@ namespace DL444.Ucqu.Client
             return ParseSchedule(page, signInContext.SignedInUser!);
         }
 
-        private Schedule? ParseSchedule(string page, string signedInUser)
+        private Schedule ParseSchedule(string page, string signedInUser)
         {
             if (string.IsNullOrWhiteSpace(page))
             {
-                return null;
+                throw new FormatException("Page is empty.");
             }
             int peTable = -1;
             int expTable = -1;

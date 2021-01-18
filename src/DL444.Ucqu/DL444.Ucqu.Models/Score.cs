@@ -6,11 +6,9 @@ namespace DL444.Ucqu.Models
 {
     public class ScoreSet : ICosmosResource
     {
-        public ScoreSet(string studentId, string name, int admissionYear)
+        public ScoreSet(string studentId)
         {
             StudentId = studentId;
-            Name = name;
-            AdmissionYear = admissionYear;
         }
 
         [JsonIgnore]
@@ -20,10 +18,6 @@ namespace DL444.Ucqu.Models
         public RecordStatus RecordStatus { get; set; }
 
         public string StudentId { get; set; }
-        public string Name { get; set; }
-        public int AdmissionYear { get; set; }
-        public string? Major { get; set; }
-        public string? ManagementClass { get; set; }
         public bool IsSecondMajor { get; set; }
         public List<Term> Terms { get; set; } = new List<Term>();
 

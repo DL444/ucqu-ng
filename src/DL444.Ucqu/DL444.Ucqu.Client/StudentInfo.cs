@@ -8,7 +8,7 @@ namespace DL444.Ucqu.Client
 {
     public partial class UcquClient
     {
-        public async Task<StudentInfo?> GetStudentInfoAsync(SignInContext signInContext)
+        public async Task<StudentInfo> GetStudentInfoAsync(SignInContext signInContext)
         {
             if (!signInContext.IsValid)
             {
@@ -20,11 +20,11 @@ namespace DL444.Ucqu.Client
             return ParseStudentInfo(page, signInContext.SignedInUser!);
         }
 
-        private StudentInfo? ParseStudentInfo(string page, string studentId)
+        private StudentInfo ParseStudentInfo(string page, string studentId)
         {
             if (string.IsNullOrWhiteSpace(page))
             {
-                return null;
+                throw new FormatException("Page is empty.");
             }
             Regex nameRegex = new Regex("姓.*?名</td>.*?>(.*?)<br>");
             Regex classRegex = new Regex("行政班级</td>.*?>(\\d*)(\\D*)(\\d*)<br>");
