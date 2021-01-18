@@ -5,7 +5,10 @@
             "zh-CN": {
                 "UpstreamErrorCannotSignIn": "教务系统存在问题，暂时无法登录",
                 "UpstreamErrorShowCached": "教务系统存在问题，将展示缓存信息",
-                "UpstreamUnregisteredShowCached": "教务系统暂未开放，将展示缓存信息"
+                "UpstreamUnregisteredShowCached": "教务系统暂未开放，将展示缓存信息",
+                "CachedDataNotUpToDate": "缓存信息，可能不是最新数据",
+                "ServiceErrorCannotFetch": "服务存在问题，暂时无法获取最新数据",
+                "UpstreamErrorCannotFetch": "教务系统存在问题，暂时无法获取最新数据"
             }
         }
     }
