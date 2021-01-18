@@ -14,11 +14,12 @@ namespace DL444.Ucqu.Backend
 {
     public class SignIn
     {
-        public SignIn(ITokenService tokenService, IUcquClient client, IDataAccessService dataService)
+        public SignIn(ITokenService tokenService, IUcquClient client, IDataAccessService dataService, ILocalizationService localizationService)
         {
             this.tokenService = tokenService;
             this.client = client;
             this.dataService = dataService;
+            this.locService = localizationService;
         }
 
         [FunctionName("SignIn")]
@@ -48,7 +49,7 @@ namespace DL444.Ucqu.Backend
             catch (Exception ex)
             {
                 log.LogError(ex, "Exception encountered while signing in to upstream server.");
-                return await HandleUpstreamFailoverAsync(credential, "教务系统存在问题，将展示缓存信息", "教务系统存在问题，暂时无法登录", log);
+                return await HandleUpstreamFailoverAsync(credential, locService.GetString("UpstreamErrorShowCached"), locService.GetString("UpstreamErrorCannotSignIn"), log);
             }
             if (signInResult == Models.SignInResult.Success)
             {
@@ -70,7 +71,7 @@ namespace DL444.Ucqu.Backend
                 {
                     log.LogError("Unexpected sign in result from client. Got {signInResult}", signInResult.ToString());
                 }
-                return await HandleUpstreamFailoverAsync(credential, "教务系统暂未开放，将展示缓存信息", "教务系统存在问题，暂时无法登录", log);
+                return await HandleUpstreamFailoverAsync(credential, locService.GetString("UpstreamUnregisteredShowCached"), locService.GetString("UpstreamErrorCannotSignIn"), log);
             }
         }
 
@@ -99,5 +100,6 @@ namespace DL444.Ucqu.Backend
         private ITokenService tokenService;
         private IUcquClient client;
         private IDataAccessService dataService;
+        private ILocalizationService locService;
     }
 }

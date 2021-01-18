@@ -62,6 +62,9 @@ namespace DL444.Ucqu.Backend
             builder.Services.AddTransient<IDataAccessService>(
                 services => new DataAccessService(services.GetService<CosmosClient>(), databaseId, containerId, services.GetService<ICredentialEncryptionService>())
             );
+
+            IConfigurationSection localizationSection = config.GetSection("Localization");
+            builder.Services.AddSingleton<ILocalizationService>(new LocalizationService(localizationSection));
         }
 
         public void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)
@@ -69,6 +72,7 @@ namespace DL444.Ucqu.Backend
             var context = builder is FunctionsConfigurationBuilder fnBuilder ? fnBuilder.Context : builder.GetContext();
             builder.ConfigurationBuilder
                 .AddJsonFile(System.IO.Path.Combine(context.ApplicationRootPath, "local.settings.json"), true)
+                .AddJsonFile(System.IO.Path.Combine(context.ApplicationRootPath, "localization.json"))
                 .AddEnvironmentVariables()
                 .Build();
         }
