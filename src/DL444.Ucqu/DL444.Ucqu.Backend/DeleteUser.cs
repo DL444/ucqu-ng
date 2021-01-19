@@ -38,6 +38,7 @@ namespace DL444.Ucqu.Backend
             }
             else
             {
+                log.LogError("Failed to delete user {user}.", username);
                 return new OkObjectResult(new BackendResult<object>(false, null, locService.GetString("ServiceErrorCannotDeleteUser")));
             }
         }
