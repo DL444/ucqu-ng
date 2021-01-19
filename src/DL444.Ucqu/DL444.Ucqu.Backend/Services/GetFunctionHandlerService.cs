@@ -12,49 +12,42 @@ namespace DL444.Ucqu.Backend.Services
         Task<IActionResult> HandleRequestAsync<T>(
             string username,
             Func<IDataAccessService, Task<DataAccessResult<T>>> databaseFetchTask,
-            Func<IUcquClient, SignInContext, Task<T>> clientFetchTask) where T : IStatusResource;
-
-        Task<IActionResult> HandleRequestAsync<T>(
-            string username,
-            Func<IDataAccessService, Task<DataAccessResult<T>>> databaseFetchTask,
             Func<IUcquClient, SignInContext, Task<T>> clientFetchTask,
-            Func<IDataAccessService, T, Task<DataAccessResult>> writeBackTask) where T : IStatusResource;
+            ILogger log) where T : IStatusResource;
 
         Task<IActionResult> HandleRequestAsync<T>(
             string username,
             Func<IDataAccessService, Task<DataAccessResult<T>>> databaseFetchTask,
             Func<IUcquClient, SignInContext, Task<T>> clientFetchTask,
             Func<IDataAccessService, T, Task<DataAccessResult>> writeBackTask,
-            Predicate<T> shouldWriteBack) where T : IStatusResource;
+            ILogger log) where T : IStatusResource;
+
+        Task<IActionResult> HandleRequestAsync<T>(
+            string username,
+            Func<IDataAccessService, Task<DataAccessResult<T>>> databaseFetchTask,
+            Func<IUcquClient, SignInContext, Task<T>> clientFetchTask,
+            Func<IDataAccessService, T, Task<DataAccessResult>> writeBackTask,
+            Predicate<T> shouldWriteBack,
+            ILogger log) where T : IStatusResource;
     }
 
     internal class GetFunctionHandlerService : IGetFunctionHandlerService
     {
-        public GetFunctionHandlerService(IUcquClient client, IDataAccessService dataService, ILocalizationService locService, ILogger log)
+        public GetFunctionHandlerService(IUcquClient client, IDataAccessService dataService, ILocalizationService locService)
         {
             this.client = client;
             this.dataService = dataService;
             this.locService = locService;
-            this.log = log;
-        }
-
-        public async Task<IActionResult> HandleRequestAsync<T>(
-            string username,
-            Func<IDataAccessService, Task<DataAccessResult<T>>> databaseFetchTask,
-            Func<IUcquClient, SignInContext, Task<T>> clientFetchTask)
-            where T : IStatusResource
-        {
-            return await HandleRequestAsync(username, databaseFetchTask, clientFetchTask, (x, y) => Task.FromResult(new DataAccessResult(true, 200)), _ => false);
         }
 
         public async Task<IActionResult> HandleRequestAsync<T>(
             string username,
             Func<IDataAccessService, Task<DataAccessResult<T>>> databaseFetchTask,
             Func<IUcquClient, SignInContext, Task<T>> clientFetchTask,
-            Func<IDataAccessService, T, Task<DataAccessResult>> writeBackTask)
+            ILogger log)
             where T : IStatusResource
         {
-            return await HandleRequestAsync(username, databaseFetchTask, clientFetchTask, writeBackTask, _ => true);
+            return await HandleRequestAsync(username, databaseFetchTask, clientFetchTask, (x, y) => Task.FromResult(new DataAccessResult(true, 200)), _ => false, log);
         }
 
         public async Task<IActionResult> HandleRequestAsync<T>(
@@ -62,7 +55,19 @@ namespace DL444.Ucqu.Backend.Services
             Func<IDataAccessService, Task<DataAccessResult<T>>> databaseFetchTask,
             Func<IUcquClient, SignInContext, Task<T>> clientFetchTask,
             Func<IDataAccessService, T, Task<DataAccessResult>> writeBackTask,
-            Predicate<T> shouldWriteBack)
+            ILogger log)
+            where T : IStatusResource
+        {
+            return await HandleRequestAsync(username, databaseFetchTask, clientFetchTask, writeBackTask, _ => true, log);
+        }
+
+        public async Task<IActionResult> HandleRequestAsync<T>(
+            string username,
+            Func<IDataAccessService, Task<DataAccessResult<T>>> databaseFetchTask,
+            Func<IUcquClient, SignInContext, Task<T>> clientFetchTask,
+            Func<IDataAccessService, T, Task<DataAccessResult>> writeBackTask,
+            Predicate<T> shouldWriteBack,
+            ILogger log)
             where T : IStatusResource
         {
             DataAccessResult<T> result = await databaseFetchTask(dataService);
@@ -149,6 +154,5 @@ namespace DL444.Ucqu.Backend.Services
         private IUcquClient client;
         private IDataAccessService dataService;
         private ILocalizationService locService;
-        private ILogger log;
     }
 }

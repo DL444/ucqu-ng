@@ -33,7 +33,8 @@ namespace DL444.Ucqu.Backend
                 dataService => dataService.GetScheduleAsync(username),
                 (client, context) => client.GetScheduleAsync(context, currentTerm),
                 (dataService, schedule) => dataService.SetScheduleAsync(schedule),
-                schedule => schedule.Weeks.Count > 0
+                schedule => schedule.Weeks.Count > 0,
+                log
             );
         }
 

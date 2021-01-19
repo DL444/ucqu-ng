@@ -35,7 +35,8 @@ namespace DL444.Ucqu.Backend
                 username,
                 dataService => dataService.GetExamsAsync(username),
                 (client, context) => client.GetExamScheduleAsync(context, currentTerm),
-                (dataService, exams) => dataService.SetExamsAsync(exams)
+                (dataService, exams) => dataService.SetExamsAsync(exams),
+                log
             );
         }
 

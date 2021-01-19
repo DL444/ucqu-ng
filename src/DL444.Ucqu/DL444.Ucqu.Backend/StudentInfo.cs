@@ -28,7 +28,8 @@ namespace DL444.Ucqu.Backend
                 username,
                 dataService => dataService.GetStudentInfoAsync(username),
                 (client, context) => client.GetStudentInfoAsync(context),
-                (dataService, info) => dataService.SetStudentInfoAsync(info)
+                (dataService, info) => dataService.SetStudentInfoAsync(info),
+                log
             );
         }
 

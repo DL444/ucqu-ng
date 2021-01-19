@@ -43,7 +43,8 @@ namespace DL444.Ucqu.Backend
                 dataService => dataService.GetScoreAsync(username, isSecondMajor),
                 (client, context) => client.GetScoreAsync(context, isSecondMajor),
                 (dataService, score) => dataService.SetScoreAsync(score),
-                score => score.Terms.Count > 0
+                score => score.Terms.Count > 0,
+                log
             );
         }
 
