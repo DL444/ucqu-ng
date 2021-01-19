@@ -8,10 +8,8 @@ namespace DL444.Ucqu.Models
     {
         public ExamSchedule(string studentId) => StudentId = studentId;
 
-        [JsonIgnore]
-        public string Id => $"Exams-{StudentId}";
-        [JsonIgnore]
-        public string PartitionKey => StudentId;
+        public string Id() => $"Exams-{StudentId}";
+        public string PartitionKey() => StudentId;
         public RecordStatus RecordStatus { get; set; }
 
         public string StudentId { get; set; }

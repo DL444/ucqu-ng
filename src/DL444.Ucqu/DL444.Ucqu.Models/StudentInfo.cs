@@ -4,10 +4,8 @@ namespace DL444.Ucqu.Models
 {
     public class StudentInfo : IStatusResource
     {
-        [JsonIgnore]
-        public string Id => $"Student-{StudentId}";
-        [JsonIgnore]
-        public string PartitionKey => StudentId;
+        public string Id() => $"Student-{StudentId}";
+        public string PartitionKey() => StudentId;
         public RecordStatus RecordStatus { get; set; }
 
         public string StudentId { get; set; } = string.Empty;

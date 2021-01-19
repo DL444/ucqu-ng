@@ -13,10 +13,8 @@ namespace DL444.Ucqu.Models
             LastUpdateTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         }
 
-        [JsonIgnore]
-        public string Id => $"UserInitStatus-{TaskId}";
-        [JsonIgnore]
-        public string PartitionKey => "UserInitStatus";
+        public string Id() => $"UserInitStatus-{TaskId}";
+        public string PartitionKey() => "UserInitStatus";
 
         public string TaskId { get; set; }
         public bool Completed { get; set; }

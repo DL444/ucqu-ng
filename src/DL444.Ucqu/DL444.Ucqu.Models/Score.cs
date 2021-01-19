@@ -11,10 +11,8 @@ namespace DL444.Ucqu.Models
             StudentId = studentId;
         }
 
-        [JsonIgnore]
-        public string Id => $"Score-{StudentId}-{(IsSecondMajor ? "S" : "M")}";
-        [JsonIgnore]
-        public string PartitionKey => StudentId;
+        public string Id() => $"Score-{StudentId}-{(IsSecondMajor ? "S" : "M")}";
+        public string PartitionKey() => StudentId;
         public RecordStatus RecordStatus { get; set; }
 
         public string StudentId { get; set; }

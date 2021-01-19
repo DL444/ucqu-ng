@@ -12,10 +12,8 @@ namespace DL444.Ucqu.Models
             PasswordHash = passwordHash;
         }
 
-        [JsonIgnore]
-        public string Id => $"Credential-{StudentId}";
-        [JsonIgnore]
-        public string PartitionKey => StudentId;
+        public string Id() => $"Credential-{StudentId}";
+        public string PartitionKey() => StudentId;
 
         public string StudentId { get; set; }
         public string PasswordHash { get; set; }
