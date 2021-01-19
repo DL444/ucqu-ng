@@ -14,6 +14,6 @@ namespace DL444.Ucqu.Models
         public string Major { get; set; } = string.Empty;
         public int Class { get; set; }
         public string? SecondMajor { get; set; }
-
+        public string? CalendarSubscriptionId { get; set; }
     }
 }

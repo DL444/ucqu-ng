@@ -77,6 +77,8 @@ namespace DL444.Ucqu.Backend
                 services.GetService<ILocalizationService>(),
                 services.GetService<ILogger>()
             ));
+
+            builder.Services.AddTransient<ICalendarService, CalendarService>();
         }
 
         public void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)

@@ -10,7 +10,7 @@ namespace DL444.Ucqu.Backend.Services
 
         string GetString(string key);
         string GetString(string key, string culture);
-        string GetString(string key, string culture, params string[] parameters);
+        string GetString(string key, string culture, params object?[] parameters);
     }
 
     internal class LocalizationService : ILocalizationService
@@ -51,7 +51,7 @@ namespace DL444.Ucqu.Backend.Services
             }
             return str;
         }
-        public string GetString(string key, string culture, params string[] parameters)
+        public string GetString(string key, string culture, params object?[] parameters)
         {
             string pattern = GetString(key, culture);
             return string.Format(pattern, parameters);

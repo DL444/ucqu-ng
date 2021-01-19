@@ -11,7 +11,11 @@
                 "UpstreamErrorCannotFetch": "教务系统存在问题，暂时无法获取最新数据",
                 "UpstreamUnregisteredCannotFetch": "教务系统暂未开放，暂时无法获取最新数据",
                 "UserInitPrepare": "正在为首次使用作准备",
-                "ServiceErrorCannotDeleteUser": "暂时无法删除帐户，请稍后重试"
+                "ServiceErrorCannotDeleteUser": "暂时无法删除帐户，请稍后重试",
+                "ServiceErrorCannotAddCalendarSub": "暂时无法更新订阅，请稍后重试",
+                "CalendarLecturer": "教师: {0}",
+                "CalendarExamEventSummary": "{0}考试",
+                "CalendarExamLocation": "{0}@{1}"
             }
         }
     }
