@@ -71,12 +71,7 @@ namespace DL444.Ucqu.Backend
 
             builder.Services.AddSingleton((IWellknownDataService)new WellKnownDataService(config));
 
-            builder.Services.AddTransient<IGetFunctionHandlerService>(services => new GetFunctionHandlerService(
-                services.GetService<IUcquClient>(),
-                services.GetService<IDataAccessService>(),
-                services.GetService<ILocalizationService>(),
-                services.GetService<ILogger>()
-            ));
+            builder.Services.AddTransient<IGetFunctionHandlerService, GetFunctionHandlerService>();
 
             builder.Services.AddTransient<ICalendarService, CalendarService>();
         }
