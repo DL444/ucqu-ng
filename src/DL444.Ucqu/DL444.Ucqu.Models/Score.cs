@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace DL444.Ucqu.Models
 {
-    public class ScoreSet : ICosmosResource
+    public class ScoreSet : IStatusResource
     {
         public ScoreSet(string studentId)
         {

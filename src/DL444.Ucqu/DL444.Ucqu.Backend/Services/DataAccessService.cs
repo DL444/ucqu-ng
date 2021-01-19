@@ -40,8 +40,8 @@ namespace DL444.Ucqu.Backend.Services
                 }
                 catch (System.Security.Cryptography.CryptographicException)
                 {
-                    // Key changed after last encryption.
-                    return new DataAccessResult<StudentCredential>(false, null, 1);
+                    // Key changed after last encryption. Equivalent to credential loss.
+                    return new DataAccessResult<StudentCredential>(false, null, 404);
                 }
             }
             return fetchResult;

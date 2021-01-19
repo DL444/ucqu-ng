@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace DL444.Ucqu.Models
 {
-    public class Schedule : ICosmosResource
+    public class Schedule : IStatusResource
     {
         public Schedule(string studentId) => StudentId = studentId;
 

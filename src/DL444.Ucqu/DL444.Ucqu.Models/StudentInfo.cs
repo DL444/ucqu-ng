@@ -2,7 +2,7 @@
 
 namespace DL444.Ucqu.Models
 {
-    public class StudentInfo : ICosmosResource
+    public class StudentInfo : IStatusResource
     {
         [JsonIgnore]
         public string Id => $"Student-{StudentId}";

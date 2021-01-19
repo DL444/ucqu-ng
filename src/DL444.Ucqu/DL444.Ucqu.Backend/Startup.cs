@@ -1,11 +1,13 @@
 using System;
 using Azure.Cosmos;
 using DL444.Ucqu.Backend.Services;
+using DL444.Ucqu.Client;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 [assembly: WebJobsStartup(typeof(DL444.Ucqu.Backend.Startup))]
 namespace DL444.Ucqu.Backend
@@ -46,7 +48,7 @@ namespace DL444.Ucqu.Backend
 
             var host = config.GetValue<string>("Upstream:Host");
             bool useTls = config.GetValue<bool>("Upstream:UseTls", false);
-            builder.Services.AddHttpClient<DL444.Ucqu.Client.IUcquClient, DL444.Ucqu.Client.UcquClient>(httpClient =>
+            builder.Services.AddHttpClient<IUcquClient, UcquClient>(httpClient =>
             {
                 httpClient.BaseAddress = new Uri($"{(useTls ? "https" : "http")}://{host}/");
             }).ConfigurePrimaryHttpMessageHandler(() => new System.Net.Http.HttpClientHandler()
@@ -66,6 +68,13 @@ namespace DL444.Ucqu.Backend
             builder.Services.AddSingleton((ILocalizationService)new LocalizationService(config.GetSection("Localization")));
 
             builder.Services.AddSingleton((IWellknownDataService)new WellKnownDataService(config));
+
+            builder.Services.AddTransient<IGetFunctionHandlerService>(services => new GetFunctionHandlerService(
+                services.GetService<IUcquClient>(),
+                services.GetService<IDataAccessService>(),
+                services.GetService<ILocalizationService>(),
+                services.GetService<ILogger>()
+            ));
         }
 
         public void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)
