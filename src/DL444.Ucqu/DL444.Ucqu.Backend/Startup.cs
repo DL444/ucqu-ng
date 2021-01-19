@@ -48,9 +48,11 @@ namespace DL444.Ucqu.Backend
 
             var host = config.GetValue<string>("Upstream:Host");
             bool useTls = config.GetValue<bool>("Upstream:UseTls", false);
+            int timeout = config.GetValue<int>("Upstream:Timeout", 30);
             builder.Services.AddHttpClient<IUcquClient, UcquClient>(httpClient =>
             {
                 httpClient.BaseAddress = new Uri($"{(useTls ? "https" : "http")}://{host}/");
+                httpClient.Timeout = TimeSpan.FromSeconds(timeout);
             }).ConfigurePrimaryHttpMessageHandler(() => new System.Net.Http.HttpClientHandler()
             {
                 UseCookies = false
