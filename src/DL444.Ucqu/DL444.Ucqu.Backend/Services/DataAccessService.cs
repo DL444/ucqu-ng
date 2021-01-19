@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Azure.Cosmos;
 using DL444.Ucqu.Models;
@@ -19,6 +21,7 @@ namespace DL444.Ucqu.Backend.Services
         Task<DataAccessResult> SetExamsAsync(ExamSchedule exams);
         Task<DataAccessResult<ScoreSet>> GetScoreAsync(string username, bool isSecondMajor);
         Task<DataAccessResult> SetScoreAsync(ScoreSet scoreSet);
+        Task<DataAccessResult> DeleteUserAsync(string username);
     }
 
     internal class DataAccessService : IDataAccessService
@@ -93,6 +96,43 @@ namespace DL444.Ucqu.Backend.Services
         public async Task<DataAccessResult<ScoreSet>> GetScoreAsync(string username, bool isSecondMajor)
             => await GetResource<ScoreSet>($"Score-{username}-{(isSecondMajor ? "S" : "M")}", username);
         public async Task<DataAccessResult> SetScoreAsync(ScoreSet scoreSet) => await SetResource(scoreSet);
+
+        public async Task<DataAccessResult> DeleteUserAsync(string username)
+        {
+            List<Task> deleteTasks = new List<Task>(6);
+            // For some reason, sharing partition key would cause a compiler error.
+            // See https://github.com/dotnet/roslyn/issues/47304
+            deleteTasks.Add(container.DeleteItemAsync<object>($"Credential-{username}", new PartitionKey(username)));
+            deleteTasks.Add(container.DeleteItemAsync<object>($"Student-{username}", new PartitionKey(username)));
+            deleteTasks.Add(container.DeleteItemAsync<object>($"Schedule-{username}", new PartitionKey(username)));
+            deleteTasks.Add(container.DeleteItemAsync<object>($"Exams-{username}", new PartitionKey(username)));
+            deleteTasks.Add(container.DeleteItemAsync<object>($"Score-{username}-M", new PartitionKey(username)));
+            deleteTasks.Add(container.DeleteItemAsync<object>($"Score-{username}-S", new PartitionKey(username)));
+            bool hasError = false;
+            try
+            {
+                await Task.WhenAll(deleteTasks);
+            }
+            catch (AggregateException aggregateException)
+            {
+                aggregateException.Handle(ex =>
+                {
+                    if (!(ex is CosmosException cosmosEx && cosmosEx.Status == 404))
+                    {
+                        hasError = true;
+                    }
+                    return true;
+                });
+            }
+            catch (CosmosException ex)
+            {
+                if (ex.Status != 404)
+                {
+                    hasError = true;
+                }
+            }
+            return hasError ? new DataAccessResult(false, -1) : DataAccessResult.Ok;
+        }
 
         private async Task<DataAccessResult<T>> GetResource<T>(string id, string partitionKey) where T : ICosmosResource
         {

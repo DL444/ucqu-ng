@@ -10,7 +10,8 @@
                 "ServiceErrorCannotFetch": "服务存在问题，暂时无法获取最新数据",
                 "UpstreamErrorCannotFetch": "教务系统存在问题，暂时无法获取最新数据",
                 "UpstreamUnregisteredCannotFetch": "教务系统暂未开放，暂时无法获取最新数据",
-                "UserInitPrepare": "正在为首次使用作准备"
+                "UserInitPrepare": "正在为首次使用作准备",
+                "ServiceErrorCannotDeleteUser": "暂时无法删除帐户，请稍后重试"
             }
         }
     }
