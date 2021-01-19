@@ -10,9 +10,9 @@ using Microsoft.Extensions.Logging;
 
 namespace DL444.Ucqu.Backend
 {
-    public class InitializeUser
+    public class InitializeUserFunction
     {
-        public InitializeUser(IUcquClient client, IDataAccessService dataService, IConfiguration config, IWellknownDataService wellknownData)
+        public InitializeUserFunction(IUcquClient client, IDataAccessService dataService, IConfiguration config, IWellknownDataService wellknownData)
         {
             this.client = client;
             this.dataService = dataService;

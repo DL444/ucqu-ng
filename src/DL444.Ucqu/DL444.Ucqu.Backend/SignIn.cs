@@ -13,9 +13,9 @@ using Microsoft.Extensions.Logging;
 
 namespace DL444.Ucqu.Backend
 {
-    public class SignIn
+    public class SignInFunction
     {
-        public SignIn(ITokenService tokenService, IUcquClient client, IDataAccessService dataService, ILocalizationService localizationService, IConfiguration config)
+        public SignInFunction(ITokenService tokenService, IUcquClient client, IDataAccessService dataService, ILocalizationService localizationService, IConfiguration config)
         {
             this.tokenService = tokenService;
             this.client = client;

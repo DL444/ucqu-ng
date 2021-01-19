@@ -10,9 +10,9 @@ using Microsoft.Extensions.Logging;
 
 namespace DL444.Ucqu.Backend
 {
-    public class UserInit
+    public class UserInitFunction
     {
-        public UserInit(IDataAccessService dataService, IConfiguration config)
+        public UserInitFunction(IDataAccessService dataService, IConfiguration config)
         {
             this.dataService = dataService;
             this.serviceBaseAddress = config.GetValue<string>("Host:ServiceBaseAddress");

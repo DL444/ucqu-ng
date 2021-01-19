@@ -7,9 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace DL444.Ucqu.Backend
 {
-    public class UserInitStatusCleanup
+    public class UserInitStatusCleanupFunction
     {
-        public UserInitStatusCleanup(IDataAccessService dataService) => this.dataService = dataService;
+        public UserInitStatusCleanupFunction(IDataAccessService dataService) => this.dataService = dataService;
 
         [FunctionName("UserInitStatusCleanup")]
         public async Task Run([TimerTrigger("0 0 0 * * *")] TimerInfo timer, ILogger log)

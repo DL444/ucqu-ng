@@ -9,9 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace DL444.Ucqu.Backend
 {
-    public class Score
+    public class ScoreFunction
     {
-        public Score(IGetFunctionHandlerService getHandler) => this.getHandler = getHandler;
+        public ScoreFunction(IGetFunctionHandlerService getHandler) => this.getHandler = getHandler;
 
         [FunctionName("Score")]
         public async Task<IActionResult> Run(
