@@ -21,7 +21,7 @@ namespace DL444.Ucqu.Backend
         }
 
         [FunctionName("InitializeUser")]
-        public async Task Run([QueueTrigger("user-init-queue", Connection = "Storage:ConnectionString")] Models.UserInitializeCommand command, ILogger log)
+        public async Task Run([QueueTrigger("user-init-queue", Connection = "AzureWebJobsStorage")] Models.UserInitializeCommand command, ILogger log)
         {
             // Avoid concurrent requests to upstream server to reduce risks of IP ban.
             SignInContext signInContext = command.SignInContext;

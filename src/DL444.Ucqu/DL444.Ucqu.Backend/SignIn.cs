@@ -27,7 +27,7 @@ namespace DL444.Ucqu.Backend
         [FunctionName("SignIn")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
-            [Queue("user-init-queue", Connection = "Storage:ConnectionString")] IAsyncCollector<Models.UserInitializeCommand> userInitCommandCollector,
+            [Queue("user-init-queue", Connection = "AzureWebJobsStorage")] IAsyncCollector<Models.UserInitializeCommand> userInitCommandCollector,
             ILogger log)
         {
             StudentCredential? credential = null;
