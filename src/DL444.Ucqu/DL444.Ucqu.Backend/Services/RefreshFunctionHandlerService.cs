@@ -16,7 +16,7 @@ namespace DL444.Ucqu.Backend.Services
             Func<IUcquClient, SignInContext, Task<T>> clientFetchTask,
             Func<IDataAccessService, T, Task<DataAccessResult>> updateTask,
             Func<T?, T, bool> shouldUpdate,
-            Func<T?, T, Task> updateCompleteCallback,
+            Func<T?, T, Task>? updateCompleteCallback,
             ILogger log) where T : IStatusResource;
 
         Task<List<string>?> GetUsersAsync(ILogger log);
@@ -36,7 +36,7 @@ namespace DL444.Ucqu.Backend.Services
             Func<IUcquClient, SignInContext, Task<T>> clientFetchTask,
             Func<IDataAccessService, T, Task<DataAccessResult>> updateTask,
             Func<T?, T, bool> shouldUpdate,
-            Func<T?, T, Task> updateCompleteCallback,
+            Func<T?, T, Task>? updateCompleteCallback,
             ILogger log)
             where T : IStatusResource
         {
@@ -126,13 +126,16 @@ namespace DL444.Ucqu.Backend.Services
                 DataAccessResult updateResult = await updateTask(dataService, newResource);
                 if (updateResult.Success)
                 {
-                    try
+                    if (updateCompleteCallback != null)
                     {
-                        await updateCompleteCallback(oldResource, newResource);
-                    }
-                    catch (Exception ex)
-                    {
-                        log.LogWarning(ex, "Update completion callback ran into an error.");
+                        try
+                        {
+                            await updateCompleteCallback(oldResource, newResource);
+                        }
+                        catch (Exception ex)
+                        {
+                            log.LogWarning(ex, "Update completion callback ran into an error.");
+                        }
                     }
                 }
                 else
