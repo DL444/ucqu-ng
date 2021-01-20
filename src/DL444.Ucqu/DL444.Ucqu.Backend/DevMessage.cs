@@ -16,14 +16,40 @@ namespace DL444.Ucqu.Backend
 
         [FunctionName("DevMessage")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "DevMessage/{platform}")] HttpRequest req,
+            string platform,
             ILogger log)
         {
+            TargetPlatforms selectedPlatform;
+            switch (platform.ToUpperInvariant())
+            {
+                case "ANDROID":
+                    selectedPlatform = TargetPlatforms.Android;
+                    break;
+                case "APPLEDESKTOP":
+                case "MACOS":
+                case "OSX":
+                    selectedPlatform = TargetPlatforms.AppleDesktop;
+                    break;
+                case "APPLEMOBILE":
+                case "IOS":
+                case "IPADOS":
+                    selectedPlatform = TargetPlatforms.AppleMobile;
+                    break;
+                case "WEB":
+                    selectedPlatform = TargetPlatforms.Web;
+                    break;
+                case "WINDOWS":
+                    selectedPlatform = TargetPlatforms.Windows;
+                    break;
+                default:
+                    return new BadRequestResult();
+            }
             DataAccessResult<DeveloperMessage> messageFetchResult = await dataService.GetDeveloperMessageAsync();
             if (messageFetchResult.Success)
             {
                 DeveloperMessage message = messageFetchResult.Resource;
-                message.Messages.RemoveAll(x => x.Archived);
+                message.Messages.RemoveAll(x => x.Archived || (x.TargetPlatforms & selectedPlatform) == 0);
                 return new OkObjectResult(new BackendResult<DeveloperMessage>(message));
             }
             else
