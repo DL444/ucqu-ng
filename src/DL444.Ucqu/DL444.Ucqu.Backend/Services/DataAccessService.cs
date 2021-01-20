@@ -24,6 +24,7 @@ namespace DL444.Ucqu.Backend.Services
         Task<DataAccessResult<ScoreSet>> GetScoreAsync(string username, bool isSecondMajor);
         Task<DataAccessResult> SetScoreAsync(ScoreSet scoreSet);
         Task<DataAccessResult> DeleteUserAsync(string username);
+        Task<DataAccessResult<DeveloperMessage>> GetDeveloperMessageAsync();
     }
 
     internal class DataAccessService : IDataAccessService
@@ -162,6 +163,8 @@ namespace DL444.Ucqu.Backend.Services
             }
             return hasError ? new DataAccessResult(false, -1) : DataAccessResult.Ok;
         }
+
+        public async Task<DataAccessResult<DeveloperMessage>> GetDeveloperMessageAsync() => await GetResource<DeveloperMessage>("DevMessage", "DevMessage");
 
         private async Task<DataAccessResult<T>> GetResource<T>(string id, string partitionKey) where T : ICosmosResource
         {
