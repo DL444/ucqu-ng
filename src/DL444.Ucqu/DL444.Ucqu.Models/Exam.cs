@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace DL444.Ucqu.Models
 {
-    public class ExamSchedule : IStatusResource
+    public class ExamSchedule : IStatusResource, ICosmosResource
     {
         public ExamSchedule(string studentId) => StudentId = studentId;
 

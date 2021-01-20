@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace DL444.Ucqu.Models
 {
-    public class ScoreSet : IStatusResource
+    public class ScoreSet : IStatusResource, ICosmosResource
     {
         public ScoreSet(string studentId)
         {

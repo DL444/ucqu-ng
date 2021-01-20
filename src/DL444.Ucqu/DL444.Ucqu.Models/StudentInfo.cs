@@ -2,7 +2,7 @@
 
 namespace DL444.Ucqu.Models
 {
-    public class StudentInfo : IStatusResource
+    public class StudentInfo : IStatusResource, ICosmosResource
     {
         public string Id() => $"Student-{StudentId}";
         public string PartitionKey() => StudentId;

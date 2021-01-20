@@ -19,8 +19,8 @@ namespace DL444.Ucqu.Models
         string PartitionKey();
     }
 
-    public interface IStatusResource : ICosmosResource
+    public interface IStatusResource
     {
-        RecordStatus RecordStatus { get; }
+        RecordStatus RecordStatus { get; set; }
     }
 }
