@@ -27,9 +27,9 @@ namespace DL444.Ucqu.Backend
 
         [FunctionName("SignIn")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "signIn/{createAccount?}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "signIn/{createAccount:bool}")] HttpRequest req,
             [Queue("user-init-queue", Connection = "AzureWebJobsStorage")] IAsyncCollector<Models.UserInitializeCommand> userInitCommandCollector,
-            string? createAccount,
+            bool createAccount,
             ILogger log)
         {
             StudentCredential? credential = null;
@@ -68,7 +68,7 @@ namespace DL444.Ucqu.Backend
                 else if (credentialFetchResult.StatusCode == 404)
                 {
                     // User does not previously exist.
-                    if (createAccount != null && createAccount.Equals("CREATEACCOUNT", StringComparison.OrdinalIgnoreCase))
+                    if (createAccount)
                     {
                         shouldUpdateCredential = true;
                         initUserTask = StartInitializeUserAsync(signInContext, userInitCommandCollector, log);

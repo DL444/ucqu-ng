@@ -15,8 +15,8 @@ namespace DL444.Ucqu.Backend
 
         [FunctionName("Score")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Score/{secondMajor:int?}")] HttpRequest req,
-            int? secondMajor,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Score/{secondMajor:int}")] HttpRequest req,
+            int secondMajor,
             [UserIdentity] string? username,
             ILogger log)
         {
@@ -25,7 +25,7 @@ namespace DL444.Ucqu.Backend
                 return new UnauthorizedResult();
             }
             bool isSecondMajor;
-            if (secondMajor == null || secondMajor == 0 || secondMajor == 1)
+            if (secondMajor == 0 || secondMajor == 1)
             {
                 isSecondMajor = false;
             }
