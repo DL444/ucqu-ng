@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using DL444.Ucqu.Backend.Models;
 using DL444.Ucqu.Backend.Services;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Azure.Cosmos;
+using DL444.Ucqu.Backend.Models;
 using DL444.Ucqu.Models;
 
 namespace DL444.Ucqu.Backend.Services

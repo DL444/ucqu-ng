@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace DL444.Ucqu.Backend.Services
+namespace DL444.Ucqu.Backend.Models
 {
     public struct DataAccessResult
     {

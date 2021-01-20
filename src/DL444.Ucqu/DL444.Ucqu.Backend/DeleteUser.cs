@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using DL444.Ucqu.Backend.Bindings;
 using DL444.Ucqu.Backend.Services;
 using DL444.Ucqu.Models;
+using DL444.Ucqu.Backend.Models;
 
 namespace DL444.Ucqu.Backend
 {
