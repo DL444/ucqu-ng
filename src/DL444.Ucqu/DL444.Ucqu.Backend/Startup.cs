@@ -73,6 +73,8 @@ namespace DL444.Ucqu.Backend
 
             builder.Services.AddTransient<IGetFunctionHandlerService, GetFunctionHandlerService>();
 
+            builder.Services.AddTransient<IRefreshFunctionHandlerService, RefreshFunctionHandlerService>();
+
             builder.Services.AddTransient<ICalendarService, CalendarService>();
         }
 

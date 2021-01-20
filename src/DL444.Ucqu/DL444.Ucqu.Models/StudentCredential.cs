@@ -1,6 +1,5 @@
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json.Serialization;
 
 namespace DL444.Ucqu.Models
 {
@@ -13,7 +12,7 @@ namespace DL444.Ucqu.Models
         }
 
         public string Id() => $"Credential-{StudentId}";
-        public string PartitionKey() => StudentId;
+        public string PartitionKey() => "Credential";
 
         public string StudentId { get; set; }
         public string PasswordHash { get; set; }

@@ -8,6 +8,7 @@ namespace DL444.Ucqu.Backend.Services
 {
     public interface IDataAccessService
     {
+        Task<DataAccessResult<List<string>>> GetUsersAsync();
         Task<DataAccessResult<StudentCredential>> GetCredentialAsync(string username);
         Task<DataAccessResult> SetCredentialAsync(StudentCredential credential);
         Task<DataAccessResult<UserInitializeStatus>> GetUserInitializeStatusAsync(string id);
@@ -32,9 +33,36 @@ namespace DL444.Ucqu.Backend.Services
             this.encryptionService = encryptionService;
         }
 
+        public async Task<DataAccessResult<List<string>>> GetUsersAsync()
+        {
+            int userCount = 0;
+            QueryDefinition countQuery = new QueryDefinition("SELECT COUNT(c) AS ItemCount FROM c WHERE c.pk = \"Credential\"");
+            await foreach (Models.CountHeader header in container.GetItemQueryIterator<Models.CountHeader>(countQuery, requestOptions: new QueryRequestOptions()
+            {
+                PartitionKey = new PartitionKey("Credential")
+            }))
+            {
+                userCount = header.ItemCount;
+            }
+            if (userCount == 0)
+            {
+                return DataAccessResult<List<string>>.Ok(new List<string>());
+            }
+            var users = new List<string>(userCount);
+            QueryDefinition usersQuery = new QueryDefinition("SELECT c.Resource.StudentId FROM c WHERE c.pk = \"Credential\"");
+            await foreach (Models.StudentIdHeader header in container.GetItemQueryIterator<Models.StudentIdHeader>(usersQuery, requestOptions: new QueryRequestOptions()
+            {
+                PartitionKey = new PartitionKey("Credential")
+            }))
+            {
+                users.Add(header.StudentId);
+            }
+            return DataAccessResult<List<string>>.Ok(users);
+        }
+
         public async Task<DataAccessResult<StudentCredential>> GetCredentialAsync(string username)
         {
-            DataAccessResult<StudentCredential> fetchResult = await GetResource<StudentCredential>($"Credential-{username}", username);
+            DataAccessResult<StudentCredential> fetchResult = await GetResource<StudentCredential>($"Credential-{username}", "Credential");
             if (fetchResult.Success)
             {
                 try
@@ -60,11 +88,11 @@ namespace DL444.Ucqu.Backend.Services
         public async Task<DataAccessResult> PurgeUserInitializeStatusAsync()
         {
             long threshold = System.DateTimeOffset.UtcNow.AddMinutes(-15).ToUnixTimeMilliseconds();
-            System.Collections.Generic.List<string> ids = new System.Collections.Generic.List<string>();
+            List<string> ids = new List<string>();
             QueryDefinition query = new QueryDefinition($"SELECT c.id FROM c WHERE c.pk = \"UserInitStatus\" AND c.Resource.LastUpdateTimestamp < {threshold}");
             await foreach (Models.IdHeader header in container.GetItemQueryIterator<Models.IdHeader>(query, requestOptions: new QueryRequestOptions()
             {
-                PartitionKey = new PartitionKey("UserInitStatus"),
+                PartitionKey = new PartitionKey("UserInitStatus")
             }))
             {
                 ids.Add(header.Id);
@@ -102,7 +130,7 @@ namespace DL444.Ucqu.Backend.Services
             List<Task> deleteTasks = new List<Task>(6);
             // For some reason, sharing partition key would cause a compiler error.
             // See https://github.com/dotnet/roslyn/issues/47304
-            deleteTasks.Add(container.DeleteItemAsync<object>($"Credential-{username}", new PartitionKey(username)));
+            deleteTasks.Add(container.DeleteItemAsync<object>($"Credential-{username}", new PartitionKey("Credential")));
             deleteTasks.Add(container.DeleteItemAsync<object>($"Student-{username}", new PartitionKey(username)));
             deleteTasks.Add(container.DeleteItemAsync<object>($"Schedule-{username}", new PartitionKey(username)));
             deleteTasks.Add(container.DeleteItemAsync<object>($"Exams-{username}", new PartitionKey(username)));

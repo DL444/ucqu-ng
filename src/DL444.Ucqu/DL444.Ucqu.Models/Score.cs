@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
@@ -18,11 +18,6 @@ namespace DL444.Ucqu.Models
         public string StudentId { get; set; }
         public bool IsSecondMajor { get; set; }
         public List<Term> Terms { get; set; } = new List<Term>();
-
-        public static void Diff(ScoreSet prev, ScoreSet current)
-        {
-            // TODO: Implement.
-        }
     }
 
     public class Term
@@ -52,11 +47,6 @@ namespace DL444.Ucqu.Models
         }
 
         public List<Course> Courses { get; set; } = new List<Course>();
-
-        public static void Diff(Term prev, Term current)
-        {
-            // TODO: Implement.
-        }
     }
 
     public class Course
@@ -69,6 +59,9 @@ namespace DL444.Ucqu.Models
         public double Credit { get; set; }
         public string? Category { get; set; }
         public bool IsInitialTake { get; set; }
+        public bool IsMakeup
+            => "补考".Equals(Comment, StringComparison.Ordinal)
+            || "补考(缺考)".Equals(Comment, StringComparison.Ordinal);
         public int Score { get; set; }
         public bool IsSecondMajor { get; set; }
         public string? Comment { get; set; }
