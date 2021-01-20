@@ -115,7 +115,10 @@ namespace DL444.Ucqu.Backend.Services
                         else if (signInContext.Result == Client.SignInResult.NotRegistered)
                         {
                             // Upstream service is not accessible.
-                            return new OkObjectResult(new BackendResult<ScoreSet>(locService.GetString("UpstreamUnregisteredCannotFetch")));
+                            return new ObjectResult(new BackendResult<ScoreSet>(locService.GetString("UpstreamUnregisteredCannotFetch")))
+                            {
+                                StatusCode = 502
+                            };
                         }
                         else
                         {
@@ -135,7 +138,10 @@ namespace DL444.Ucqu.Backend.Services
                     catch (Exception ex)
                     {
                         log.LogError(ex, "Exception encountered while signing in or fetching resource. Resource type {resType}", typeof(T));
-                        return new OkObjectResult(new BackendResult<ScoreSet>(locService.GetString("UpstreamErrorCannotFetch")));
+                        return new ObjectResult(new BackendResult<ScoreSet>(locService.GetString("UpstreamErrorCannotFetch")))
+                        {
+                            StatusCode = 502
+                        };
                     }
                 }
                 else if (credentialResult.StatusCode == 404)
@@ -147,7 +153,10 @@ namespace DL444.Ucqu.Backend.Services
                 {
                     // Data access error.
                     log.LogError("Data access error occured fetching user credential. Status {statusCode}", credentialResult.StatusCode);
-                    return new OkObjectResult(new BackendResult<ScoreSet>(locService.GetString("ServiceErrorCannotFetch")));
+                    return new ObjectResult(new BackendResult<ScoreSet>(locService.GetString("ServiceErrorCannotFetch")))
+                    {
+                        StatusCode = 503
+                    };
                 }
             }
         }

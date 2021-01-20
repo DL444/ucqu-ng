@@ -14,27 +14,17 @@ namespace DL444.Ucqu.Models
         public RecordStatus RecordStatus { get; set; }
 
         public string StudentId { get; set; }
-        public SortedList<int, ScheduleWeek> Weeks { get; set; } = new SortedList<int, ScheduleWeek>();
+        public List<ScheduleWeek> Weeks { get; set; } = new List<ScheduleWeek>();
 
         public void AddEntry(int week, ScheduleEntry entry)
         {
-            if (!Weeks.ContainsKey(week))
+            ScheduleWeek scheduleWeek = Weeks.FirstOrDefault(x => x.WeekNumber == week);
+            if (scheduleWeek == null)
             {
-                Weeks.Add(week, new ScheduleWeek(week));
+                scheduleWeek = new ScheduleWeek(week);
+                Weeks.Add(scheduleWeek);
             }
-            Weeks[week].Entries.Add(entry);
-        }
-
-        public List<ScheduleEntry> GetDaySchedule(int day)
-        {
-            int weekNumber = day / 7 + 1;
-            if (!Weeks.ContainsKey(weekNumber))
-            {
-                return new List<ScheduleEntry>();
-            }
-            ScheduleWeek week = Weeks[weekNumber];
-            int dayOfWeek = day % 7 + 1;
-            return week.Entries.Where(x => x.DayOfWeek == dayOfWeek).OrderBy(x => x.StartSession).ToList();
+            scheduleWeek.Entries.Add(entry);
         }
     }
 

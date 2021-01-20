@@ -10,6 +10,7 @@ namespace DL444.Ucqu.Backend.Services
     public interface ICalendarService
     {
         string GetCalendar(Schedule schedule, ExamSchedule? examSchedule, int remindTime);
+        string GetEmptyCalendar();
     }
 
     internal class CalendarService : ICalendarService
@@ -23,9 +24,8 @@ namespace DL444.Ucqu.Backend.Services
         public string GetCalendar(Schedule schedule, ExamSchedule? examSchedule, int remindTime)
         {
             Calendar calendar = new Calendar();
-            foreach (var weekEntry in schedule.Weeks)
+            foreach (var week in schedule.Weeks)
             {
-                ScheduleWeek week = weekEntry.Value;
                 foreach (ScheduleEntry entry in week.Entries)
                 {
                     if (entry.StartSession > wellknown.Schedule.Count)
@@ -74,6 +74,8 @@ namespace DL444.Ucqu.Backend.Services
             }
             return new CalendarSerializer(calendar).SerializeToString();
         }
+
+        public string GetEmptyCalendar() => new CalendarSerializer(new Calendar()).SerializeToString();
 
         private CalDateTime GetTime(int week, int dayOfWeek, TimeSpan time)
         {

@@ -5,12 +5,11 @@ namespace DL444.Ucqu.Models
 {
     public struct UserInitializeStatus : ICosmosResource
     {
-        public UserInitializeStatus(string id, bool completed, string? message)
+        public UserInitializeStatus(string id, bool completed)
         {
             TaskId = id;
             Completed = completed;
-            Message = message;
-            LastUpdateTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            LastUpdateTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         }
 
         public string Id() => $"UserInitStatus-{TaskId}";
@@ -18,7 +17,6 @@ namespace DL444.Ucqu.Models
 
         public string TaskId { get; set; }
         public bool Completed { get; set; }
-        public string? Message { get; set; }
         public long LastUpdateTimestamp { get; set; }
     }
 }

@@ -18,6 +18,28 @@ namespace DL444.Ucqu.Models
         public string StudentId { get; set; }
         public bool IsSecondMajor { get; set; }
         public List<Term> Terms { get; set; } = new List<Term>();
+        [JsonInclude]
+        public double GradePoint
+        {
+            get
+            {
+                double sumGp = 0.0;
+                double sumCredit = 0.0;
+                foreach (Term term in Terms)
+                {
+                    foreach (var course in term.Courses)
+                    {
+                        if (course.GradePoint == 0.0)
+                        {
+                            continue;
+                        }
+                        sumGp += course.GradePoint * course.Credit;
+                        sumCredit += course.Credit;
+                    }
+                }
+                return sumCredit == 0.0 ? 0.0 : sumGp / sumCredit;
+            }
+        }
     }
 
     public class Term
@@ -59,6 +81,7 @@ namespace DL444.Ucqu.Models
         public double Credit { get; set; }
         public string? Category { get; set; }
         public bool IsInitialTake { get; set; }
+        [JsonInclude]
         public bool IsMakeup
             => "补考".Equals(Comment, StringComparison.Ordinal)
             || "补考(缺考)".Equals(Comment, StringComparison.Ordinal);

@@ -146,6 +146,7 @@ namespace DL444.Ucqu.Client
                     }
                 }
             }
+            schedule.Weeks.Sort((x, y) => x.WeekNumber.CompareTo(y.WeekNumber));
             return schedule;
         }
 

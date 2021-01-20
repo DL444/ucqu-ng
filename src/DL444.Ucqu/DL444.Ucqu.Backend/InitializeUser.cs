@@ -87,7 +87,7 @@ namespace DL444.Ucqu.Backend
                 log.LogError(ex, "Exception occured when initializing user. Step: Database update. User {user}", signInContext.SignedInUser);
             }
 
-            UserInitializeStatus newStatus = new UserInitializeStatus(command.StatusId, true, null);
+            UserInitializeStatus newStatus = new UserInitializeStatus(command.StatusId, true);
             DataAccessResult statusUpdateResult = await dataService.SetUserInitializeStatusAsync(newStatus);
             if (!statusUpdateResult.Success)
             {

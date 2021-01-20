@@ -25,7 +25,7 @@ namespace DL444.Ucqu.Backend
 
         [FunctionName("CalendarSubscriptionGet")]
         public async Task<IActionResult> RunGet(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "Calendar/{username}/{id}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Calendar/{username}/{id}")] HttpRequest req,
             string? username,
             string? id,
             ILogger log)
@@ -39,22 +39,26 @@ namespace DL444.Ucqu.Backend
             DataAccessResult<StudentInfo> userFetchResult = await dataService.GetStudentInfoAsync(username);
             if (!userFetchResult.Success)
             {
-                if (userFetchResult.StatusCode != 404)
+                if (userFetchResult.StatusCode == 404)
+                {
+                    return new OkObjectResult(calService.GetEmptyCalendar());
+                }
+                else
                 {
                     log.LogWarning("Failed to fetch user info from database. Status {statusCode}", userFetchResult.StatusCode);
+                    return new StatusCodeResult(503);
                 }
-                return new NotFoundResult();
             }
             if (!id.Equals(userFetchResult.Resource.CalendarSubscriptionId))
             {
-                return new NotFoundResult();
+                return new OkObjectResult(calService.GetEmptyCalendar());
             }
 
             DataAccessResult<Schedule> scheduleFetchResult = await scheduleFetchTask;
             if (!scheduleFetchResult.Success)
             {
                 log.LogError("Failed to fetch schedule from database. Status {statusCode}", scheduleFetchResult.StatusCode);
-                return new NotFoundResult();
+                return new StatusCodeResult(503);
             }
             DataAccessResult<ExamSchedule> examsFetchResult = await examsFetchTask;
             ExamSchedule? exams;
@@ -119,7 +123,10 @@ namespace DL444.Ucqu.Backend
 
             if (info == null)
             {
-                return new OkObjectResult(new BackendResult<CalendarSubscription>(locService.GetString("ServiceErrorCannotAddCalendarSub")));
+                return new ObjectResult(new BackendResult<CalendarSubscription>(locService.GetString("ServiceErrorCannotAddCalendarSub")))
+                {
+                    StatusCode = 503
+                };
             }
 
             info.CalendarSubscriptionId = Guid.NewGuid().ToString();
@@ -131,7 +138,10 @@ namespace DL444.Ucqu.Backend
             else
             {
                 log.LogError("Failed to update user info. Status {statusCode}", userUpdateResult.StatusCode);
-                return new OkObjectResult(new BackendResult<CalendarSubscription>(locService.GetString("ServiceErrorCannotAddCalendarSub")));
+                return new ObjectResult(new BackendResult<CalendarSubscription>(locService.GetString("ServiceErrorCannotAddCalendarSub")))
+                {
+                    StatusCode = 503
+                };
             }
         }
 

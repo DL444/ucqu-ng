@@ -129,10 +129,9 @@ namespace DL444.Ucqu.Backend.Services
 
         public async Task<DataAccessResult> DeleteUserAsync(string username)
         {
-            List<Task> deleteTasks = new List<Task>(6);
+            List<Task> deleteTasks = new List<Task>(5);
             // For some reason, sharing partition key would cause a compiler error.
             // See https://github.com/dotnet/roslyn/issues/47304
-            deleteTasks.Add(container.DeleteItemAsync<object>($"Credential-{username}", new PartitionKey("Credential")));
             deleteTasks.Add(container.DeleteItemAsync<object>($"Student-{username}", new PartitionKey(username)));
             deleteTasks.Add(container.DeleteItemAsync<object>($"Schedule-{username}", new PartitionKey(username)));
             deleteTasks.Add(container.DeleteItemAsync<object>($"Exams-{username}", new PartitionKey(username)));
@@ -161,7 +160,31 @@ namespace DL444.Ucqu.Backend.Services
                     hasError = true;
                 }
             }
-            return hasError ? new DataAccessResult(false, -1) : DataAccessResult.Ok;
+            catch (Exception)
+            {
+                hasError = true;
+            }
+
+            if (hasError)
+            {
+                return new DataAccessResult(false, -1);
+            }
+            try
+            {
+                await container.DeleteItemAsync<object>($"Credential-{username}", new PartitionKey("Credential"));
+            }
+            catch (CosmosException ex)
+            {
+                if (ex.Status != 404)
+                {
+                    return new DataAccessResult(false, -1);
+                }
+            }
+            catch (Exception)
+            {
+                return new DataAccessResult(false, -1);
+            }
+            return DataAccessResult.Ok;
         }
 
         public async Task<DataAccessResult<DeveloperMessage>> GetDeveloperMessageAsync() => await GetResource<DeveloperMessage>("DevMessage", "DevMessage");

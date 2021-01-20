@@ -15,7 +15,9 @@
                 "ServiceErrorCannotAddCalendarSub": "暂时无法更新订阅，请稍后重试",
                 "CalendarLecturer": "教师: {0}",
                 "CalendarExamEventSummary": "{0}考试",
-                "CalendarExamLocation": "{0}@{1}"
+                "CalendarExamLocation": "{0}@{1}",
+                "CredentialErrorCannotSignIn": "帐户信息不正确，请重试",
+                "AccountInexistCannotSignIn": "帐户不存在，继续登录将创建帐户，请确认"
             }
         }
     }

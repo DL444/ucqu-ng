@@ -27,8 +27,9 @@ namespace DL444.Ucqu.Backend
 
         [FunctionName("SignIn")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "signIn/{createAccount?}")] HttpRequest req,
             [Queue("user-init-queue", Connection = "AzureWebJobsStorage")] IAsyncCollector<Models.UserInitializeCommand> userInitCommandCollector,
+            string? createAccount,
             ILogger log)
         {
             StudentCredential? credential = null;
@@ -67,8 +68,15 @@ namespace DL444.Ucqu.Backend
                 else if (credentialFetchResult.StatusCode == 404)
                 {
                     // User does not previously exist.
-                    shouldUpdateCredential = true;
-                    initUserTask = StartInitializeUserAsync(signInContext, userInitCommandCollector, log);
+                    if (createAccount != null && createAccount.Equals("CREATEACCOUNT", StringComparison.OrdinalIgnoreCase))
+                    {
+                        shouldUpdateCredential = true;
+                        initUserTask = StartInitializeUserAsync(signInContext, userInitCommandCollector, log);
+                    }
+                    else
+                    {
+                        return new UnauthorizedObjectResult(new BackendResult<AccessToken>(locService.GetString("AccountInexistCannotSignIn")));
+                    }
                 }
                 else
                 {
@@ -88,7 +96,7 @@ namespace DL444.Ucqu.Backend
                 if (initUserTask != null)
                 {
                     string location = await initUserTask;
-                    return new AcceptedResult(location, new BackendResult<AccessToken>(AccessToken.IncompleteToken(token, location)));
+                    return new AcceptedResult(location, new BackendResult<AccessToken>(true, AccessToken.IncompleteToken(token, location), locService.GetString("UserInitPrepare")));
                 }
                 else
                 {
@@ -97,7 +105,7 @@ namespace DL444.Ucqu.Backend
             }
             else if (signInContext.Result == Client.SignInResult.InvalidCredentials)
             {
-                return new UnauthorizedResult();
+                return new UnauthorizedObjectResult(new BackendResult<AccessToken>(locService.GetString("CredentialErrorCannotSignIn")));
             }
             else
             {
@@ -122,12 +130,12 @@ namespace DL444.Ucqu.Backend
                 }
                 else
                 {
-                    return new UnauthorizedResult();
+                    return new UnauthorizedObjectResult(new BackendResult<AccessToken>(locService.GetString("CredentialErrorCannotSignIn")));
                 }
             }
             else
             {
-                return new OkObjectResult(new BackendResult<AccessToken>(failMessage));
+                return new UnauthorizedObjectResult(new BackendResult<AccessToken>(failMessage));
             }
         }
 
@@ -135,7 +143,7 @@ namespace DL444.Ucqu.Backend
         {
             string id = Guid.NewGuid().ToString();
             string location = $"{serviceBaseAddress}/UserInit/{id}";
-            UserInitializeStatus status = new UserInitializeStatus(id, false, locService.GetString("UserInitPrepare"));
+            UserInitializeStatus status = new UserInitializeStatus(id, false);
             DataAccessResult entryAddResult = await dataService.SetUserInitializeStatusAsync(status);
             if (!entryAddResult.Success)
             {

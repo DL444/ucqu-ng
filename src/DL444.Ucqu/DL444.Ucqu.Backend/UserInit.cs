@@ -13,9 +13,10 @@ namespace DL444.Ucqu.Backend
 {
     public class UserInitFunction
     {
-        public UserInitFunction(IDataAccessService dataService, IConfiguration config)
+        public UserInitFunction(IDataAccessService dataService, ILocalizationService locService, IConfiguration config)
         {
             this.dataService = dataService;
+            this.locService = locService;
             this.serviceBaseAddress = config.GetValue<string>("Host:ServiceBaseAddress");
         }
 
@@ -38,7 +39,7 @@ namespace DL444.Ucqu.Backend
                 }
                 else
                 {
-                    return new AcceptedResult($"{serviceBaseAddress}/UserInit/{id}", new BackendResult<UserInitializeStatus>(result.Resource));
+                    return new AcceptedResult($"{serviceBaseAddress}/UserInit/{id}", new BackendResult<UserInitializeStatus>(true, result.Resource, locService.GetString("UserInitPrepare")));
                 }
             }
             else
@@ -48,6 +49,7 @@ namespace DL444.Ucqu.Backend
         }
 
         private IDataAccessService dataService;
+        private ILocalizationService locService;
         private string serviceBaseAddress;
     }
 }
