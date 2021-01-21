@@ -17,7 +17,7 @@ namespace DL444.Ucqu.Backend.Services
             Func<IDataAccessService, T, Task<DataAccessResult>> updateTask,
             Func<T?, T, bool> shouldUpdate,
             Func<T?, T, Task>? updateCompleteCallback,
-            ILogger log) where T : IStatusResource;
+            ILogger log) where T : class, IStatusResource;
 
         Task<List<string>?> GetUsersAsync(ILogger log);
     }
@@ -38,7 +38,7 @@ namespace DL444.Ucqu.Backend.Services
             Func<T?, T, bool> shouldUpdate,
             Func<T?, T, Task>? updateCompleteCallback,
             ILogger log)
-            where T : IStatusResource
+            where T : class, IStatusResource
         {
             // Fetch new version.
             Task<DataAccessResult<T>> oldFetchTask = databaseFetchTask(dataService);
