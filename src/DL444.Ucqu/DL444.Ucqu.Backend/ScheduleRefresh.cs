@@ -13,7 +13,7 @@ namespace DL444.Ucqu.Backend
 
         [FunctionName("ScheduleRefresh_Client")]
         public async Task Start(
-            [TimerTrigger("0 0 2 * * *")] TimerInfo timer,
+            [TimerTrigger("0 0 18 * * *")] TimerInfo timer,
             [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {

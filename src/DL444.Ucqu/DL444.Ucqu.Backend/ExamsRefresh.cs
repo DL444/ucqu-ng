@@ -13,7 +13,7 @@ namespace DL444.Ucqu.Backend
 
         [FunctionName("ExamsRefresh_Client")]
         public async Task Start(
-            [TimerTrigger("0 0 3 * * *")] TimerInfo timer,
+            [TimerTrigger("0 0 19 * * *")] TimerInfo timer,
             [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {

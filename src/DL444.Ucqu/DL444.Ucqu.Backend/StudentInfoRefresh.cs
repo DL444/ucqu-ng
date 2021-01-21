@@ -12,7 +12,7 @@ namespace DL444.Ucqu.Backend
 
         [FunctionName("StudentInfoRefresh_Client")]
         public async Task Start(
-            [TimerTrigger("0 0 1 * * *")] TimerInfo timer,
+            [TimerTrigger("0 0 17 * * *")] TimerInfo timer,
             [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
