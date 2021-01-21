@@ -35,12 +35,12 @@ namespace DL444.Ucqu.Backend
             DataAccessResult result = await dataService.DeleteUserAsync(username);
             if (result.Success)
             {
-                return new OkObjectResult(new BackendResult<object>(true, null, null));
+                return new OkObjectResult(new BackendResult<object>(true, new object(), null));
             }
             else
             {
                 log.LogError("Failed to delete user {user}.", username);
-                return new ObjectResult(new BackendResult<object>(false, null, locService.GetString("ServiceErrorCannotDeleteUser")))
+                return new ObjectResult(new BackendResult<object>(false, new object(), locService.GetString("ServiceErrorCannotDeleteUser")))
                 {
                     StatusCode = 503
                 };

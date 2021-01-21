@@ -16,7 +16,7 @@ namespace DL444.Ucqu.Models
 
         public string StudentId { get; set; }
         public string PasswordHash { get; set; }
-        public string? Iv { get; set; }
+        public string Iv { get; set; }
 
         /// <summary>
         /// Compute password hash for given username and password.

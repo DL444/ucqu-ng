@@ -13,7 +13,7 @@ namespace DL444.Ucqu.Models
         public int Year { get; set; }
         public string Major { get; set; } = string.Empty;
         public int Class { get; set; }
-        public string? SecondMajor { get; set; }
-        public string? CalendarSubscriptionId { get; set; }
+        public string SecondMajor { get; set; }
+        public string CalendarSubscriptionId { get; set; }
     }
 }

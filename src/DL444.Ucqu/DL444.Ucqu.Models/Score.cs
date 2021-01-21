@@ -79,7 +79,7 @@ namespace DL444.Ucqu.Models
         [JsonInclude]
         public string ShortName => Utilities.GetShortformName(Name);
         public double Credit { get; set; }
-        public string? Category { get; set; }
+        public string Category { get; set; }
         public bool IsInitialTake { get; set; }
         [JsonInclude]
         public bool IsMakeup
@@ -87,8 +87,8 @@ namespace DL444.Ucqu.Models
             || "补考(缺考)".Equals(Comment, StringComparison.Ordinal);
         public int Score { get; set; }
         public bool IsSecondMajor { get; set; }
-        public string? Comment { get; set; }
-        public string? Lecturer { get; set; }
+        public string Comment { get; set; }
+        public string Lecturer { get; set; }
         [JsonInclude]
         public string ShortLecturer => Utilities.GetShortformName(Lecturer);
         public DateTimeOffset ObtainedTime { get; set; }

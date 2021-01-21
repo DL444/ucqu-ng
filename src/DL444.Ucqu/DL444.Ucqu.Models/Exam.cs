@@ -31,8 +31,8 @@ namespace DL444.Ucqu.Models
         [JsonInclude]
         public string ShortName => Utilities.GetShortformName(Name);
         public double Credit { get; set; }
-        public string? Category { get; set; }
-        public string? Type { get; set; }
+        public string Category { get; set; }
+        public string Type { get; set; }
         public DateTimeOffset StartTime { get; set; }
         public DateTimeOffset EndTime { get; set; }
         public int Week { get; set; }
