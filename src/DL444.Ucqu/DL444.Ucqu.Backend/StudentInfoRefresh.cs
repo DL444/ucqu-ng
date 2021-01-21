@@ -33,7 +33,11 @@ namespace DL444.Ucqu.Backend
                 dataService => dataService.GetStudentInfoAsync(username),
                 (client, context) => client.GetStudentInfoAsync(context),
                 (dataService, resource) => dataService.SetStudentInfoAsync(resource),
-                (oldRes, newRes) => newRes.Name != null,
+                (oldRes, newRes) =>
+                {
+                    newRes.CalendarSubscriptionId = oldRes?.CalendarSubscriptionId;
+                    return newRes.Name != null;
+                },
                 null,
                 log
             );
