@@ -7,6 +7,7 @@ namespace DL444.Ucqu.Models
 {
     public class Schedule : IStatusResource, ICosmosResource
     {
+        public Schedule() { }
         public Schedule(string studentId) => StudentId = studentId;
 
         public string Id() => $"Schedule-{StudentId}";
@@ -30,6 +31,7 @@ namespace DL444.Ucqu.Models
 
     public class ScheduleWeek
     {
+        public ScheduleWeek() { }
         public ScheduleWeek(int weekNumber) => WeekNumber = weekNumber;
 
         public int WeekNumber { get; set; }
@@ -38,6 +40,7 @@ namespace DL444.Ucqu.Models
 
     public class ScheduleEntry
     {
+        public ScheduleEntry() { }
         public ScheduleEntry(string name, string lecturer, string room)
         {
             Name = name;

@@ -6,6 +6,7 @@ namespace DL444.Ucqu.Models
 {
     public class ScoreSet : IStatusResource, ICosmosResource
     {
+        public ScoreSet() { }
         public ScoreSet(string studentId)
         {
             StudentId = studentId;
@@ -73,6 +74,7 @@ namespace DL444.Ucqu.Models
 
     public class Course
     {
+        public Course() { }
         public Course(string name) => Name = name;
         
         public string Name { get; set; }

@@ -7,6 +7,7 @@ namespace DL444.Ucqu.Models
 {
     public class ExamSchedule : IStatusResource, ICosmosResource
     {
+        public ExamSchedule() { }
         public ExamSchedule(string studentId) => StudentId = studentId;
 
         public string Id() => $"Exams-{StudentId}";
@@ -19,6 +20,7 @@ namespace DL444.Ucqu.Models
 
     public class Exam
     {
+        public Exam() { }
         public Exam(string name, string location, int seating)
         {
             Name = name;

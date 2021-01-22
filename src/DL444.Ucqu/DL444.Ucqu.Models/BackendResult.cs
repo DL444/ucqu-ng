@@ -1,7 +1,11 @@
+using System.Text.Json.Serialization;
+
 namespace DL444.Ucqu.Models
 {
     public class BackendResult<T>
     {
+        public BackendResult() { }
+
         public BackendResult(bool success, T resource, string message)
         {
             Success = success;
