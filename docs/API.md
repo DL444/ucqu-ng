@@ -775,6 +775,39 @@ public static string GetPasswordHash(string username, string password)
 
 若用户多端登录，则其它客户端的后续请求将返回状态为 401 的响应。按照本文档推荐的方式实现的客户端应当退出登录并清除所有本地数据。
 
+## 获取公开基础信息
+### 请求
+**`GET /wellknown`**  
+无需身份认证
+
+### 响应
+`200`  
+**获取成功**
+
+成功获取到数据。
+
+返回对象
+```json
+{
+    "currentTerm": "string",
+    "termStartDate": "dateTime",
+    "termEndDate": "dateTime"
+}
+```
+- `currentTerm`  
+    当前的学期编号
+- `termStartDate`  
+    本学期的开始日期  
+    本学期包含该日。
+- `termEndDate`  
+    本学期的结束日期  
+    本学期不含该日。
+
+### 接入说明
+客户端应当缓存学期信息。当前日期位于学期开始日与结束日之间时，客户端可以直接使用缓存数据。
+
+学期结束后，客户端应当定期调用这一接口，以获取最新的信息。
+
 ## 获取开发人员消息
 ### 请求
 **`GET /devMessage/{platform}`**  
