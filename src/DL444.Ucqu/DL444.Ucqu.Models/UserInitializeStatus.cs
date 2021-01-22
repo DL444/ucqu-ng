@@ -5,7 +5,6 @@ namespace DL444.Ucqu.Models
 {
     public struct UserInitializeStatus : ICosmosResource
     {
-        public UserInitializeStatus() { }
         public UserInitializeStatus(string id, bool completed)
         {
             TaskId = id;
