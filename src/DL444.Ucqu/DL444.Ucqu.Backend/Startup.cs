@@ -69,7 +69,7 @@ namespace DL444.Ucqu.Backend
 
             builder.Services.AddSingleton((ILocalizationService)new LocalizationService(config.GetSection("Localization")));
 
-            builder.Services.AddSingleton((IWellknownDataService)new WellKnownDataService(config));
+            builder.Services.AddSingleton((IWellknownDataService)new WellknownDataService(config));
 
             builder.Services.AddTransient<IGetFunctionHandlerService, GetFunctionHandlerService>();
 

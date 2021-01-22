@@ -9,15 +9,17 @@ namespace DL444.Ucqu.Backend.Services
     {
         string CurrentTerm { get; }
         DateTimeOffset TermStartDate { get; }
+        DateTimeOffset TermEndDate { get; }
         IList<ScheduleTime> Schedule { get; }
     }
 
-    internal class WellKnownDataService : IWellknownDataService
+    internal class WellknownDataService : IWellknownDataService
     {
-        public WellKnownDataService(IConfiguration config)
+        public WellknownDataService(IConfiguration config)
         {
             CurrentTerm = config.GetValue<string>("Term:CurrentTerm");
             TermStartDate = DateTimeOffset.Parse(config.GetValue<string>("Term:TermStartDate"));
+            TermEndDate = DateTimeOffset.Parse(config.GetValue<string>("Term:TermEndDate"));
             List<ScheduleTime> scheduleItems = new List<ScheduleTime>();
             foreach (IConfigurationSection scheduleCfgItem in config.GetSection("Wellknown:Schedule").GetChildren())
             {
@@ -30,6 +32,7 @@ namespace DL444.Ucqu.Backend.Services
 
         public string CurrentTerm { get; }
         public DateTimeOffset TermStartDate { get; }
+        public DateTimeOffset TermEndDate { get; }
         public IList<ScheduleTime> Schedule { get; }
     }
 }
