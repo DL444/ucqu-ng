@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using DL444.Ucqu.App.WinUniversal.Services;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -14,6 +16,8 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using DL444.Ucqu.App.WinUniversal.Extensions;
+using DL444.Ucqu.App.WinUniversal.Exceptions;
 
 namespace DL444.Ucqu.App.WinUniversal
 {
@@ -30,6 +34,42 @@ namespace DL444.Ucqu.App.WinUniversal
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+
+            var configBuilder = new ConfigurationBuilder();
+            ConfigureConfiguration(configBuilder);
+            IConfiguration config = configBuilder.Build();
+            Configuration = config;
+
+            var services = new ServiceCollection();
+            ConfigureServices(services, config);
+            Services = services.BuildServiceProvider();
+        }
+
+        public IConfiguration Configuration { get; }
+
+        public IServiceProvider Services { get; }
+
+        private static void ConfigureConfiguration(IConfigurationBuilder builder) => builder.AddJsonFile("appconfig.json");
+
+        private static void ConfigureServices(IServiceCollection services, IConfiguration config)
+        {
+            services.AddSingleton<ICredentialService>(new UserCredentialService());
+
+            var baseAddress = new Uri(config.GetValue<string>("Backend:BaseAddress"));
+            int retryCount = config.GetValue("Backend:RetryCount", 2);
+            int timeout = config.GetValue("Backend:Timeout", 30);
+            services.AddHttpClient<IDataService, BackendService>(client =>
+            {
+                client.BaseAddress = baseAddress;
+            }).AddDefaultPolicy(retryCount, timeout);
+            services.AddHttpClient<ISignInService, BackendService>(client =>
+            {
+                client.BaseAddress = baseAddress;
+            }).AddDefaultPolicy(retryCount, timeout);
+            services.AddHttpClient<ICalendarSubscriptionService, BackendService>(client =>
+            {
+                client.BaseAddress = baseAddress;
+            }).AddDefaultPolicy(retryCount, timeout);
         }
 
         /// <summary>
@@ -66,7 +106,7 @@ namespace DL444.Ucqu.App.WinUniversal
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
                     // parameter
-                    rootFrame.Navigate(typeof(Pages.MainPage), e.Arguments);
+                    NavigateToFirstPage(rootFrame, e.Arguments);
                 }
                 // Ensure the current window is active
                 Window.Current.Activate();
@@ -95,6 +135,12 @@ namespace DL444.Ucqu.App.WinUniversal
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
             deferral.Complete();
+        }
+
+        private void NavigateToFirstPage(Frame rootFrame, string arguments)
+        {
+            // TODO: If has credential, configure online client and go to main page. Else go to sign in page.
+            rootFrame.Navigate(typeof(Pages.MainPage), arguments);
         }
     }
 }

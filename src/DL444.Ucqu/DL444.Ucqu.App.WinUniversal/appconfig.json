@@ -1,0 +1,8 @@
+﻿{
+  "Backend": {
+    "BaseAddress": "https://ucqu.azure-api.net/v1/",
+    "Timeout": 30,
+    "RetryCount": 2,
+    "UserInitPollInterval": 5
+  }
+}
