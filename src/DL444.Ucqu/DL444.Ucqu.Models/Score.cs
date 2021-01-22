@@ -37,7 +37,7 @@ namespace DL444.Ucqu.Models
                         sumCredit += course.Credit;
                     }
                 }
-                return sumCredit == 0.0 ? 0.0 : sumGp / sumCredit;
+                return sumCredit == 0.0 ? 0.0 : Math.Round(sumGp / sumCredit, 2);
             }
         }
     }
@@ -64,7 +64,7 @@ namespace DL444.Ucqu.Models
                     sumGp += course.GradePoint * course.Credit;
                     sumCredit += course.Credit;
                 }
-                return sumCredit == 0.0 ? 0.0 : sumGp / sumCredit;
+                return sumCredit == 0.0 ? 0.0 : Math.Round(sumGp / sumCredit, 2);
             }
         }
 
