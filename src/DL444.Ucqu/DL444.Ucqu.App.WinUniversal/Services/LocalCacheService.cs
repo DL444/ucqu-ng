@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using DL444.Ucqu.App.WinUniversal.Exceptions;
@@ -41,9 +40,14 @@ namespace DL444.Ucqu.App.WinUniversal.Services
         public async Task<DataRequestResult<ScoreSet>> GetScoreAsync(bool isSecondMajor)
             => new DataRequestResult<ScoreSet>(await GetRecordDataAsync<ScoreSet>(isSecondMajor ? RecordType.ScoreSecondMajor : RecordType.ScoreMajor), null);
 
-        public Task<DataRequestResult<object>> DeleteUserAsync()
+        public async Task<DataRequestResult<object>> DeleteUserAsync()
         {
-            throw new NotImplementedException();
+            using (SqliteConnection connection = await ConnectDatabaseAsync())
+            {
+                SqliteCommand command = new SqliteCommand("DELETE FROM cachedData", connection);
+                await command.ExecuteNonQueryAsync();
+                return new DataRequestResult<object>();
+            }
         }
 
         public async Task<DataRequestResult<DeveloperMessage>> GetDeveloperMessagesAsync()
