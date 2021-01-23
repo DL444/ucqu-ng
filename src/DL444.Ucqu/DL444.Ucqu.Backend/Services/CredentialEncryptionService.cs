@@ -11,12 +11,11 @@ namespace DL444.Ucqu.Backend.Services
         void DecryptCredential(StudentCredential credential);
     }
 
-    internal class CredentialEncryptionService : ICredentialEncryptionService, IDisposable
+    internal class CredentialEncryptionService : ICredentialEncryptionService
     {
         public CredentialEncryptionService(string key)
         {
-            aes = Aes.Create();
-            aes.Key = Convert.FromBase64String(key);
+            this.key = Convert.FromBase64String(key);
         }
 
         public void EncryptCredential(StudentCredential credential)
@@ -25,18 +24,21 @@ namespace DL444.Ucqu.Backend.Services
             {
                 throw new InvalidOperationException("IV is not empty. Possibly already encrypted.");
             }
-            aes.GenerateIV();
-            credential.Iv = Convert.ToBase64String(aes.IV);
-            using (var encryptedStream = new MemoryStream())
+            using (Aes aes = Aes.Create())
             {
-                using (var cryptoStream = new CryptoStream(encryptedStream, aes.CreateEncryptor(), CryptoStreamMode.Write))
+                aes.Key = key;
+                credential.Iv = Convert.ToBase64String(aes.IV);
+                using (var encryptedStream = new MemoryStream())
                 {
-                    using (var writer = new StreamWriter(cryptoStream))
+                    using (var cryptoStream = new CryptoStream(encryptedStream, aes.CreateEncryptor(), CryptoStreamMode.Write))
                     {
-                        writer.Write(credential.PasswordHash);
+                        using (var writer = new StreamWriter(cryptoStream))
+                        {
+                            writer.Write(credential.PasswordHash);
+                        }
                     }
+                    credential.PasswordHash = Convert.ToBase64String(encryptedStream.ToArray());
                 }
-                credential.PasswordHash = Convert.ToBase64String(encryptedStream.ToArray());
             }
         }
 
@@ -46,42 +48,24 @@ namespace DL444.Ucqu.Backend.Services
             {
                 throw new ArgumentException("Missing IV in provided credential.");
             }
-            aes.IV = Convert.FromBase64String(credential.Iv);
-            using (var encryptedStream = new MemoryStream(Convert.FromBase64String(credential.PasswordHash)))
+            using (Aes aes = Aes.Create())
             {
-                using (var cryptoStream = new CryptoStream(encryptedStream, aes.CreateDecryptor(), CryptoStreamMode.Read))
+                aes.Key = key;
+                aes.IV = Convert.FromBase64String(credential.Iv);
+                using (var encryptedStream = new MemoryStream(Convert.FromBase64String(credential.PasswordHash)))
                 {
-                    using (var reader = new StreamReader(cryptoStream))
+                    using (var cryptoStream = new CryptoStream(encryptedStream, aes.CreateDecryptor(), CryptoStreamMode.Read))
                     {
-                        credential.PasswordHash = reader.ReadToEnd();
+                        using (var reader = new StreamReader(cryptoStream))
+                        {
+                            credential.PasswordHash = reader.ReadToEnd();
+                        }
                     }
                 }
             }
             credential.Iv = null;
         }
 
-        private Aes aes;
-
-        #region IDisposable
-        private bool disposedValue;
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    aes.Dispose();
-                }
-                disposedValue = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-        #endregion
+        private byte[] key;
     }
 }
