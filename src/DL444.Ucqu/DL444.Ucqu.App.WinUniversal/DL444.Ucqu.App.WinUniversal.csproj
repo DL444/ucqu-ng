@@ -122,6 +122,8 @@
     </Compile>
     <Compile Include="Exceptions\BackendAuthenticationFailedException.cs" />
     <Compile Include="Exceptions\BackendRequestFailedException.cs" />
+    <Compile Include="Exceptions\LocalCacheInexistException.cs" />
+    <Compile Include="Exceptions\LocalCacheRequestFailedException.cs" />
     <Compile Include="Extensions\ApplicationExtension.cs" />
     <Compile Include="Extensions\HttpClientBuilderExtension.cs" />
     <Compile Include="Extensions\HttpContentExtension.cs" />
@@ -134,8 +136,10 @@
     <Compile Include="Services\ICalendarSubscriptionService.cs" />
     <Compile Include="Services\ICredentialService.cs" />
     <Compile Include="Services\IDataService.cs" />
+    <Compile Include="Services\ILocalCacheService.cs" />
     <Compile Include="Services\ISignInService.cs" />
     <Compile Include="Services\BackendService.cs" />
+    <Compile Include="Services\LocalCacheService.cs" />
     <Compile Include="Services\UserCredentialService.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -168,6 +172,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite.Core">
+      <Version>5.0.2</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration">
       <Version>5.0.0</Version>
     </PackageReference>
@@ -191,6 +198,9 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>12.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="SQLitePCLRaw.bundle_winsqlite3">
+      <Version>2.0.4</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

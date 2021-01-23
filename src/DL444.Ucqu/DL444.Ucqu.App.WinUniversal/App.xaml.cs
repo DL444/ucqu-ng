@@ -42,6 +42,7 @@ namespace DL444.Ucqu.App.WinUniversal
 
             var services = new ServiceCollection();
             ConfigureServices(services, config);
+            services.AddSingleton(config);
             Services = services.BuildServiceProvider();
         }
 
@@ -70,6 +71,10 @@ namespace DL444.Ucqu.App.WinUniversal
             {
                 client.BaseAddress = baseAddress;
             }).AddDefaultPolicy(retryCount, timeout);
+
+            LocalCacheService localCacheService = new LocalCacheService(config);
+            services.AddSingleton<IDataService>(localCacheService);
+            services.AddSingleton<ILocalCacheService>(localCacheService);
         }
 
         /// <summary>

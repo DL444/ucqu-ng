@@ -4,5 +4,8 @@
     "Timeout": 30,
     "RetryCount": 2,
     "UserInitPollInterval": 5
+  },
+  "LocalData": {
+    "DatabaseName": "data.db"
   }
 }
