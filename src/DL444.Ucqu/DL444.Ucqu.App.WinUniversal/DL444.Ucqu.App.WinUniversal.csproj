@@ -156,6 +156,7 @@
     <Compile Include="Services\ResourceLocalizationService.cs" />
     <Compile Include="Services\UserCredentialService.cs" />
     <Compile Include="ViewModels\DataViewModel.cs" />
+    <Compile Include="ViewModels\ScoreSetViewModel.cs" />
     <Compile Include="ViewModels\SignInViewModel.cs" />
     <Compile Include="ViewModels\StudentInfoViewModel.cs" />
   </ItemGroup>

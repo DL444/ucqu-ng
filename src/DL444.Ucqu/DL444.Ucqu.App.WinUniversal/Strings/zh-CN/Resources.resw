@@ -144,6 +144,9 @@
   <data name="NavigationItemScore.Content" xml:space="preserve">
     <value>成绩</value>
   </data>
+  <data name="OverallGradePointFormat" xml:space="preserve">
+    <value>总绩点: {0}</value>
+  </data>
   <data name="SignInButton.Content" xml:space="preserve">
     <value>登录</value>
   </data>
@@ -158,5 +161,23 @@
   </data>
   <data name="SignInUsernameBox.PlaceholderText" xml:space="preserve">
     <value>学号</value>
+  </data>
+  <data name="TermDisplayNameFormat" xml:space="preserve">
+    <value>{0}-{1}学年第{2}学期</value>
+  </data>
+  <data name="TermGradePointFormat" xml:space="preserve">
+    <value>学期绩点: {0}</value>
+  </data>
+  <data name="TermNumberNotation0" xml:space="preserve">
+    <value>一</value>
+  </data>
+  <data name="TermNumberNotation1" xml:space="preserve">
+    <value>二</value>
+  </data>
+  <data name="TermNumberNotation2" xml:space="preserve">
+    <value>三</value>
+  </data>
+  <data name="TermNumberNotation3" xml:space="preserve">
+    <value>四</value>
   </data>
 </root>
