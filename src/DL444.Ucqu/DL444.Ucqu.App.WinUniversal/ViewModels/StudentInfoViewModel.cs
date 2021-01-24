@@ -2,16 +2,18 @@
 
 namespace DL444.Ucqu.App.WinUniversal.ViewModels
 {
-    internal class StudentInfoViewModel
+    internal struct StudentInfoViewModel
     {
-        public StudentInfoViewModel() : this(new StudentInfo()) { }
-        public StudentInfoViewModel(StudentInfo info) => this.info = info;
+        public StudentInfoViewModel(StudentInfo info)
+        {
+            Name = info.Name;
+            Major = info.Major;
+            SecondMajor = info.SecondMajor;
+        }
         
-        public string Name => info.Name;
-        public string Major => info.Major;
-        public bool HasSecondMajor => info.SecondMajor != null;
-        public string SecondMajor => info.SecondMajor;
-
-        private StudentInfo info;
+        public string Name { get; }
+        public string Major { get; }
+        public bool HasSecondMajor => SecondMajor != null;
+        public string SecondMajor { get; }
     }
 }
