@@ -40,6 +40,8 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
+        <Frame x:Name="ContentFrame" Grid.Row="1" Grid.ColumnSpan="2"/>
+
         <Grid x:Name="NavPane" Background="{ThemeResource AppPaneBackgroundBrush}" Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="{ThemeResource AppTitleBarHeight}" />
@@ -55,12 +57,12 @@
             <muxc:NavigationView x:Name="NavigationView" Style="{ThemeResource AppNavigationPaneStyle}" PaneDisplayMode="Top" IsBackButtonVisible="Collapsed" IsSettingsVisible="False" 
                                  SelectionChanged="NavigationView_SelectionChanged" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top">
                 <muxc:NavigationView.MenuItems>
-                    <muxc:NavigationViewItem x:Uid="NavigationItemSchedule" Icon="Calendar" Tag="0" />
-                    <muxc:NavigationViewItem x:Uid="NavigationItemScore" Icon="OutlineStar" Tag="1" />
+                    <muxc:NavigationViewItem x:Uid="NavigationItemSchedule" Icon="Calendar" Tag="Schedule" />
+                    <muxc:NavigationViewItem x:Uid="NavigationItemScore" Icon="OutlineStar" Tag="Score" />
                 </muxc:NavigationView.MenuItems>
                 <muxc:NavigationView.PaneFooter>
                     <Grid>
-                        <controls:NavigationPaneButton Icon="&#xE10C;">
+                        <controls:NavigationPaneButton Icon="&#xE10C;" UseSystemFocusVisuals="True">
                             <controls:NavigationPaneButton.Flyout>
                                 <MenuFlyout Placement="BottomEdgeAlignedRight" x:DefaultBindMode="OneWay">
                                     <controls:MenuFlyoutContentItem Visibility="{x:Bind StudentInfoViewModel.IsValueReady}">
@@ -103,9 +105,7 @@
         </Grid>
 
         <Grid x:Name="SummaryPane" Background="{ThemeResource AppPaneBackgroundBrush}" Visibility="Collapsed" Grid.Row="1">
-            
-        </Grid>
 
-        <Frame x:Name="ContentFrame" Grid.Row="1" Grid.ColumnSpan="2"/>
+        </Grid>
     </Grid>
 </Page>

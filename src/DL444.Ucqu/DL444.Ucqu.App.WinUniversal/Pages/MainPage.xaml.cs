@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using WinUI = Microsoft.UI.Xaml.Controls;
 
@@ -53,12 +54,42 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
 
         private void NavigationView_SelectionChanged(WinUI.NavigationView sender, WinUI.NavigationViewSelectionChangedEventArgs args)
         {
-            if (args.SelectedItem is WinUI.NavigationViewItem item)
+            if (args.SelectedItem is WinUI.NavigationViewItem item && item.Tag is string key)
             {
-                if (item.Tag is string str && int.TryParse(str, out int index) && index < pages.Length)
-                {
-                    ContentFrame.Navigate(pages[index]);
-                }
+                Navigate(key);
+            }
+        }
+
+        private void Navigate(string key)
+        {
+            switch (key)
+            {
+                case "Schedule":
+                    if (ContentFrame.CurrentSourcePageType == typeof(ScorePage))
+                    {
+                        ContentFrame.Navigate(typeof(SchedulePage), null, new SlideNavigationTransitionInfo()
+                        {
+                            Effect = SlideNavigationTransitionEffect.FromLeft
+                        });
+                    }
+                    else
+                    {
+                        ContentFrame.Navigate(typeof(SchedulePage), null, new EntranceNavigationTransitionInfo());
+                    }
+                    break;
+                case "Score":
+                    if (ContentFrame.CurrentSourcePageType == typeof(SchedulePage))
+                    {
+                        ContentFrame.Navigate(typeof(ScorePage), null, new SlideNavigationTransitionInfo()
+                        {
+                            Effect = SlideNavigationTransitionEffect.FromRight
+                        });
+                    }
+                    else
+                    {
+                        ContentFrame.Navigate(typeof(ScorePage), null, new EntranceNavigationTransitionInfo());
+                    }
+                    break;
             }
         }
 
@@ -67,6 +98,5 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         private IDataService localDataService;
         private IDataService remoteDataService;
         private ILocalCacheService cacheService;
-        private Type[] pages = new Type[] { };
     }
 }
