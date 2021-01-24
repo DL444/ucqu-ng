@@ -20,7 +20,8 @@ using DL444.Ucqu.App.WinUniversal.Extensions;
 using Windows.ApplicationModel.Core;
 using Windows.UI;
 using Windows.UI.ViewManagement;
-
+using System.Threading.Tasks;
+using Windows.UI.Xaml.Media.Animation;
 
 namespace DL444.Ucqu.App.WinUniversal
 {
@@ -53,9 +54,34 @@ namespace DL444.Ucqu.App.WinUniversal
 
         public IServiceProvider Services { get; }
 
-        public void SignOut()
+        public void NavigateToFirstPage(string arguments = null)
         {
-            // TODO: Sign out.
+            Frame rootFrame = Window.Current.Content as Frame;
+            if (rootFrame != null)
+            {
+                ICredentialService credentialService = Services.GetService<ICredentialService>();
+                if (credentialService.Username != null && credentialService.PasswordHash != null)
+                {
+                    rootFrame.Navigate(typeof(Pages.MainPage), arguments, new DrillInNavigationTransitionInfo());
+                }
+                else
+                {
+                    rootFrame.Navigate(typeof(Pages.SignInPage), arguments, new DrillInNavigationTransitionInfo());
+                }
+            }
+        }
+
+        public async Task SignOut()
+        {
+            Frame rootFrame = Window.Current.Content as Frame;
+            if (rootFrame != null)
+            {
+                ICredentialService credentialService = Services.GetService<ICredentialService>();
+                ILocalCacheService cacheService = Services.GetService<ILocalCacheService>();
+                credentialService.ClearCredential();
+                await cacheService.ClearCacheAsync();
+                rootFrame.Navigate(typeof(Pages.SignInPage), null, new DrillInNavigationTransitionInfo());
+            }
         }
 
         private static void ConfigureConfiguration(IConfigurationBuilder builder) => builder.AddJsonFile("appconfig.json");
@@ -122,7 +148,7 @@ namespace DL444.Ucqu.App.WinUniversal
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
                     // parameter
-                    rootFrame.Navigate(typeof(Pages.MainPage), e.Arguments);
+                    NavigateToFirstPage(e.Arguments);
                 }
                 // Ensure the current window is active
                 Window.Current.Activate();

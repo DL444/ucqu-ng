@@ -6,6 +6,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
 {
     internal interface ISignInService
     {
+        Task<DataRequestResult<AccessToken>> SignInAsync(StudentCredential credential, bool createAccount);
         Task<DataRequestResult<AccessToken>> SignInAsync(bool createAccount);
         Task WaitForUserInitializationAsync(string location, int pollInterval);
     }

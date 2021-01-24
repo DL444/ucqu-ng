@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using DL444.Ucqu.App.WinUniversal.Exceptions;
 using DL444.Ucqu.App.WinUniversal.Models;
+using Windows.UI.Xaml;
 
 namespace DL444.Ucqu.App.WinUniversal.ViewModels
 {
@@ -67,7 +68,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             }
             catch (BackendAuthenticationFailedException)
             {
-                // TODO: Sign out.
+                await ((App)Application.Current).SignOut();
                 return;
             }
             catch (BackendRequestFailedException)

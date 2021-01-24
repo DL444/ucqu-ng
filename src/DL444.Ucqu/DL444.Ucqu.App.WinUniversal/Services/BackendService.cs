@@ -30,12 +30,11 @@ namespace DL444.Ucqu.App.WinUniversal.Services
 
         public DataSource DataSource => DataSource.Online;
 
-        public async Task<DataRequestResult<AccessToken>> SignInAsync(bool createAccount = false)
+        public async Task<DataRequestResult<AccessToken>> SignInAsync(StudentCredential credential, bool createAccount = false)
         {
-            _ = credentialService?.Username ?? throw new InvalidOperationException("User credential is not yet configured.");
-            _ = credentialService?.PasswordHash ?? throw new InvalidOperationException("User credential is not yet configured.");
+            _ = credential?.StudentId ?? throw new InvalidOperationException("User credential is not yet configured.");
+            _ = credential?.PasswordHash ?? throw new InvalidOperationException("User credential is not yet configured.");
 
-            StudentCredential credential = new StudentCredential(credentialService.Username, credentialService.PasswordHash);
             try
             {
                 HttpResponseMessage response = await client.PostAsync($"signIn/{createAccount}", new JsonStringContent(credential));
@@ -65,6 +64,9 @@ namespace DL444.Ucqu.App.WinUniversal.Services
                 throw GetDefaultException($"signIn", ex);
             }
         }
+
+        public Task<DataRequestResult<AccessToken>> SignInAsync(bool createAccount = false) 
+            => SignInAsync(new StudentCredential(credentialService.Username, credentialService.PasswordHash), createAccount);
 
         public async Task WaitForUserInitializationAsync(string location, int pollInterval)
         {

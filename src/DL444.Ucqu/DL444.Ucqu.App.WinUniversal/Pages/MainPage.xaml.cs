@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using DL444.Ucqu.App.WinUniversal.Extensions;
 using DL444.Ucqu.App.WinUniversal.Services;
 using DL444.Ucqu.App.WinUniversal.ViewModels;
@@ -60,6 +61,8 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
                 }
             }
         }
+
+        private async Task SignOut() => await ((App)Application.Current).SignOut();
 
         private IDataService localDataService;
         private IDataService remoteDataService;

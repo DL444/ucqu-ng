@@ -35,6 +35,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
 
         public void ClearCredential()
         {
+            Token = null;
             try
             {
                 foreach (PasswordCredential credential in vault.FindAllByResource("User"))

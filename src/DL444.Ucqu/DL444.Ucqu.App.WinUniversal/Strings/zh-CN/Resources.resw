@@ -144,4 +144,19 @@
   <data name="NavigationItemScore.Content" xml:space="preserve">
     <value>成绩</value>
   </data>
+  <data name="SignInButton.Content" xml:space="preserve">
+    <value>登录</value>
+  </data>
+  <data name="SignInButton.Width" xml:space="preserve">
+    <value>100</value>
+  </data>
+  <data name="SignInPageTitle.Text" xml:space="preserve">
+    <value>登录</value>
+  </data>
+  <data name="SignInPasswordBox.PlaceholderText" xml:space="preserve">
+    <value>密码</value>
+  </data>
+  <data name="SignInUsernameBox.PlaceholderText" xml:space="preserve">
+    <value>学号</value>
+  </data>
 </root>

@@ -19,7 +19,9 @@
                             <x:Double x:Key="AppTitleBarHeight">32</x:Double>
                             <x:Double x:Key="AppLeftPaneCompactLength">40</x:Double>
                             <x:Double x:Key="AppLeftPaneOpenLength">320</x:Double>
+                            <x:Double x:Key="SignInPageTextBoxWidth">280</x:Double>
                             <StaticResource x:Key="AppPaneBackgroundBrush" ResourceKey="SystemControlChromeMediumLowAcrylicWindowMediumBrush" />
+                            <StaticResource x:Key="SignInPageBackgroundBrush" ResourceKey="SystemControlAcrylicElementMediumHighBrush" />
                             <SolidColorBrush x:Key="NavigationViewTopPaneBackground" Color="Transparent" />
                             <Color x:Key="DestructiveWarningColor">#FF4F4F</Color>
                             <SolidColorBrush x:Key="DestructiveWarningColorBrush" Color="{StaticResource DestructiveWarningColor}" />
