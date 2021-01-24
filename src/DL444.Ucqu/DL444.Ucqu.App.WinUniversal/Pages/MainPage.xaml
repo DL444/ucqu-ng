@@ -5,10 +5,107 @@
     xmlns:local="using:DL444.Ucqu.App.WinUniversal.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:controls="using:DL444.Ucqu.App.WinUniversal.Controls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1008" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="SummaryPaneColumn.Width" Value="{ThemeResource AppLeftPaneOpenLength}" />
+                        <Setter Target="NavPane.(Grid.ColumnSpan)" Value="1" />
+                        <Setter Target="SummaryPane.Visibility" Value="Visible" />
+                        <Setter Target="PaneToggleButton.Visibility" Value="Collapsed" />
+                        <Setter Target="ContentFrame.(Grid.Row)" Value="0" />
+                        <Setter Target="ContentFrame.(Grid.RowSpan)" Value="2" />
+                        <Setter Target="ContentFrame.(Grid.Column)" Value="1" />
+                        <Setter Target="ContentFrame.(Grid.ColumnSpan)" Value="1" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="SummaryPaneColumn" Width="0" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
 
+        <Grid x:Name="NavPane" Background="{ThemeResource AppPaneBackgroundBrush}" Grid.ColumnSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="{ThemeResource AppTitleBarHeight}" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="{ThemeResource AppLeftPaneCompactLength}" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock x:Uid="AppTitle" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <controls:NavigationPaneButton x:Name="PaneToggleButton" Icon="&#xE099;" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" />
+            <muxc:NavigationView x:Name="NavigationView" Style="{ThemeResource AppNavigationPaneStyle}" PaneDisplayMode="Top" IsBackButtonVisible="Collapsed" IsSettingsVisible="False" 
+                                 SelectionChanged="NavigationView_SelectionChanged" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top">
+                <muxc:NavigationView.MenuItems>
+                    <muxc:NavigationViewItem x:Uid="NavigationItemSchedule" Icon="Calendar" Tag="0" />
+                    <muxc:NavigationViewItem x:Uid="NavigationItemScore" Icon="OutlineStar" Tag="1" />
+                </muxc:NavigationView.MenuItems>
+                <muxc:NavigationView.PaneFooter>
+                    <Grid>
+                        <controls:NavigationPaneButton Icon="&#xE10C;">
+                            <controls:NavigationPaneButton.Flyout>
+                                <MenuFlyout Placement="BottomEdgeAlignedRight" x:DefaultBindMode="OneWay">
+                                    <controls:MenuFlyoutContentItem Visibility="{x:Bind StudentInfoViewModel.IsValueReady}">
+                                        <controls:MenuFlyoutContentItem.Content>
+                                            <Grid RowSpacing="4">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="{x:Bind StudentInfoViewModel.Value.Name}" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                                                <StackPanel Orientation="Horizontal" Spacing="8" Grid.Row="1">
+                                                    <TextBlock Text="{x:Bind StudentInfoViewModel.Value.Major}" />
+                                                    <TextBlock Text="·" Visibility="{x:Bind StudentInfoViewModel.Value.HasSecondMajor}" />
+                                                    <TextBlock Visibility="{x:Bind StudentInfoViewModel.Value.HasSecondMajor}" Text="{x:Bind StudentInfoViewModel.Value.SecondMajor}" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </controls:MenuFlyoutContentItem.Content>
+                                    </controls:MenuFlyoutContentItem>
+                                    <MenuFlyoutItem x:Uid="MenuItemCalendarSub" Visibility="{x:Bind StudentInfoViewModel.IsValueReady}" Icon="CalendarReply" />
+                                    <MenuFlyoutSeparator Visibility="{x:Bind StudentInfoViewModel.IsValueReady}" />
+                                    <MenuFlyoutItem x:Uid="MenuItemStaleWarning" Foreground="{ThemeResource NonDestructiveWarningColor}" Visibility="{x:Bind StudentInfoViewModel.IsDataStale}">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE7BA;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem x:Uid="MenuItemDataFetchError" Foreground="{ThemeResource DestructiveWarningColorBrush}" Visibility="{x:Bind StudentInfoViewModel.IsDataError}">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xEA39;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem x:Uid="MenuItemSettings" Icon="Setting" />
+                                    <MenuFlyoutItem x:Uid="MenuItemSignOut" Icon="Permissions" />
+                                    <MenuFlyoutItem x:Uid="MenuItemAbout" Icon="Emoji2" />
+                                </MenuFlyout>
+                            </controls:NavigationPaneButton.Flyout>
+                        </controls:NavigationPaneButton>
+                    </Grid>
+                </muxc:NavigationView.PaneFooter>
+            </muxc:NavigationView>
+        </Grid>
+
+        <Grid x:Name="SummaryPane" Background="{ThemeResource AppPaneBackgroundBrush}" Visibility="Collapsed" Grid.Row="1">
+            
+        </Grid>
+
+        <Frame x:Name="ContentFrame" Grid.Row="1" Grid.ColumnSpan="2"/>
     </Grid>
 </Page>

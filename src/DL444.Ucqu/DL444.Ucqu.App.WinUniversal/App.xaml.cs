@@ -17,7 +17,10 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using DL444.Ucqu.App.WinUniversal.Extensions;
-using DL444.Ucqu.App.WinUniversal.Exceptions;
+using Windows.ApplicationModel.Core;
+using Windows.UI;
+using Windows.UI.ViewManagement;
+
 
 namespace DL444.Ucqu.App.WinUniversal
 {
@@ -50,6 +53,11 @@ namespace DL444.Ucqu.App.WinUniversal
 
         public IServiceProvider Services { get; }
 
+        public void SignOut()
+        {
+            // TODO: Sign out.
+        }
+
         private static void ConfigureConfiguration(IConfigurationBuilder builder) => builder.AddJsonFile("appconfig.json");
 
         private static void ConfigureServices(IServiceCollection services, IConfiguration config)
@@ -75,6 +83,8 @@ namespace DL444.Ucqu.App.WinUniversal
             LocalCacheService localCacheService = new LocalCacheService(config);
             services.AddSingleton<IDataService>(localCacheService);
             services.AddSingleton<ILocalCacheService>(localCacheService);
+
+            services.AddTransient<ILocalizationService, ResourceLocalizationService>();
         }
 
         /// <summary>
@@ -84,6 +94,7 @@ namespace DL444.Ucqu.App.WinUniversal
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
+            ConfigureTitleBar();
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -111,7 +122,7 @@ namespace DL444.Ucqu.App.WinUniversal
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
                     // parameter
-                    NavigateToFirstPage(rootFrame, e.Arguments);
+                    rootFrame.Navigate(typeof(Pages.MainPage), e.Arguments);
                 }
                 // Ensure the current window is active
                 Window.Current.Activate();
@@ -142,10 +153,13 @@ namespace DL444.Ucqu.App.WinUniversal
             deferral.Complete();
         }
 
-        private void NavigateToFirstPage(Frame rootFrame, string arguments)
+        private void ConfigureTitleBar()
         {
-            // TODO: If has credential, configure online client and go to main page. Else go to sign in page.
-            rootFrame.Navigate(typeof(Pages.MainPage), arguments);
+            var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
+            coreTitleBar.ExtendViewIntoTitleBar = true;
+            var titleBar = ApplicationView.GetForCurrentView().TitleBar;
+            titleBar.ButtonBackgroundColor = Colors.Transparent;
+            titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
         }
     }
 }
