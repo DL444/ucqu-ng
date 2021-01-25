@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DL444.Ucqu.Backend.Models
+namespace DL444.Ucqu.Models
 {
     public struct ScheduleTime
     {

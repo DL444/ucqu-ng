@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using DL444.Ucqu.Backend.Models;
+using DL444.Ucqu.Models;
 using Microsoft.Extensions.Configuration;
 
 namespace DL444.Ucqu.Backend.Services

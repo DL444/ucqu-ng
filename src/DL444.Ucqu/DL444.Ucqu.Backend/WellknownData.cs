@@ -5,6 +5,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using DL444.Ucqu.Backend.Services;
 using DL444.Ucqu.Models;
+using System.Linq;
 
 namespace DL444.Ucqu.Backend
 {
@@ -16,7 +17,8 @@ namespace DL444.Ucqu.Backend
             {
                 CurrentTerm = wellknown.CurrentTerm,
                 TermStartDate = wellknown.TermStartDate,
-                TermEndDate = wellknown.TermEndDate
+                TermEndDate = wellknown.TermEndDate,
+                Schedule = wellknown.Schedule.ToList()
             };
         }
 
