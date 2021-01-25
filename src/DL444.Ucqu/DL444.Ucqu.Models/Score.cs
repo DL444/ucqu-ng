@@ -18,6 +18,7 @@ namespace DL444.Ucqu.Models
 
         public string StudentId { get; set; }
         public bool IsSecondMajor { get; set; }
+        public string Major { get; set; }
         public List<Term> Terms { get; set; } = new List<Term>();
         [JsonInclude]
         public double GradePoint
