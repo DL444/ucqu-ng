@@ -13,19 +13,19 @@ using Windows.Storage;
 
 namespace DL444.Ucqu.App.WinUniversal.Services
 {
-    internal class LocalCacheService : IDataService, ILocalCacheService
+    internal class LocalCacheService : IDataService, ILocalCacheService, IDisposable
     {
         public LocalCacheService(IConfiguration config)
         {
-            databaseName = config.GetValue<string>("LocalData:DatabaseName");
-            InitializeDatabase();
+            string databaseName = config.GetValue<string>("LocalData:DatabaseName");
+            InitializeDatabase(databaseName);
             string keyString = GetEncryptionKey();
             key = Convert.FromBase64String(keyString);
         }
 
         public DataSource DataSource => DataSource.LocalCache;
 
-        public async Task<DataRequestResult<WellknownData>> GetWellknownDataAsync() 
+        public async Task<DataRequestResult<WellknownData>> GetWellknownDataAsync()
             => new DataRequestResult<WellknownData>(await GetRecordDataAsync<WellknownData>(RecordType.Wellknown), null);
 
         public async Task<DataRequestResult<StudentInfo>> GetStudentInfoAsync()
@@ -42,12 +42,9 @@ namespace DL444.Ucqu.App.WinUniversal.Services
 
         public async Task<DataRequestResult<object>> DeleteUserAsync()
         {
-            using (SqliteConnection connection = await ConnectDatabaseAsync())
-            {
-                SqliteCommand command = new SqliteCommand("DELETE FROM cachedData", connection);
-                await command.ExecuteNonQueryAsync();
-                return new DataRequestResult<object>();
-            }
+            SqliteCommand command = new SqliteCommand("DELETE FROM cachedData", connection);
+            await command.ExecuteNonQueryAsync();
+            return new DataRequestResult<object>();
         }
 
         public async Task<DataRequestResult<DeveloperMessage>> GetDeveloperMessagesAsync()
@@ -67,7 +64,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
 
         public Task ClearCacheAsync() => DeleteUserAsync();
 
-        private async Task<SqliteConnection> ConnectDatabaseAsync()
+        private async Task<SqliteConnection> ConnectDatabaseAsync(string databaseName)
         {
             await ApplicationData.Current.LocalFolder.CreateFileAsync(databaseName, CreationCollisionOption.OpenIfExists);
             string path = Path.Combine(ApplicationData.Current.LocalFolder.Path, databaseName);
@@ -76,49 +73,44 @@ namespace DL444.Ucqu.App.WinUniversal.Services
             return connection;
         }
 
-        private void InitializeDatabase()
+        private void InitializeDatabase(string databaseName)
         {
-            using (var connection = ConnectDatabaseAsync().Result)
-            {
-                SqliteCommand command = new SqliteCommand("CREATE TABLE IF NOT EXISTS cachedData (recordType INTEGER PRIMARY KEY, iv TEXT, data BLOB)", connection);
-                command.ExecuteNonQuery();
-            }
+            connection = ConnectDatabaseAsync(databaseName).Result;
+            SqliteCommand command = new SqliteCommand("CREATE TABLE IF NOT EXISTS cachedData (recordType INTEGER PRIMARY KEY, iv TEXT, data BLOB)", connection);
+            command.ExecuteNonQuery();
         }
 
         private async Task<T> GetRecordDataAsync<T>(RecordType type)
         {
-            using (SqliteConnection connection = await ConnectDatabaseAsync())
+            SqliteCommand command = new SqliteCommand("SELECT recordType, iv, data FROM cachedData WHERE recordType = @type", connection);
+            command.Parameters.AddWithValue("@type", (int)type);
+            using (SqliteDataReader reader = await command.ExecuteReaderAsync())
             {
-                SqliteCommand command = new SqliteCommand("SELECT recordType, iv, data FROM cachedData WHERE recordType = @type", connection);
-                command.Parameters.AddWithValue("@type", (int)type);
-                using (SqliteDataReader reader = await command.ExecuteReaderAsync())
+                if (reader.Read() == false)
                 {
-                    if (reader.Read() == false)
+                    throw new LocalCacheInexistException($"Local cache for type {type} does not exist.");
+                }
+                string iv = reader.GetString(1);
+                Aes aes = Aes.Create();
+                aes.Key = key;
+                aes.IV = Convert.FromBase64String(iv);
+                try
+                {
+                    using (Stream stream = reader.GetStream(2))
+                    using (var cryptoStream = new CryptoStream(stream, aes.CreateDecryptor(), CryptoStreamMode.Read))
+                    using (var streamReader = new StreamReader(cryptoStream))
+                    using (var jsonReader = new JsonTextReader(streamReader))
                     {
-                        throw new LocalCacheInexistException($"Local cache for type {type} does not exist.");
+                        return new JsonSerializer().Deserialize<T>(jsonReader);
                     }
-                    string iv = reader.GetString(1);
-                    Aes aes = Aes.Create();
-                    aes.Key = key;
-                    aes.IV = Convert.FromBase64String(iv);
-                    try
-                    {
-                        using (Stream stream = reader.GetStream(2))
-                        using (var cryptoStream = new CryptoStream(stream, aes.CreateDecryptor(), CryptoStreamMode.Read))
-                        using (var streamReader = new StreamReader(cryptoStream))
-                        using (var jsonReader = new JsonTextReader(streamReader))
-                        {
-                            return new JsonSerializer().Deserialize<T>(jsonReader);
-                        }
-                    }
-                    catch (CryptographicException ex)
-                    {
-                        throw new LocalCacheRequestFailedException($"Local cache for type {type} cannot be decrypted.", ex);
-                    }
-                    catch (JsonException ex)
-                    {
-                        throw new LocalCacheRequestFailedException($"Local cache for type {type} cannot be deserialized.", ex);
-                    }
+                }
+                catch (CryptographicException ex)
+                {
+                    throw new LocalCacheRequestFailedException($"Local cache for type {type} cannot be decrypted.", ex);
+                }
+                catch (JsonException ex)
+                {
+                    throw new LocalCacheRequestFailedException($"Local cache for type {type} cannot be deserialized.", ex);
                 }
             }
         }
@@ -134,25 +126,22 @@ namespace DL444.Ucqu.App.WinUniversal.Services
                 new JsonSerializer().Serialize(streamWriter, data);
                 await streamWriter.FlushAsync();
                 cryptoStream.FlushFinalBlock();
-                using (SqliteConnection connection = await ConnectDatabaseAsync())
+                SqliteCommand command = new SqliteCommand(
+                    "INSERT INTO cachedData (recordType, iv, data) VALUES (@type, @iv, zeroblob(@length))" +
+                    "ON CONFLICT (recordType) DO UPDATE SET iv = @iv, data = zeroblob(@length)", connection);
+                command.Parameters.AddWithValue("@type", (int)type);
+                command.Parameters.AddWithValue("@iv", Convert.ToBase64String(aes.IV));
+                command.Parameters.AddWithValue("@length", inputStream.Length);
+                var updatedRows = await command.ExecuteNonQueryAsync();
+                if (updatedRows == 0)
                 {
-                    SqliteCommand command = new SqliteCommand(
-                        "INSERT INTO cachedData (recordType, iv, data) VALUES (@type, @iv, zeroblob(@length))" +
-                        "ON CONFLICT (recordType) DO UPDATE SET iv = @iv, data = zeroblob(@length)", connection);
-                    command.Parameters.AddWithValue("@type", (int)type);
-                    command.Parameters.AddWithValue("@iv", Convert.ToBase64String(aes.IV));
-                    command.Parameters.AddWithValue("@length", inputStream.Length);
-                    var updatedRows = await command.ExecuteNonQueryAsync();
-                    if (updatedRows == 0)
-                    {
-                        throw new LocalCacheRequestFailedException($"Failed to update cache for type {type}.");
-                    }
+                    throw new LocalCacheRequestFailedException($"Failed to update cache for type {type}.");
+                }
 
-                    using (var blob = new SqliteBlob(connection, "cachedData", "data", (long)type))
-                    {
-                        inputStream.Seek(0, SeekOrigin.Begin);
-                        await inputStream.CopyToAsync(blob);
-                    }
+                using (var blob = new SqliteBlob(connection, "cachedData", "data", (long)type))
+                {
+                    inputStream.Seek(0, SeekOrigin.Begin);
+                    await inputStream.CopyToAsync(blob);
                 }
             }
         }
@@ -178,7 +167,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
             return key;
         }
 
-        private string databaseName;
+        private SqliteConnection connection;
         private byte[] key;
 
         private enum RecordType
@@ -191,5 +180,26 @@ namespace DL444.Ucqu.App.WinUniversal.Services
             ScoreSecondMajor = 5,
             DeveloperMessages = 6
         }
+
+        #region IDisposable
+        private bool disposedValue;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    connection.Dispose();
+                }
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }
