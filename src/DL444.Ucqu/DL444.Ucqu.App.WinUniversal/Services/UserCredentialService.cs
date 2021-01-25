@@ -27,7 +27,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
             get
             {
                 string username = Username;
-                return username == null ? null : vault.Retrieve("User", Username).Password;
+                return username == null ? null : vault.Retrieve("User", username).Password;
             }
         }
 
