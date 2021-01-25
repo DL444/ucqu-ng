@@ -13,7 +13,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
         
         public string Name { get; }
         public string Major { get; }
-        public bool HasSecondMajor => SecondMajor != null;
+        public bool HasSecondMajor => !string.IsNullOrWhiteSpace(SecondMajor);
         public string SecondMajor { get; }
     }
 }

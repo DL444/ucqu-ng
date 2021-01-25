@@ -122,6 +122,7 @@
     </Compile>
     <Compile Include="Controls\MenuFlyoutContentItem.cs" />
     <Compile Include="Controls\NavigationPaneButton.cs" />
+    <Compile Include="Controls\ScoreTable.cs" />
     <Compile Include="Converters\InvertedVisibilityBooleanConverter.cs" />
     <Compile Include="Exceptions\BackendAuthenticationFailedException.cs" />
     <Compile Include="Exceptions\BackendRequestFailedException.cs" />
@@ -155,6 +156,9 @@
     <Compile Include="Services\LocalCacheService.cs" />
     <Compile Include="Services\ResourceLocalizationService.cs" />
     <Compile Include="Services\UserCredentialService.cs" />
+    <Compile Include="Themes\Generic.xaml.cs">
+      <DependentUpon>Generic.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\DataViewModel.cs" />
     <Compile Include="ViewModels\ScoreSetViewModel.cs" />
     <Compile Include="ViewModels\SignInViewModel.cs" />
@@ -231,6 +235,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.10</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI">
+      <Version>6.1.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
       <Version>2.5.0</Version>

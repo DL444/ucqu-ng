@@ -2,13 +2,34 @@
     x:Class="DL444.Ucqu.App.WinUniversal.Pages.ScorePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:DL444.Ucqu.App.WinUniversal.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:DL444.Ucqu.App.WinUniversal.Controls"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        
+        <Pivot x:Name="ScoreSectionsPivot" Grid.Row="1" Margin="0,0,0,0" SelectionChanged="ScoreSectionsPivot_SelectionChanged">
+            <Pivot.LeftHeader>
+                <Grid Width="16" />
+            </Pivot.LeftHeader>
+            <PivotItem x:Uid="MajorScoreSection">
+                <Grid>
+                    <muxc:ProgressBar IsIndeterminate="True" Visibility="{x:Bind MajorScoreViewModel.IsDataInProgress, Mode=OneWay}" VerticalAlignment="Top" Margin="16,4,0,0" />
+                    <controls:ScoreTable ScoreSet="{x:Bind MajorScoreViewModel.Value, Mode=OneWay}" 
+                                         Major="{x:Bind StudentInfoViewModel.Value.Major, Mode=OneWay}" 
+                                         Visibility="{x:Bind MajorScoreViewModel.IsValueReady, Mode=OneWay}" />
+                </Grid>
+            </PivotItem>
+            <PivotItem x:Uid="SecondMajorScoreSection">
+                <Grid>
+                    <muxc:ProgressBar IsIndeterminate="True" Visibility="{x:Bind SecondMajorScoreViewModel.IsDataInProgress, Mode=OneWay}" VerticalAlignment="Top" Margin="16,4,0,0" />
+                    <controls:ScoreTable ScoreSet="{x:Bind SecondMajorScoreViewModel.Value, Mode=OneWay}" 
+                                         Major="{x:Bind StudentInfoViewModel.Value.SecondMajor, Mode=OneWay}"
+                                         Visibility="{x:Bind SecondMajorScoreViewModel.IsValueReady, Mode=OneWay}" />
+                </Grid>
+            </PivotItem>
+        </Pivot>
     </Grid>
 </Page>

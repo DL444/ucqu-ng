@@ -120,6 +120,9 @@
   <data name="AppTitle.Text" xml:space="preserve">
     <value>UCQU</value>
   </data>
+  <data name="MajorScoreSection.Header" xml:space="preserve">
+    <value>主修</value>
+  </data>
   <data name="MenuItemAbout.Text" xml:space="preserve">
     <value>反馈与关于</value>
   </data>
@@ -145,7 +148,31 @@
     <value>成绩</value>
   </data>
   <data name="OverallGradePointFormat" xml:space="preserve">
-    <value>总绩点: {0}</value>
+    <value>总绩点: {0:0.00}</value>
+  </data>
+  <data name="ScoreTableHeaderCourseName.Text" xml:space="preserve">
+    <value>课程</value>
+  </data>
+  <data name="ScoreTableHeaderCredit.Text" xml:space="preserve">
+    <value>学分</value>
+  </data>
+  <data name="ScoreTableHeaderGradePoint.Text" xml:space="preserve">
+    <value>绩点</value>
+  </data>
+  <data name="ScoreTableHeaderLecturer.Text" xml:space="preserve">
+    <value>教师</value>
+  </data>
+  <data name="ScoreTableHeaderScore.Text" xml:space="preserve">
+    <value>成绩</value>
+  </data>
+  <data name="ScoreTableNoResultDescription.Text" xml:space="preserve">
+    <value>尽情享受当下</value>
+  </data>
+  <data name="ScoreTableNoResultTitle.Text" xml:space="preserve">
+    <value>暂时没有成绩</value>
+  </data>
+  <data name="SecondMajorScoreSection.Header" xml:space="preserve">
+    <value>辅修</value>
   </data>
   <data name="SignInButton.Content" xml:space="preserve">
     <value>登录</value>
@@ -163,10 +190,10 @@
     <value>学号</value>
   </data>
   <data name="TermDisplayNameFormat" xml:space="preserve">
-    <value>{0}-{1}学年第{2}学期</value>
+    <value>{0} - {1} 学年第{2}学期</value>
   </data>
   <data name="TermGradePointFormat" xml:space="preserve">
-    <value>学期绩点: {0}</value>
+    <value>学期绩点: {0:0.00}</value>
   </data>
   <data name="TermNumberNotation0" xml:space="preserve">
     <value>一</value>

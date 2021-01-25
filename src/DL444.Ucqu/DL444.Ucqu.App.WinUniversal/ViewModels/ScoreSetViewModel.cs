@@ -16,6 +16,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             ILocalizationService locService = Application.Current.GetService<ILocalizationService>();
             GradePoint = scoreSet.GradePoint;
             GradePointDisplay = locService.Format("OverallGradePointFormat", scoreSet.GradePoint);
+            HasTerms = scoreSet.Terms.Count > 0;
             Terms = new CollectionViewSource()
             {
                 IsSourceGrouped = true,
@@ -28,6 +29,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
         public string GradePointDisplay { get; }
 
         public CollectionViewSource Terms { get; }
+        public bool HasTerms { get; }
     }
 
     internal struct TermViewModel
@@ -67,5 +69,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
         public string Comment { get; }
         public string ShortLecturer { get; }
         public double GradePoint { get; }
+        public string GradePointDisplay => $"{GradePoint:0.0}";
+        public double StarCount => Score < 60 ? -1 : (Score - 60) / 10 + 1;
     }
 }

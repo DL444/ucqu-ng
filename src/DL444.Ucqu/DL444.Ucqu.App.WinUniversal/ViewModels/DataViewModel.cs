@@ -38,7 +38,8 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             Func<Task<DataRequestResult<TModel>>> localFetchFunc,
             Func<Task<DataRequestResult<TModel>>> remoteFetchFunc,
             Func<TModel, Task> cacheUpdateFunc,
-            Func<TModel, TViewModel> viewModelCreateFunc)
+            Func<TModel, TViewModel> viewModelCreateFunc,
+            bool preferLocal = false)
         {
             Status = DataStatus.InProgress;
             bool localFetchSuccess = false;
@@ -51,6 +52,11 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
                 Value = viewModelCreateFunc(cachedInfo);
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsValueReady)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
+                if (preferLocal)
+                {
+                    Status = DataStatus.Ok;
+                    return;
+                }
             }
             catch (LocalCacheRequestFailedException) { }
 
@@ -85,6 +91,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
                 catch (LocalCacheRequestFailedException) { }
             }
         }
+
         private DataStatus status;
     }
 

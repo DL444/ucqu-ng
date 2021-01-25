@@ -22,6 +22,7 @@
                         <Setter Target="NavPane.(Grid.ColumnSpan)" Value="1" />
                         <Setter Target="SummaryPane.Visibility" Value="Visible" />
                         <Setter Target="PaneToggleButton.Visibility" Value="Collapsed" />
+                        <Setter Target="ContentFrame.Margin" Value="{ThemeResource AppTitleBarMargin}" />
                         <Setter Target="ContentFrame.(Grid.Row)" Value="0" />
                         <Setter Target="ContentFrame.(Grid.RowSpan)" Value="2" />
                         <Setter Target="ContentFrame.(Grid.Column)" Value="1" />
