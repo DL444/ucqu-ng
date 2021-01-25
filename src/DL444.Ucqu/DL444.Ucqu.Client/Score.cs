@@ -54,10 +54,8 @@ namespace DL444.Ucqu.Client
                 };
             }
             _ = int.TryParse(GetScorePageProperty(page, "年级", "&"), out int admissionYear);
-            string? major = GetScorePageProperty(page, "专业", "&");
             ScoreSet set = new ScoreSet(studentId)
             {
-                Major = major,
                 IsSecondMajor = isSecondMajor,
                 Terms = GetTerms(page)
             };
