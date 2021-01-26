@@ -10,6 +10,58 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
+    <Page.Resources>
+        <Storyboard x:Name="TopPaneShowAnimation">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="SummaryPane" 
+                                           Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" 
+                                           Duration="0:0:0.2">
+                <DiscreteDoubleKeyFrame Value="-400" KeyTime="0:0:0" />
+                <EasingDoubleKeyFrame Value="0" KeyTime="0:0:0.2">
+                    <EasingDoubleKeyFrame.EasingFunction>
+                        <CircleEase EasingMode="EaseOut" />
+                    </EasingDoubleKeyFrame.EasingFunction>
+                </EasingDoubleKeyFrame>
+            </DoubleAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="SummaryPane"
+                                           Storyboard.TargetProperty="Visibility">
+                <DiscreteObjectKeyFrame Value="Visible" KeyTime="0:0:0" />
+            </ObjectAnimationUsingKeyFrames>
+            <DoubleAnimation Storyboard.TargetName="TopPaneLightDismissTarget" 
+                             Storyboard.TargetProperty="Opacity" 
+                             From="0" To="0.8" Duration="0:0:0.2" />
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TopPaneLightDismissTarget"
+                                           Storyboard.TargetProperty="Visibility">
+                <DiscreteObjectKeyFrame Value="Visible" KeyTime="0:0:0" />
+            </ObjectAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Name="TopPaneHideAnimation">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="SummaryPane" 
+                                           Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" 
+                                           Duration="0:0:0.21">
+                <DiscreteDoubleKeyFrame Value="0" KeyTime="0:0:0" />
+                <EasingDoubleKeyFrame Value="-400" KeyTime="0:0:0.2">
+                    <EasingDoubleKeyFrame.EasingFunction>
+                        <CircleEase EasingMode="EaseIn" />
+                    </EasingDoubleKeyFrame.EasingFunction>
+                </EasingDoubleKeyFrame>
+                <DiscreteDoubleKeyFrame Value="0" KeyTime="0:0:0.21" />
+            </DoubleAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="SummaryPane"
+                                           Storyboard.TargetProperty="Visibility"
+                                           Duration="0:0:0.2">
+                <DiscreteObjectKeyFrame Value="Collapsed" KeyTime="0:0:0.2" />
+            </ObjectAnimationUsingKeyFrames>
+            <DoubleAnimation Storyboard.TargetName="TopPaneLightDismissTarget" 
+                             Storyboard.TargetProperty="Opacity" 
+                             From="0.8" To="0.0" Duration="0:0:0.2" />
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TopPaneLightDismissTarget"
+                                           Storyboard.TargetProperty="Visibility"
+                                           Duration="0:0:0.2">
+                <DiscreteObjectKeyFrame Value="Collapsed" KeyTime="0:0:0.2" />
+            </ObjectAnimationUsingKeyFrames>
+        </Storyboard>
+    </Page.Resources>
+
     <Grid>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
@@ -24,6 +76,7 @@
                         <Setter Target="SummaryPane.ColumnSpan" Value="1" />
                         <Setter Target="SummaryPane.VerticalAlignment" Value="Stretch" />
                         <Setter Target="SummaryPane.Height" Value="Auto" />
+                        <Setter Target="TopPaneLightDismissTarget.Visibility" Value="Collapsed" />
                         <Setter Target="PaneToggleButton.Visibility" Value="Collapsed" />
                         <Setter Target="ContentFrame.Margin" Value="{ThemeResource AppTitleBarMargin}" />
                         <Setter Target="ContentFrame.(Grid.Row)" Value="0" />
@@ -46,6 +99,18 @@
 
         <Frame x:Name="ContentFrame" Grid.Row="1" Grid.ColumnSpan="2"/>
 
+        <Grid x:Name="TopPaneLightDismissTarget" Visibility="Collapsed" Background="#000000" Grid.Row="1" Grid.ColumnSpan="2" Tapped="TopPaneLightDismissTarget_Tapped" />
+
+        <Grid x:Name="SummaryPane" Background="{ThemeResource AppPaneBackgroundBrush}" Visibility="Collapsed" Grid.Row="1" Grid.ColumnSpan="2" Height="{ThemeResource AppTopPaneOpenLength}" VerticalAlignment="Top">
+            <Grid.RenderTransform>
+                <TranslateTransform />
+            </Grid.RenderTransform>
+            <controls:ScheduleSummary TermRange="{x:Bind WellknownDataViewModel.Value, Mode=OneWay}" 
+                                      Schedule="{x:Bind ScheduleViewModel.Value, Mode=OneWay}"
+                                      Exams="{x:Bind ExamsViewModel.Value, Mode=OneWay}" 
+                                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        </Grid>
+
         <Grid x:Name="NavPane" Background="{ThemeResource AppPaneBackgroundBrush}" Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="{ThemeResource AppTitleBarHeight}" />
@@ -57,7 +122,15 @@
             </Grid.ColumnDefinitions>
             
             <TextBlock x:Uid="AppTitle" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
-            <controls:NavigationPaneButton x:Name="PaneToggleButton" Icon="&#xE099;" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" />
+            <controls:NavigationPaneButton x:Name="PaneToggleButton" Click="PaneToggleButton_Click" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <controls:NavigationPaneButton.Icon>
+                    <FontIcon x:Name="PaneToggleIcon" Glyph="&#xE099;">
+                        <FontIcon.RotationTransition>
+                            <ScalarTransition />
+                        </FontIcon.RotationTransition>
+                    </FontIcon>
+                </controls:NavigationPaneButton.Icon>
+            </controls:NavigationPaneButton>
             <muxc:NavigationView x:Name="NavigationView" Style="{ThemeResource AppNavigationPaneStyle}" PaneDisplayMode="Top" IsBackButtonVisible="Collapsed" IsSettingsVisible="False" 
                                  SelectionChanged="NavigationView_SelectionChanged" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top">
                 <muxc:NavigationView.MenuItems>
@@ -66,7 +139,10 @@
                 </muxc:NavigationView.MenuItems>
                 <muxc:NavigationView.PaneFooter>
                     <Grid>
-                        <controls:NavigationPaneButton Icon="&#xE10C;" UseSystemFocusVisuals="True">
+                        <controls:NavigationPaneButton>
+                            <controls:NavigationPaneButton.Icon>
+                                <FontIcon Glyph="&#xE10C;" />
+                            </controls:NavigationPaneButton.Icon>
                             <controls:NavigationPaneButton.Flyout>
                                 <MenuFlyout Placement="BottomEdgeAlignedRight" x:DefaultBindMode="OneWay">
                                     <controls:MenuFlyoutContentItem Visibility="{x:Bind StudentInfoViewModel.IsValueReady}">
@@ -106,13 +182,6 @@
                     </Grid>
                 </muxc:NavigationView.PaneFooter>
             </muxc:NavigationView>
-        </Grid>
-
-        <Grid x:Name="SummaryPane" Background="{ThemeResource AppPaneBackgroundBrush}" Visibility="Collapsed" Grid.Row="1" Grid.ColumnSpan="2" Height="{ThemeResource AppTopPaneOpenLength}" VerticalAlignment="Top">
-            <controls:ScheduleSummary TermRange="{x:Bind WellknownDataViewModel.Value, Mode=OneWay}" 
-                                      Schedule="{x:Bind ScheduleViewModel.Value, Mode=OneWay}"
-                                      Exams="{x:Bind ExamsViewModel.Value, Mode=OneWay}" 
-                                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
         </Grid>
     </Grid>
 </Page>

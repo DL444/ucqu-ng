@@ -20,6 +20,7 @@
         <Setter Property="Background" Value="{ThemeResource NavigationViewItemBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource NavigationViewItemForeground}" />
         <Setter Property="BorderThickness" Value="{ThemeResource NavigationViewToggleBorderThickness}" />
+        <Setter Property="UseSystemFocusVisuals" Value="True" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="controls:NavigationPaneButton">
@@ -102,10 +103,9 @@
                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                             AutomationProperties.AccessibilityView="Raw">
 
-                            <TextBlock
+                            <ContentPresenter
                                 x:Name="Icon"
-                                Text="{TemplateBinding Icon}"
-                                FontSize="{TemplateBinding FontSize}"
+                                Content="{TemplateBinding Icon}"
                                 AutomationProperties.AccessibilityView="Raw"/>
 
                         </Viewbox>

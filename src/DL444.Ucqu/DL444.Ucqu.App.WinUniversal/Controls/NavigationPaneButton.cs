@@ -12,13 +12,13 @@ namespace DL444.Ucqu.App.WinUniversal.Controls
             this.DefaultStyleKey = typeof(NavigationPaneButton);
         }
 
-        public string Icon
+        public IconElement Icon
         {
-            get => (string)GetValue(IconProperty);
+            get => (IconElement)GetValue(IconProperty);
             set => SetValue(IconProperty, value);
         }
 
         public static DependencyProperty IconProperty =
-            DependencyProperty.Register(nameof(Icon), typeof(string), typeof(NavigationPaneButton), new PropertyMetadata("\uE700"));
+            DependencyProperty.Register(nameof(Icon), typeof(IconElement), typeof(NavigationPaneButton), null);
     }
 }

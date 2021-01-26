@@ -49,6 +49,8 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+            prevWidth = Window.Current.Bounds.Width;
+            Window.Current.SizeChanged += CurrentWindow_SizeChanged;
             var wellknownUpdateTask = WellknownDataViewModel.UpdateAsync(
                 () => localDataService.GetWellknownDataAsync(),
                 () => remoteDataService.GetWellknownDataAsync(),
@@ -80,16 +82,77 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
             await Task.WhenAll(studentInfoUpdateTask, examsUpdateTask, scheduleUpdateTask);
         }
 
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+            base.OnNavigatingFrom(e);
+            Window.Current.SizeChanged -= CurrentWindow_SizeChanged;
+        }
+
         internal DataViewModel<StudentInfo, StudentInfoViewModel> StudentInfoViewModel { get; }
         internal DataViewModel<WellknownData, WellknownDataViewModel> WellknownDataViewModel { get; }
         internal DataViewModel<ExamSchedule, ExamScheduleViewModel> ExamsViewModel { get; }
         internal DataViewModel<Schedule, ScheduleViewModel> ScheduleViewModel { get; }
+
+        private void PaneToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetTopPaneOpenAsync(!topPaneOpen, true);
+        }
+
+        private void TopPaneLightDismissTarget_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            SetTopPaneOpenAsync(false, true);
+        }
+
+        private void CurrentWindow_SizeChanged(object sender, Windows.UI.Core.WindowSizeChangedEventArgs e)
+        {
+            if (prevWidth >= 1008 && e.Size.Width < 1008)
+            {
+                SetTopPaneOpenAsync(false, false);
+            }
+            prevWidth = e.Size.Width;
+        }
 
         private void NavigationView_SelectionChanged(WinUI.NavigationView sender, WinUI.NavigationViewSelectionChangedEventArgs args)
         {
             if (args.SelectedItem is WinUI.NavigationViewItem item && item.Tag is string key)
             {
                 Navigate(key);
+            }
+        }
+
+        private void SetTopPaneOpenAsync(bool value, bool showAnimation)
+        {
+            if (topPaneOpen == value)
+            {
+                return;
+            }
+            topPaneOpen = value;
+            PaneToggleIcon.CenterPoint = new System.Numerics.Vector3((float)PaneToggleIcon.ActualWidth / 2.0f, (float)PaneToggleIcon.ActualHeight / 2.0f, 0.0f);
+            if (value == true)
+            {
+                PaneToggleIcon.Rotation = 180;
+                if (showAnimation)
+                {
+                    TopPaneShowAnimation.Begin();
+                }
+                else
+                {
+                    TopPaneLightDismissTarget.Visibility = Visibility.Visible;
+                    SummaryPane.Visibility = Visibility.Visible;
+                }
+            }
+            else
+            {
+                PaneToggleIcon.Rotation = 0;
+                if (showAnimation)
+                {
+                    TopPaneHideAnimation.Begin();
+                }
+                else
+                {
+                    TopPaneLightDismissTarget.Visibility = Visibility.Collapsed;
+                    SummaryPane.Visibility = Visibility.Collapsed;
+                }
             }
         }
 
@@ -131,5 +194,7 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         private IDataService localDataService;
         private IDataService remoteDataService;
         private ILocalCacheService cacheService;
+        private bool topPaneOpen;
+        private double prevWidth;
     }
 }
