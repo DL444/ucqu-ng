@@ -150,6 +150,30 @@
   <data name="OverallGradePointFormat" xml:space="preserve">
     <value>总绩点: {0:0.00}</value>
   </data>
+  <data name="ScheduleSummaryExamCountdown0" xml:space="preserve">
+    <value>今天</value>
+  </data>
+  <data name="ScheduleSummaryExamCountdown1" xml:space="preserve">
+    <value>明天</value>
+  </data>
+  <data name="ScheduleSummaryExamCountdown2" xml:space="preserve">
+    <value>后天</value>
+  </data>
+  <data name="ScheduleSummaryExamCountdownEnded" xml:space="preserve">
+    <value>已结束</value>
+  </data>
+  <data name="ScheduleSummaryExamCountdownFormat" xml:space="preserve">
+    <value>{0} 天后</value>
+  </data>
+  <data name="ScheduleSummaryRecentExamsHeader.Text" xml:space="preserve">
+    <value>最近考试</value>
+  </data>
+  <data name="ScheduleSummaryTimeRangeFormat" xml:space="preserve">
+    <value>{0:h\:mm} - {1:h\:mm}</value>
+  </data>
+  <data name="ScheduleSummaryTodayCoursesHeader.Text" xml:space="preserve">
+    <value>今日课程</value>
+  </data>
   <data name="ScoreTableHeaderCourseName.Text" xml:space="preserve">
     <value>课程</value>
   </data>

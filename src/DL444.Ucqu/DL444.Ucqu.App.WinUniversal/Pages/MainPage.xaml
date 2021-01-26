@@ -21,6 +21,9 @@
                         <Setter Target="SummaryPaneColumn.Width" Value="{ThemeResource AppLeftPaneOpenLength}" />
                         <Setter Target="NavPane.(Grid.ColumnSpan)" Value="1" />
                         <Setter Target="SummaryPane.Visibility" Value="Visible" />
+                        <Setter Target="SummaryPane.ColumnSpan" Value="1" />
+                        <Setter Target="SummaryPane.VerticalAlignment" Value="Stretch" />
+                        <Setter Target="SummaryPane.Height" Value="Auto" />
                         <Setter Target="PaneToggleButton.Visibility" Value="Collapsed" />
                         <Setter Target="ContentFrame.Margin" Value="{ThemeResource AppTitleBarMargin}" />
                         <Setter Target="ContentFrame.(Grid.Row)" Value="0" />
@@ -105,8 +108,11 @@
             </muxc:NavigationView>
         </Grid>
 
-        <Grid x:Name="SummaryPane" Background="{ThemeResource AppPaneBackgroundBrush}" Visibility="Collapsed" Grid.Row="1">
-
+        <Grid x:Name="SummaryPane" Background="{ThemeResource AppPaneBackgroundBrush}" Visibility="Collapsed" Grid.Row="1" Grid.ColumnSpan="2" Height="{ThemeResource AppTopPaneOpenLength}" VerticalAlignment="Top">
+            <controls:ScheduleSummary TermRange="{x:Bind WellknownDataViewModel.Value, Mode=OneWay}" 
+                                      Schedule="{x:Bind ScheduleViewModel.Value, Mode=OneWay}"
+                                      Exams="{x:Bind ExamsViewModel.Value, Mode=OneWay}" 
+                                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
         </Grid>
     </Grid>
 </Page>

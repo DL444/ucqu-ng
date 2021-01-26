@@ -120,7 +120,7 @@ namespace DL444.Ucqu.App.WinUniversal
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            ConfigureTitleBar();
+            ConfigureWindow();
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -179,8 +179,9 @@ namespace DL444.Ucqu.App.WinUniversal
             deferral.Complete();
         }
 
-        private void ConfigureTitleBar()
+        private void ConfigureWindow()
         {
+            ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(500, 500));
             var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
             coreTitleBar.ExtendViewIntoTitleBar = true;
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;

@@ -25,7 +25,12 @@ namespace DL444.Ucqu.App.WinUniversal.Extensions
 
         public static T GetConfigurationValue<T>(this Application application, string key)
         {
-            return GetConfiguration(application).GetValue<T>(key);
+            return GetConfigurationValue<T>(application, key, default(T));
+        }
+
+        public static T GetConfigurationValue<T>(this Application application, string key, T defaultVaule)
+        {
+            return GetConfiguration(application).GetValue<T>(key, defaultVaule);
         }
     }
 }

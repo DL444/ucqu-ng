@@ -38,12 +38,36 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             Func<Task<DataRequestResult<TModel>>> localFetchFunc,
             Func<Task<DataRequestResult<TModel>>> remoteFetchFunc,
             Func<TModel, Task> cacheUpdateFunc,
+            Func<TModel, TViewModel> viewModelCreateFunc)
+        {
+            await UpdateAsync(localFetchFunc, remoteFetchFunc, cacheUpdateFunc, viewModelCreateFunc, false);
+        }
+
+        public async Task UpdateAsync(
+            Func<Task<DataRequestResult<TModel>>> localFetchFunc,
+            Func<Task<DataRequestResult<TModel>>> remoteFetchFunc,
+            Func<TModel, Task> cacheUpdateFunc,
             Func<TModel, TViewModel> viewModelCreateFunc,
-            bool preferLocal = false)
+            bool preferLocal)
+        {
+            await UpdateAsync(localFetchFunc, remoteFetchFunc, cacheUpdateFunc, viewModelCreateFunc, preferLocal, _ => !preferLocal);
+        }
+
+        public async Task UpdateAsync(
+            Func<Task<DataRequestResult<TModel>>> localFetchFunc,
+            Func<Task<DataRequestResult<TModel>>> remoteFetchFunc,
+            Func<TModel, Task> cacheUpdateFunc,
+            Func<TModel, TViewModel> viewModelCreateFunc,
+            bool preferLocal,
+            Func<TModel, bool> shouldFetchRemote)
         {
             Status = DataStatus.InProgress;
             bool localFetchSuccess = false;
-            Task<DataRequestResult<TModel>> remoteTask = remoteFetchFunc();
+            Task<DataRequestResult<TModel>> remoteTask = null;
+            if (!preferLocal)
+            {
+                remoteTask = remoteFetchFunc();
+            }
             try
             {
                 TModel cachedInfo = (await localFetchFunc()).Resource;
@@ -52,7 +76,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
                 Value = viewModelCreateFunc(cachedInfo);
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsValueReady)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
-                if (preferLocal)
+                if (preferLocal && !shouldFetchRemote(cachedInfo))
                 {
                     Status = DataStatus.Ok;
                     return;
@@ -60,6 +84,10 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             }
             catch (LocalCacheRequestFailedException) { }
 
+            if (remoteTask == null)
+            {
+                remoteTask = remoteFetchFunc();
+            }
             TModel remoteInfo = default;
             bool remoteFetchSuccess = false;
             try

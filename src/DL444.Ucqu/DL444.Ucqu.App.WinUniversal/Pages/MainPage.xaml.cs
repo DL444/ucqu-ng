@@ -37,20 +37,53 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
             cacheService = Application.Current.GetService<ILocalCacheService>();
             NavigationView.SelectedItem = NavigationView.MenuItems.First();
             StudentInfoViewModel = new DataViewModel<StudentInfo, StudentInfoViewModel>(new StudentInfoViewModel());
+            WellknownDataViewModel = new DataViewModel<WellknownData, WellknownDataViewModel>(new WellknownDataViewModel(new WellknownData()
+            {
+                TermStartDate = DateTimeOffset.UtcNow.Date,
+                TermEndDate = DateTimeOffset.UtcNow.Date.AddDays(1)
+            }));
+            ExamsViewModel = new DataViewModel<ExamSchedule, ExamScheduleViewModel>(new ExamScheduleViewModel());
+            ScheduleViewModel = new DataViewModel<Schedule, ScheduleViewModel>(new ScheduleViewModel());
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            await StudentInfoViewModel.UpdateAsync(
+            var wellknownUpdateTask = WellknownDataViewModel.UpdateAsync(
+                () => localDataService.GetWellknownDataAsync(),
+                () => remoteDataService.GetWellknownDataAsync(),
+                x => cacheService.SetWellknownDataAsync(x),
+                x => new WellknownDataViewModel(x),
+                preferLocal: true,
+                x => DateTimeOffset.UtcNow > x.TermEndDate);
+            var studentInfoUpdateTask = StudentInfoViewModel.UpdateAsync(
                 () => localDataService.GetStudentInfoAsync(),
                 () => remoteDataService.GetStudentInfoAsync(),
                 x => cacheService.SetStudentInfoAsync(x),
                 x => new StudentInfoViewModel(x)
             );
+            await wellknownUpdateTask;
+            Task examsUpdateTask = ExamsViewModel.UpdateAsync(
+                () => localDataService.GetExamsAsync(),
+                () => remoteDataService.GetExamsAsync(),
+                x => cacheService.SetExamsAsync(x),
+                x => new ExamScheduleViewModel(x, WellknownDataViewModel.Value.Model),
+                true,
+                _ => DateTimeOffset.UtcNow < WellknownDataViewModel.Value.Model.TermEndDate);
+            Task scheduleUpdateTask = ScheduleViewModel.UpdateAsync(
+                () => localDataService.GetScheduleAsync(),
+                () => remoteDataService.GetScheduleAsync(),
+                x => cacheService.SetScheduleAsync(x),
+                x => new ScheduleViewModel(x, WellknownDataViewModel.Value.Model),
+                true,
+                _ => DateTimeOffset.UtcNow < WellknownDataViewModel.Value.Model.TermEndDate);
+            await Task.WhenAll(studentInfoUpdateTask, examsUpdateTask, scheduleUpdateTask);
         }
 
         internal DataViewModel<StudentInfo, StudentInfoViewModel> StudentInfoViewModel { get; }
+        internal DataViewModel<WellknownData, WellknownDataViewModel> WellknownDataViewModel { get; }
+        internal DataViewModel<ExamSchedule, ExamScheduleViewModel> ExamsViewModel { get; }
+        internal DataViewModel<Schedule, ScheduleViewModel> ScheduleViewModel { get; }
 
         private void NavigationView_SelectionChanged(WinUI.NavigationView sender, WinUI.NavigationViewSelectionChangedEventArgs args)
         {

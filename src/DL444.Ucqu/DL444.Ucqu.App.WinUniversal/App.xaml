@@ -20,6 +20,7 @@
                             <Thickness x:Key="AppTitleBarMargin">0,32,0,0</Thickness>
                             <x:Double x:Key="AppLeftPaneCompactLength">40</x:Double>
                             <x:Double x:Key="AppLeftPaneOpenLength">320</x:Double>
+                            <x:Double x:Key="AppTopPaneOpenLength">360</x:Double>
                             <x:Double x:Key="SignInPageTextBoxWidth">280</x:Double>
                             <StaticResource x:Key="AppPaneBackgroundBrush" ResourceKey="SystemControlChromeMediumLowAcrylicWindowMediumBrush" />
                             <StaticResource x:Key="SignInPageBackgroundBrush" ResourceKey="SystemControlAcrylicElementMediumHighBrush" />
@@ -29,6 +30,9 @@
                             <Color x:Key="NonDestructiveWarningColor">#FFC200</Color>
                             <SolidColorBrush x:Key="NonDestructiveWarningColorBrush" Color="{StaticResource NonDestructiveWarningColor}" />
                             <SolidColorBrush x:Key="ScoreAlternateRowBackgroundBrush" Color="{ThemeResource SystemBaseLowColor}" Opacity="0.6" />
+                            <SolidColorBrush x:Key="SummaryCalendarFreeSlotBrush" Color="Transparent" />
+                            <SolidColorBrush x:Key="SummaryCalendarCourseSlotBrush" Color="{ThemeResource SystemAccentColor}" />
+                            <SolidColorBrush x:Key="SummaryCalendarExamSlotBrush" Color="{StaticResource DestructiveWarningColor}" />
                         </ResourceDictionary>
                         <ResourceDictionary x:Key="Light">
                             <Color x:Key="DestructiveWarningColor">#EF4136</Color>
@@ -588,6 +592,68 @@
                 </Setter>
             </Style>
 
+            <Style x:Key="ScheduleSummaryCalendarViewStyle" TargetType="CalendarView" BasedOn="{StaticResource CalendarViewRevealStyle}">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="FirstDayOfWeek" Value="Monday" />
+                <Setter Property="CalendarViewDayItemStyle" Value="{ThemeResource SlottedCalendarViewDayItemRevealStyle}" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="IsOutOfScopeEnabled" Value="False" />
+            </Style>
+
+            <Style x:Key="SlottedCalendarViewDayItemRevealStyle" TargetType="CalendarViewDayItem">
+                <Setter Property="MinWidth" Value="40" />
+                <Setter Property="MinHeight" Value="40" />
+                <Setter Property="Margin" Value="1" />
+                <Setter Property="Padding" Value="0, 0, 0, 4" />
+                <Setter Property="UseSystemFocusVisuals" Value="{StaticResource UseSystemFocusVisuals}" />
+                <Setter Property="FocusVisualMargin" Value="-2" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="CalendarViewDayItem">
+                            <Grid x:Name="Root">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal" />
+
+                                        <VisualState x:Name="PointerOver">
+                                            <VisualState.Setters>
+                                                <Setter Target="Root.(RevealBrush.State)" Value="PointerOver" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+
+                                        <VisualState x:Name="Pressed">
+                                            <VisualState.Setters>
+                                                <Setter Target="Root.(RevealBrush.State)" Value="Pressed" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+
+                                    </VisualStateGroup>
+
+                                </VisualStateManager.VisualStateGroups>
+
+                                <Grid Height="4" Margin="4,0,4,0" VerticalAlignment="Bottom">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <Ellipse Grid.Column="0" Fill="{Binding Slot0Brush}" Height="4" Width="4" />
+                                    <Ellipse Grid.Column="1" Fill="{Binding Slot1Brush}" Height="4" Width="4" />
+                                    <Ellipse Grid.Column="2" Fill="{Binding Slot2Brush}" Height="4" Width="4" />
+                                    <Ellipse Grid.Column="3" Fill="{Binding Slot3Brush}" Height="4" Width="4" />
+                                    <Ellipse Grid.Column="4" Fill="{Binding Slot4Brush}" Height="4" Width="4" />
+                                </Grid>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
             <Style x:Key="ScoreTableCellTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
                 <Setter Property="TextWrapping" Value="NoWrap" />
                 <Setter Property="VerticalAlignment" Value="Center" />
@@ -597,6 +663,19 @@
             <Style x:Key="ScoreTableTermGradePointTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
                 <Setter Property="VerticalAlignment" Value="Bottom" />
                 <Setter Property="Foreground" Value="{ThemeResource SystemAccentColor}" />
+            </Style>
+
+            <Style x:Key="ScheduleSummarySectionHeaderTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource SubtitleTextBlockStyle}">
+                <Setter Property="Foreground" Value="{ThemeResource SystemBaseMediumHighColor}" />
+            </Style>
+
+            <Style x:Key="ScheduleSummaryItemHeaderTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+                <Setter Property="TextWrapping" Value="NoWrap" />
+                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            </Style>
+            
+            <Style x:Key="ScheduleSummaryItemDescriptionTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
+                <Setter Property="Foreground" Value="{ThemeResource SystemBaseMediumColor}" />
             </Style>
         </ResourceDictionary>
     </Application.Resources>

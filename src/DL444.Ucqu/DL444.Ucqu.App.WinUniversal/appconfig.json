@@ -10,5 +10,8 @@
   },
   "Tenant": {
     "TenantId": "10611"
+  },
+  "ScheduleSummary": {
+    "RecentExamsThreshold": 15
   }
 }

@@ -122,6 +122,9 @@
     </Compile>
     <Compile Include="Controls\MenuFlyoutContentItem.cs" />
     <Compile Include="Controls\NavigationPaneButton.cs" />
+    <Compile Include="Controls\ScheduleSummary.xaml.cs">
+      <DependentUpon>ScheduleSummary.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ScoreTable.cs" />
     <Compile Include="Converters\InvertedVisibilityBooleanConverter.cs" />
     <Compile Include="Exceptions\BackendAuthenticationFailedException.cs" />
@@ -129,6 +132,7 @@
     <Compile Include="Exceptions\LocalCacheInexistException.cs" />
     <Compile Include="Exceptions\LocalCacheRequestFailedException.cs" />
     <Compile Include="Extensions\ApplicationExtension.cs" />
+    <Compile Include="Extensions\DateTimeOffsetExtension.cs" />
     <Compile Include="Extensions\HttpClientBuilderExtension.cs" />
     <Compile Include="Extensions\HttpContentExtension.cs" />
     <Compile Include="Models\DataRequestResult.cs" />
@@ -160,9 +164,13 @@
       <DependentUpon>Generic.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\DataViewModel.cs" />
+    <Compile Include="ViewModels\ExamScheduleViewModel.cs" />
+    <Compile Include="ViewModels\ScheduleViewModel.cs" />
     <Compile Include="ViewModels\ScoreSetViewModel.cs" />
     <Compile Include="ViewModels\SignInViewModel.cs" />
     <Compile Include="ViewModels\StudentInfoViewModel.cs" />
+    <Compile Include="ViewModels\SummaryCalendarDayViewModel.cs" />
+    <Compile Include="ViewModels\WellknownDataViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -190,6 +198,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Controls\ScheduleSummary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\MainPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
