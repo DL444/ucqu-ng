@@ -47,6 +47,24 @@ namespace DL444.Ucqu.App.WinUniversal.Controls
         public static readonly DependencyProperty ScheduleProperty =
             DependencyProperty.Register(nameof(Schedule), typeof(ScheduleViewModel), typeof(ScheduleSummary), new PropertyMetadata(new ScheduleViewModel(), OnScheduleChanged));
 
+        public bool IsTodayFree
+        {
+            get => (bool)GetValue(IsTodayFreeProperty);
+            private set => SetValue(IsTodayFreeProperty, value);
+        }
+
+        public static readonly DependencyProperty IsTodayFreeProperty =
+            DependencyProperty.Register(nameof(IsTodayFree), typeof(bool), typeof(ScheduleSummary), new PropertyMetadata(false));
+
+        public bool IsOnVacation
+        {
+            get => (bool)GetValue(IsOnVacationProperty);
+            private set => SetValue(IsOnVacationProperty, value);
+        }
+
+        public static readonly DependencyProperty IsOnVacationProperty =
+            DependencyProperty.Register(nameof(IsOnVacation), typeof(bool), typeof(ScheduleSummary), new PropertyMetadata(false));
+
         public event EventHandler<ScheduleSummaryCalendarDateSelectedEventArgs> ScheduleSummaryCalendarDateSelected;
 
         private static void OnScheduleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -93,6 +111,9 @@ namespace DL444.Ucqu.App.WinUniversal.Controls
             {
                 day.CommitChanges();
             }
+
+            summary.IsOnVacation = DateTimeOffset.Now > summary.TermRange.TermEndDate || DateTimeOffset.Now < summary.TermRange.TermStartDate;
+            summary.IsTodayFree = !schedule.IsTodayOccupied && !exams.HasRecentExams && !summary.IsOnVacation;
         }
 
         private void AddScheduleToCalendar(DateTimeOffset time, SummaryCalendarSlotStatus status, int startSession, int endSession)

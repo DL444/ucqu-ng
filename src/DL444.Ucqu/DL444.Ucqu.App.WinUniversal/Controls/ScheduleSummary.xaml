@@ -81,9 +81,13 @@
                           SelectedDatesChanged="Calendar_SelectedDatesChanged" />
 
             <ScrollViewer x:Name="SummaryScrollViewer" HorizontalScrollMode="Disabled" Grid.Column="1">
-                <StackPanel x:Name="SummaryStackPanel" Spacing="16" Margin="0,8,8,16">
+                <StackPanel x:Name="SummaryStackPanel" Margin="0,8,8,16">
+                    <TextBlock x:Uid="ScheduleSummaryTodayFreeHeader" Style="{ThemeResource ScheduleSummarySectionHeaderTextBlockStyle}" Visibility="{x:Bind IsTodayFree, Mode=OneWay}" />
+                    <TextBlock x:Uid="ScheduleSummaryTodayFreeDescription" Style="{ThemeResource ScheduleSummaryItemDescriptionTextBlockStyle}" Visibility="{x:Bind IsTodayFree, Mode=OneWay}" Margin="0,0,0,16" />
+                    <TextBlock x:Uid="ScheduleSummaryOnVacationHeader" Style="{ThemeResource ScheduleSummarySectionHeaderTextBlockStyle}" Visibility="{x:Bind IsOnVacation, Mode=OneWay}" />
+                    <TextBlock x:Uid="ScheduleSummaryOnVacationDescription" Style="{ThemeResource ScheduleSummaryItemDescriptionTextBlockStyle}" Visibility="{x:Bind IsOnVacation, Mode=OneWay}" Margin="0,0,0,16" />
                     <TextBlock x:Uid="ScheduleSummaryTodayCoursesHeader" Style="{ThemeResource ScheduleSummarySectionHeaderTextBlockStyle}" Visibility="{x:Bind Schedule.IsTodayOccupied, Mode=OneWay}" />
-                    <muxc:ItemsRepeater ItemsSource="{x:Bind Schedule.Today, Mode=OneWay}">
+                    <muxc:ItemsRepeater ItemsSource="{x:Bind Schedule.Today, Mode=OneWay}" Visibility="{x:Bind Schedule.IsTodayOccupied, Mode=OneWay}" Margin="0,0,0,16">
                         <muxc:ItemsRepeater.ItemTemplate>
                             <DataTemplate x:DataType="vm:ScheduleEntryViewModel">
                                 <Grid RowSpacing="4" ColumnSpacing="4">
@@ -106,7 +110,7 @@
                         </muxc:ItemsRepeater.Layout>
                     </muxc:ItemsRepeater>
                     <TextBlock x:Uid="ScheduleSummaryRecentExamsHeader" Style="{ThemeResource ScheduleSummarySectionHeaderTextBlockStyle}" Visibility="{x:Bind Exams.HasRecentExams, Mode=OneWay}" />
-                    <muxc:ItemsRepeater ItemsSource="{x:Bind Exams.RecentExams, Mode=OneWay}">
+                    <muxc:ItemsRepeater ItemsSource="{x:Bind Exams.RecentExams, Mode=OneWay}" Visibility="{x:Bind Exams.HasRecentExams, Mode=OneWay}" Margin="0,0,0,16">
                         <muxc:ItemsRepeater.ItemTemplate>
                             <local:ScheduleSummaryRecentExamsItemTemplateSelector>
                                 <local:ScheduleSummaryRecentExamsItemTemplateSelector.SimpleTemplate>

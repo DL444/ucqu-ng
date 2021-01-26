@@ -165,6 +165,12 @@
   <data name="ScheduleSummaryExamCountdownFormat" xml:space="preserve">
     <value>{0} 天后</value>
   </data>
+  <data name="ScheduleSummaryOnVacationDescription.Text" xml:space="preserve">
+    <value>尽情享受当下</value>
+  </data>
+  <data name="ScheduleSummaryOnVacationHeader.Text" xml:space="preserve">
+    <value>放假中</value>
+  </data>
   <data name="ScheduleSummaryRecentExamsHeader.Text" xml:space="preserve">
     <value>最近考试</value>
   </data>
@@ -173,6 +179,12 @@
   </data>
   <data name="ScheduleSummaryTodayCoursesHeader.Text" xml:space="preserve">
     <value>今日课程</value>
+  </data>
+  <data name="ScheduleSummaryTodayFreeDescription.Text" xml:space="preserve">
+    <value>尽情享受当下</value>
+  </data>
+  <data name="ScheduleSummaryTodayFreeHeader.Text" xml:space="preserve">
+    <value>今日无课</value>
   </data>
   <data name="ScoreTableHeaderCourseName.Text" xml:space="preserve">
     <value>课程</value>
