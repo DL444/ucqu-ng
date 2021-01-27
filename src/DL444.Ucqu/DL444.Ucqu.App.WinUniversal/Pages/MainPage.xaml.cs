@@ -186,8 +186,18 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
                         ContentFrame.Navigate(typeof(ScorePage), null, new EntranceNavigationTransitionInfo());
                     }
                     break;
+                case "CalendarSub":
+                    if (!StudentInfoViewModel.IsValueReady)
+                    {
+                        return;
+                    }
+                    NavigationView.SelectedItem = null;
+                    ContentFrame.Navigate(typeof(CalendarSubscriptionPage), StudentInfoViewModel.Value.StudentId);
+                    break;
             }
         }
+
+        private void GoToCalendarSubscriptionPage() => Navigate("CalendarSub");
 
         private async Task SignOut() => await ((App)Application.Current).SignOut();
 

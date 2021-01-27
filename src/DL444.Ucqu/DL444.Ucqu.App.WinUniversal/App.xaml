@@ -674,11 +674,35 @@
                 <Setter Property="TextWrapping" Value="NoWrap" />
                 <Setter Property="TextTrimming" Value="CharacterEllipsis" />
             </Style>
-            
+
             <Style x:Key="ScheduleSummaryItemDescriptionTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
                 <Setter Property="Foreground" Value="{ThemeResource SystemBaseMediumColor}" />
             </Style>
+
+            <Style x:Key="MiscellaneousPageSectionContainerStackPanelStyle" TargetType="StackPanel">
+                <Setter Property="Margin" Value="0,16,0,16" />
+                <Setter Property="Spacing" Value="12" />
+            </Style>
+
+            <Style x:Key="MiscellaneousPageHeaderTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource TitleTextBlockStyle}">
+                <Setter Property="Margin" Value="0,0,0,8" />
+            </Style>
+            
+            <StaticResource x:Key="MiscellaneousPageTitleTextBlockStyle" ResourceKey="SubtitleTextBlockStyle" />
+
+            <StaticResource x:Key="MiscellaneousPageBodyTextBlockStyle" ResourceKey="BodyTextBlockStyle" />
+
+            <Style x:Key="MiscellaneousPageWarningTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
+                <Setter Property="Foreground" Value="{ThemeResource NonDestructiveWarningColorBrush}" />
+            </Style>
+
+            <Style x:Key="MiscellaneousPageLinkButtonStyle" TargetType="HyperlinkButton" BasedOn="{StaticResource TextBlockButtonStyle}">
+                <Setter Property="Padding" Value="0" />
+            </Style>
+
+            <Style x:Key="MiscellaneousPageButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonRevealStyle}">
+                <Setter Property="MinWidth" Value="100" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
-
 </Application>

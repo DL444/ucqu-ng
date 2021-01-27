@@ -120,6 +120,72 @@
   <data name="AppTitle.Text" xml:space="preserve">
     <value>UCQU</value>
   </data>
+  <data name="CalendarSubPageDescription.Text" xml:space="preserve">
+    <value>按以下步骤将课程表导入日历应用，可以更方便地查看课程信息。</value>
+  </data>
+  <data name="CalendarSubPageEnterUriSectionHeader.Text" xml:space="preserve">
+    <value>输入订阅地址</value>
+  </data>
+  <data name="CalendarSubPageEnterUriSectionUseUri.Text" xml:space="preserve">
+    <value>使用以下订阅地址</value>
+  </data>
+  <data name="CalendarSubPageFileImportSectionHeader.Text" xml:space="preserve">
+    <value>无法通过地址订阅？</value>
+  </data>
+  <data name="CalendarSubPageFileImportSectionSaveFileButton.Content" xml:space="preserve">
+    <value>保存日历文件</value>
+  </data>
+  <data name="CalendarSubPageFileImportSectionTryFileImport.Text" xml:space="preserve">
+    <value>也可以尝试导入日历文件，但这样导入的日历将无法获得更新。</value>
+  </data>
+  <data name="CalendarSubPageFindOptionSectionGoogleButton.Content" xml:space="preserve">
+    <value>Google 日历</value>
+  </data>
+  <data name="CalendarSubPageFindOptionSectionHeader.Text" xml:space="preserve">
+    <value>找到导入订阅选项</value>
+  </data>
+  <data name="CalendarSubPageFindOptionSectionOtherApps.Text" xml:space="preserve">
+    <value>如果使用其它应用，请自行从中找到导入订阅选项。</value>
+  </data>
+  <data name="CalendarSubPageFindOptionSectionOutlookButton.Content" xml:space="preserve">
+    <value>Outlook 或 Windows 日历</value>
+  </data>
+  <data name="CalendarSubPageFindOptionSectionSelectApp.Text" xml:space="preserve">
+    <value>选择你使用的日历应用</value>
+  </data>
+  <data name="CalendarSubPageHeader.Text" xml:space="preserve">
+    <value>订阅课程日历</value>
+  </data>
+  <data name="CalendarSubPageKeepSecretSectionHeader.Text" xml:space="preserve">
+    <value>保守你的秘密</value>
+  </data>
+  <data name="CalendarSubPageKeepSecretSectionNoAuth.Text" xml:space="preserve">
+    <value>任何知道你的订阅地址的人都可以获得你的课程信息，请妥善保管。</value>
+  </data>
+  <data name="CalendarSubPageKeepSecretSectionResetButton.Content" xml:space="preserve">
+    <value>更换</value>
+  </data>
+  <data name="CalendarSubPageKeepSecretSectionResetFailed.Text" xml:space="preserve">
+    <value>暂时无法更换订阅地址</value>
+  </data>
+  <data name="CalendarSubPageKeepSecretSectionResetSub.Text" xml:space="preserve">
+    <value>如果订阅地址不慎泄露，请更换订阅地址。原有的订阅将会失效。</value>
+  </data>
+  <data name="CalendarSubPageKeepSecretSectionSaveFileFailed.Text" xml:space="preserve">
+    <value>暂时无法保存文件</value>
+  </data>
+  <data name="CalendarSubPageUpdateFailed.Text" xml:space="preserve">
+    <value>暂时无法获取订阅信息</value>
+  </data>
+  <data name="CalendarSubscriptionDefaultName" xml:space="preserve">
+    <value>课程</value>
+  </data>
+  <data name="DefaultScheduleIcsName" xml:space="preserve">
+    <value>课程</value>
+  </data>
+  <data name="IcsFileTypeName" xml:space="preserve">
+    <value>日历文件</value>
+  </data>
   <data name="MajorScoreSection.Header" xml:space="preserve">
     <value>主修</value>
   </data>

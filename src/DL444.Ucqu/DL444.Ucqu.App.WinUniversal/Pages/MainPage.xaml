@@ -161,7 +161,7 @@
                                             </Grid>
                                         </controls:MenuFlyoutContentItem.Content>
                                     </controls:MenuFlyoutContentItem>
-                                    <MenuFlyoutItem x:Uid="MenuItemCalendarSub" Visibility="{x:Bind StudentInfoViewModel.IsValueReady}" Icon="CalendarReply" />
+                                    <MenuFlyoutItem x:Uid="MenuItemCalendarSub" Visibility="{x:Bind StudentInfoViewModel.IsValueReady}" Icon="CalendarReply" Click="{x:Bind GoToCalendarSubscriptionPage}" />
                                     <MenuFlyoutSeparator Visibility="{x:Bind StudentInfoViewModel.IsValueReady}" />
                                     <MenuFlyoutItem x:Uid="MenuItemStaleWarning" Foreground="{ThemeResource NonDestructiveWarningColor}" Visibility="{x:Bind StudentInfoViewModel.IsDataStale}">
                                         <MenuFlyoutItem.Icon>

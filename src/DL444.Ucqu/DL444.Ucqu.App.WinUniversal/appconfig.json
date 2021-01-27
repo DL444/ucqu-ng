@@ -13,5 +13,10 @@
   },
   "ScheduleSummary": {
     "RecentExamsThreshold": 15
+  },
+  "CalendarSubscription": {
+    "Endpoint": "calendar/{0}/{1}",
+    "OutlookUri": "https://outlook.live.com/owa?path=/calendar/action/compose&rru=addsubscription&url={0}&name={1}",
+    "GoogleUri": "https://calendar.google.com/calendar/u/0/r/settings/addbyurl"
   }
 }
