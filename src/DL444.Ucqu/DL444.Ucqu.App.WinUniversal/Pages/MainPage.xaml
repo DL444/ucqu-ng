@@ -173,7 +173,7 @@
                                             <FontIcon Glyph="&#xEA39;" />
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
-                                    <MenuFlyoutItem x:Uid="MenuItemSettings" Icon="Setting" />
+                                    <MenuFlyoutItem x:Uid="MenuItemSettings" Icon="Setting" Click="{x:Bind GoToSettingsPage}" />
                                     <MenuFlyoutItem x:Uid="MenuItemSignOut" Icon="Permissions" Click="{x:Bind SignOut}" />
                                     <MenuFlyoutItem x:Uid="MenuItemAbout" Icon="Emoji2" />
                                 </MenuFlyout>

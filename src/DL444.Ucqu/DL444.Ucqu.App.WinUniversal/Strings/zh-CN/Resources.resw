@@ -276,6 +276,21 @@
   <data name="SecondMajorScoreSection.Header" xml:space="preserve">
     <value>辅修</value>
   </data>
+  <data name="SettingsPageHeader.Text" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="SettingsPageWindowsHelloSectionDescription.Text" xml:space="preserve">
+    <value>启动时使用 Windows Hello 进行身份验证</value>
+  </data>
+  <data name="SettingsPageWindowsHelloSectionHeader.Text" xml:space="preserve">
+    <value>Windows Hello</value>
+  </data>
+  <data name="SettingsPageWindowsHelloSectionNotAvailable.Text" xml:space="preserve">
+    <value>你还未设置 Windows Hello</value>
+  </data>
+  <data name="SettingsPageWindowsHelloSectionSetup.Content" xml:space="preserve">
+    <value>现在设置</value>
+  </data>
   <data name="SignInButton.Content" xml:space="preserve">
     <value>登录</value>
   </data>
@@ -308,5 +323,20 @@
   </data>
   <data name="TermNumberNotation3" xml:space="preserve">
     <value>四</value>
+  </data>
+  <data name="WindowsHelloAuthButton.Content" xml:space="preserve">
+    <value>验证</value>
+  </data>
+  <data name="WindowsHelloAuthError.Text" xml:space="preserve">
+    <value>进行身份验证时出现了一些问题</value>
+  </data>
+  <data name="WindowsHelloAuthMessage" xml:space="preserve">
+    <value>使用 Windows Hello 进行身份验证</value>
+  </data>
+  <data name="WindowsHelloAuthPageTitle.Text" xml:space="preserve">
+    <value>身份验证</value>
+  </data>
+  <data name="WindowsHelloSignOutButton.Content" xml:space="preserve">
+    <value>退出登录</value>
   </data>
 </root>

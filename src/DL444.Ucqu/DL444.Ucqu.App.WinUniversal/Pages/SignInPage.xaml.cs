@@ -31,7 +31,9 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         {
             base.OnNavigatedTo(e);
             if (e.Parameter is string args)
-            arguments = args;
+            {
+                arguments = args;
+            }
         }
 
         internal SignInViewModel ViewModel { get; }
@@ -56,7 +58,7 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
                 bool success = await ViewModel.SignInAsync();
                 if (success)
                 {
-                    ((App)Application.Current).NavigateToFirstPage(arguments);
+                    ((App)Application.Current).NavigateToFirstPage(arguments, true);
                 }
             }
             catch (BackendAuthenticationFailedException)

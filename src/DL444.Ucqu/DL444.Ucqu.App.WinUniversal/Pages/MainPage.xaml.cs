@@ -194,10 +194,16 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
                     NavigationView.SelectedItem = null;
                     ContentFrame.Navigate(typeof(CalendarSubscriptionPage), StudentInfoViewModel.Value.StudentId);
                     break;
+                case "Settings":
+                    NavigationView.SelectedItem = null;
+                    ContentFrame.Navigate(typeof(SettingsPage));
+                    break;
             }
         }
 
         private void GoToCalendarSubscriptionPage() => Navigate("CalendarSub");
+
+        private void GoToSettingsPage() => Navigate("Settings");
 
         private async Task SignOut() => await ((App)Application.Current).SignOut();
 

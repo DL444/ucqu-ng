@@ -54,19 +54,27 @@ namespace DL444.Ucqu.App.WinUniversal
 
         public IServiceProvider Services { get; }
 
-        public void NavigateToFirstPage(string arguments = null)
+        public void NavigateToFirstPage(string arguments = null, bool winHelloAuthenticated = false)
         {
             Frame rootFrame = Window.Current.Content as Frame;
             if (rootFrame != null)
             {
                 ICredentialService credentialService = Services.GetService<ICredentialService>();
-                if (credentialService.Username != null && credentialService.PasswordHash != null)
+                if (credentialService.Username == null || credentialService.PasswordHash == null)
                 {
-                    rootFrame.Navigate(typeof(Pages.MainPage), arguments, new DrillInNavigationTransitionInfo());
+                    rootFrame.Navigate(typeof(Pages.SignInPage), arguments, new DrillInNavigationTransitionInfo());
                 }
                 else
                 {
-                    rootFrame.Navigate(typeof(Pages.SignInPage), arguments, new DrillInNavigationTransitionInfo());
+                    IWindowsHelloService winHelloService = Services.GetService<IWindowsHelloService>();
+                    if (!winHelloAuthenticated && winHelloService.IsEnabled)
+                    {
+                        rootFrame.Navigate(typeof(Pages.WindowsHelloAuthPage), arguments, new DrillInNavigationTransitionInfo());
+                    }
+                    else
+                    {
+                        rootFrame.Navigate(typeof(Pages.MainPage), arguments, new DrillInNavigationTransitionInfo());
+                    }
                 }
             }
         }
@@ -89,6 +97,7 @@ namespace DL444.Ucqu.App.WinUniversal
         private static void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
             services.AddSingleton<ICredentialService>(new UserCredentialService());
+            services.AddTransient<IWindowsHelloService, WindowsHelloService>();
 
             var baseAddress = new Uri(config.GetValue<string>("Backend:BaseAddress"));
             int retryCount = config.GetValue("Backend:RetryCount", 2);
