@@ -361,7 +361,7 @@
     <value>验证</value>
   </data>
   <data name="WindowsHelloAuthError.Text" xml:space="preserve">
-    <value>进行身份验证时出现了一些问题</value>
+    <value>进行身份验证时遇到了一些问题</value>
   </data>
   <data name="WindowsHelloAuthMessage" xml:space="preserve">
     <value>使用 Windows Hello 进行身份验证</value>
