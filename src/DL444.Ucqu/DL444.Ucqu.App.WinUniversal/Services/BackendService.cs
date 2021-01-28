@@ -97,8 +97,10 @@ namespace DL444.Ucqu.App.WinUniversal.Services
                 }
                 else
                 {
-                    BackendRequestFailedException exception = new BackendRequestFailedException($"Request failed due to an unexpected response status {response.StatusCode}. Endpoint: wellknown.");
-                    exception.DisplayMessage = await GetBackendMessageAsync(response.Content);
+                    BackendRequestFailedException exception = new BackendRequestFailedException($"Request failed due to an unexpected response status {response.StatusCode}. Endpoint: wellknown.")
+                    {
+                        DisplayMessage = await GetBackendMessageAsync(response.Content)
+                    };
                     throw exception;
                 }
             }
@@ -178,8 +180,10 @@ namespace DL444.Ucqu.App.WinUniversal.Services
                 }
                 else
                 {
-                    BackendRequestFailedException exception = new BackendRequestFailedException($"Request failed due to an unexpected response status {response.StatusCode}. Endpoint: {endpoint}.");
-                    exception.DisplayMessage = await GetBackendMessageAsync(response.Content);
+                    BackendRequestFailedException exception = new BackendRequestFailedException($"Request failed due to an unexpected response status {response.StatusCode}. Endpoint: {endpoint}.")
+                    {
+                        DisplayMessage = await GetBackendMessageAsync(response.Content)
+                    };
                     throw exception;
                 }
             }

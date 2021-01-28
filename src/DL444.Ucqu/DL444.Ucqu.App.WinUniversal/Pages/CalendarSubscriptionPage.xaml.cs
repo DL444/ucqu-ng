@@ -27,7 +27,7 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
             }
             ICalendarSubscriptionService service = Application.Current.GetService<ICalendarSubscriptionService>();
             ViewModel = new CalendarSubscriptionViewModel(username, service);
-            await ViewModel.Update();
+            await ViewModel.UpdateAsync();
         }
 
         internal CalendarSubscriptionViewModel ViewModel { get; private set; }
@@ -42,7 +42,7 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
 
         private async void SaveCalendarFile_Click(object sender, RoutedEventArgs e)
         {
-            string content = await ViewModel.GetSubscriptionContent();
+            string content = await ViewModel.GetSubscriptionContentAsync();
             if (string.IsNullOrEmpty(content))
             {
                 return;

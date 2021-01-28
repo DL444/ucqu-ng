@@ -56,7 +56,7 @@ namespace DL444.Ucqu.Backend.Bindings
                 return BindAsync(null, context.ValueContext);
             }
         }
-        
+
         public ParameterDescriptor ToParameterDescriptor()
         {
             return new ParameterDescriptor()
@@ -69,7 +69,7 @@ namespace DL444.Ucqu.Backend.Bindings
                 }
             };
         }
-        
+
         private ITokenService tokenService;
     }
 

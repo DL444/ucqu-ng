@@ -12,5 +12,5 @@ namespace DL444.Ucqu.Backend.Models
 
         public SignInContext SignInContext { get; set; }
         public string StatusId { get; set; }
-    } 
+    }
 }

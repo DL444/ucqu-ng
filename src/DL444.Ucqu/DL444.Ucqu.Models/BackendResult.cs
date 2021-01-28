@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace DL444.Ucqu.Models
 {
     public class BackendResult<T>

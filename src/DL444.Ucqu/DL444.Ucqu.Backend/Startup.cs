@@ -7,7 +7,6 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 [assembly: WebJobsStartup(typeof(DL444.Ucqu.Backend.Startup))]
 namespace DL444.Ucqu.Backend

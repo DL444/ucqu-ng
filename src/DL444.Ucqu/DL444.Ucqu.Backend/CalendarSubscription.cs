@@ -1,15 +1,15 @@
 using System;
 using System.Threading.Tasks;
+using DL444.Ucqu.Backend.Bindings;
+using DL444.Ucqu.Backend.Models;
+using DL444.Ucqu.Backend.Services;
+using DL444.Ucqu.Client;
+using DL444.Ucqu.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using DL444.Ucqu.Backend.Services;
-using DL444.Ucqu.Backend.Bindings;
-using DL444.Ucqu.Models;
-using DL444.Ucqu.Client;
-using DL444.Ucqu.Backend.Models;
 
 namespace DL444.Ucqu.Backend
 {
@@ -73,7 +73,7 @@ namespace DL444.Ucqu.Backend
             }
             return new OkObjectResult(calService.GetCalendar(scheduleFetchResult.Resource, exams, 15));
         }
-        
+
         [FunctionName("CalendarSubscriptionPost")]
         public async Task<IActionResult> RunPost(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Calendar")] HttpRequest req,
@@ -145,9 +145,9 @@ namespace DL444.Ucqu.Backend
             }
         }
 
-        private IUcquClient client;
-        private IDataAccessService dataService;
-        private ICalendarService calService;
-        private ILocalizationService locService;
+        private readonly IUcquClient client;
+        private readonly IDataAccessService dataService;
+        private readonly ICalendarService calService;
+        private readonly ILocalizationService locService;
     }
 }

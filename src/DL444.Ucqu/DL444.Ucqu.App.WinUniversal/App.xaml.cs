@@ -56,8 +56,7 @@ namespace DL444.Ucqu.App.WinUniversal
 
         public void NavigateToFirstPage(string arguments = null, bool winHelloAuthenticated = false)
         {
-            Frame rootFrame = Window.Current.Content as Frame;
-            if (rootFrame != null)
+            if (Window.Current.Content is Frame rootFrame)
             {
                 ICredentialService credentialService = Services.GetService<ICredentialService>();
                 if (credentialService.Username == null || credentialService.PasswordHash == null)
@@ -79,10 +78,9 @@ namespace DL444.Ucqu.App.WinUniversal
             }
         }
 
-        public async Task SignOut()
+        public async Task SignOutAsync()
         {
-            Frame rootFrame = Window.Current.Content as Frame;
-            if (rootFrame != null)
+            if (Window.Current.Content is Frame rootFrame)
             {
                 ICredentialService credentialService = Services.GetService<ICredentialService>();
                 ILocalCacheService cacheService = Services.GetService<ILocalCacheService>();

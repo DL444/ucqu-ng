@@ -205,7 +205,7 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
 
         private void GoToSettingsPage() => Navigate("Settings");
 
-        private async Task SignOut() => await ((App)Application.Current).SignOut();
+        private async Task SignOut() => await ((App)Application.Current).SignOutAsync();
 
         private IDataService localDataService;
         private IDataService remoteDataService;

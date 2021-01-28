@@ -76,7 +76,7 @@ namespace DL444.Ucqu.Models
     {
         public Course() { }
         public Course(string name) => Name = name;
-        
+
         public string Name { get; set; }
         [JsonInclude]
         public string ShortName => Utilities.GetShortformName(Name);

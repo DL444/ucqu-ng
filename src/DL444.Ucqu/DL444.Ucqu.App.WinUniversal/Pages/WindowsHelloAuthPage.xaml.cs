@@ -34,7 +34,7 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         private async void SignOut_Click(object sender, RoutedEventArgs e)
         {
             winHelloService.Disable();
-            await ((App)Application.Current).SignOut();
+            await ((App)Application.Current).SignOutAsync();
         }
 
         private async Task Authenticate()
@@ -56,7 +56,7 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
             VisualStateManager.GoToState(this, "Default", false);
         }
 
-        private IWindowsHelloService winHelloService;
+        private readonly IWindowsHelloService winHelloService;
         private string arguments;
     }
 }

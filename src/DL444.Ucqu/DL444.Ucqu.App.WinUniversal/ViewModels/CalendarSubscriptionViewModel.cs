@@ -104,7 +104,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public async Task Update()
+        public async Task UpdateAsync()
         {
             UpdateInProgress = true;
             try
@@ -112,7 +112,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
                 DataRequestResult<CalendarSubscription> infoResult = await calendarService.GetCalendarSubscriptionIdAsync();
                 if (infoResult.Resource.SubscriptionId == null)
                 {
-                    bool success = await ResetSubscription();
+                    bool success = await ResetSubscriptionAsync();
                     ResetSuccess = false;
                     if (!success)
                     {
@@ -127,7 +127,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             }
             catch (BackendAuthenticationFailedException)
             {
-                await ((App)Application.Current).SignOut();
+                await ((App)Application.Current).SignOutAsync();
                 return;
             }
             catch (BackendRequestFailedException)
@@ -140,7 +140,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             }
         }
 
-        public async Task<bool> ResetSubscription()
+        public async Task<bool> ResetSubscriptionAsync()
         {
             ResetInProgress = true;
             try
@@ -152,7 +152,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             }
             catch (BackendAuthenticationFailedException)
             {
-                await ((App)Application.Current).SignOut();
+                await ((App)Application.Current).SignOutAsync();
                 return false;
             }
             catch (BackendRequestFailedException)
@@ -166,7 +166,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             }
         }
 
-        public async Task<string> GetSubscriptionContent()
+        public async Task<string> GetSubscriptionContentAsync()
         {
             _ = username ?? throw new InvalidOperationException("Username is not yet set. Call Update method to fetch latest info.");
             _ = SubscriptionId ?? throw new InvalidOperationException("Subscription ID is not yet set. Call Update method to fetch latest info.");
@@ -211,8 +211,8 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GoogleUri)));
         }
 
-        private string username;
-        private ICalendarSubscriptionService calendarService;
+        private readonly string username;
+        private readonly ICalendarSubscriptionService calendarService;
         private string subscriptionContent;
         private bool _updateInProgress;
         private bool _updateFailed;

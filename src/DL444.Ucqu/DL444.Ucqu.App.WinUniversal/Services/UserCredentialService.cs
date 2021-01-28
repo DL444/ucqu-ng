@@ -14,7 +14,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
                 try
                 {
                     PasswordCredential credential = vault.FindAllByResource("User").FirstOrDefault();
-                    return credential == null ? null : credential.UserName;
+                    return credential?.UserName;
                 }
                 catch (Exception ex) when (ex.HResult == -2147023728)
                 {
@@ -56,6 +56,6 @@ namespace DL444.Ucqu.App.WinUniversal.Services
             vault.Add(new PasswordCredential("User", username, passwordHash));
         }
 
-        private PasswordVault vault = new PasswordVault();
+        private readonly PasswordVault vault = new PasswordVault();
     }
 }

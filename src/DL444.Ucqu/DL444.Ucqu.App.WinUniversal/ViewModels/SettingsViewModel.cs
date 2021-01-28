@@ -90,7 +90,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             {
                 IDataService backendService = Application.Current.GetService<IDataService>(x => x.DataSource == DataSource.Online);
                 await backendService.DeleteUserAsync();
-                await ((App)Application.Current).SignOut();
+                await ((App)Application.Current).SignOutAsync();
             }
             catch (BackendAuthenticationFailedException)
             {
@@ -126,8 +126,8 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
 
         private void SetValue<T>(string key, T value) => container.Values[key] = value;
 
-        private ApplicationDataContainer container;
-        private IWindowsHelloService winHelloService;
+        private readonly ApplicationDataContainer container;
+        private readonly IWindowsHelloService winHelloService;
         private bool _isWindowsHelloAvailable;
         private bool _accountDeleteInProgress;
         private bool _accountDeleteFailed;

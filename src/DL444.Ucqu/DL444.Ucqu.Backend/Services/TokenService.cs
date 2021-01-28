@@ -20,7 +20,7 @@ namespace DL444.Ucqu.Backend.Services
             this.issuer = issuer;
             this.tokenValidMinutes = tokenValidMinutes;
         }
-        
+
         public string CreateToken(string username)
         {
             var token = new JwtSecurityToken(

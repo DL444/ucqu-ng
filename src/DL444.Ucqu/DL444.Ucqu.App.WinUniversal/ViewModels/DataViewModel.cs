@@ -102,7 +102,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             }
             catch (BackendAuthenticationFailedException)
             {
-                await ((App)Application.Current).SignOut();
+                await ((App)Application.Current).SignOutAsync();
                 return;
             }
             catch (BackendRequestFailedException)

@@ -1,5 +1,3 @@
-using System.Net;
-
 namespace DL444.Ucqu.Backend.Models
 {
     public struct DataAccessResult

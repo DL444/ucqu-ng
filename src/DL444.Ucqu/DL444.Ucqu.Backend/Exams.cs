@@ -1,14 +1,11 @@
-using System;
-using System.IO;
 using System.Threading.Tasks;
+using DL444.Ucqu.Backend.Bindings;
+using DL444.Ucqu.Backend.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using DL444.Ucqu.Backend.Bindings;
-using DL444.Ucqu.Backend.Services;
 
 namespace DL444.Ucqu.Backend
 {
