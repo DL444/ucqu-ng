@@ -1,10 +1,8 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Threading.Tasks;
 using DL444.Ucqu.App.WinUniversal.Exceptions;
 using DL444.Ucqu.App.WinUniversal.Extensions;
 using DL444.Ucqu.App.WinUniversal.Services;
-using Windows.Storage;
 using Windows.UI.Xaml;
 
 namespace DL444.Ucqu.App.WinUniversal.ViewModels
@@ -13,7 +11,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
     {
         public SettingsViewModel()
         {
-            container = ApplicationData.Current.LocalSettings;
+            settingsService = Application.Current.GetService<ILocalSettingsService>();
             winHelloService = Application.Current.GetService<IWindowsHelloService>();
         }
 
@@ -106,27 +104,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             }
         }
 
-        private T GetValue<T>(string key)
-        {
-            object obj = container.Values[key];
-            if (obj == null)
-            {
-                container.Values[key] = default(T);
-                return default;
-            }
-            else if (obj is T value)
-            {
-                return value;
-            }
-            else
-            {
-                throw new InvalidCastException($"Value for key {key} is of type {obj.GetType()}, not {typeof(T)}.");
-            }
-        }
-
-        private void SetValue<T>(string key, T value) => container.Values[key] = value;
-
-        private readonly ApplicationDataContainer container;
+        private readonly ILocalSettingsService settingsService;
         private readonly IWindowsHelloService winHelloService;
         private bool _isWindowsHelloAvailable;
         private bool _accountDeleteInProgress;

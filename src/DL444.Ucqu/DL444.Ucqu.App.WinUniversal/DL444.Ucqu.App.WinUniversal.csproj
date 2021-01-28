@@ -170,10 +170,12 @@
     <Compile Include="Services\IDataService.cs" />
     <Compile Include="Services\ILocalCacheService.cs" />
     <Compile Include="Services\ILocalizationService.cs" />
+    <Compile Include="Services\ILocalSettingsService.cs" />
     <Compile Include="Services\ISignInService.cs" />
     <Compile Include="Services\BackendService.cs" />
     <Compile Include="Services\IWindowsHelloService.cs" />
     <Compile Include="Services\LocalCacheService.cs" />
+    <Compile Include="Services\LocalSettingsService.cs" />
     <Compile Include="Services\ResourceLocalizationService.cs" />
     <Compile Include="Services\UserCredentialService.cs" />
     <Compile Include="Services\WindowsHelloService.cs" />

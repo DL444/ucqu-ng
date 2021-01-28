@@ -118,6 +118,7 @@ namespace DL444.Ucqu.App.WinUniversal
             services.AddSingleton<ILocalCacheService>(localCacheService);
 
             services.AddTransient<ILocalizationService, ResourceLocalizationService>();
+            services.AddTransient<ILocalSettingsService, LocalSettingsService>();
         }
 
         /// <summary>
@@ -128,6 +129,7 @@ namespace DL444.Ucqu.App.WinUniversal
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
             ConfigureWindow();
+            Services.GetService<ILocalSettingsService>().Migrate();
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,

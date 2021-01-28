@@ -2,29 +2,19 @@
 using System.Threading.Tasks;
 using DL444.Ucqu.App.WinUniversal.Extensions;
 using Windows.Security.Credentials.UI;
-using Windows.Storage;
 using Windows.UI.Xaml;
 
 namespace DL444.Ucqu.App.WinUniversal.Services
 {
     internal class WindowsHelloService : IWindowsHelloService
     {
-        public bool IsEnabled
-        {
-            get
-            {
-                object obj = ApplicationData.Current.LocalSettings.Values["WinHelloEnabled"];
-                if (obj == null || !(obj is bool enabled))
-                {
-                    return false;
-                }
-                return enabled;
-            }
-        }
+        public WindowsHelloService() => settingsService = Application.Current.GetService<ILocalSettingsService>();
+
+        public bool IsEnabled => settingsService.GetValue("WinHelloEnabled", false);
 
         public async Task<bool> IsAvailableAsync() => await UserConsentVerifier.CheckAvailabilityAsync() == UserConsentVerifierAvailability.Available;
 
-        public void Disable() => ApplicationData.Current.LocalSettings.Values["WinHelloEnabled"] = false;
+        public void Disable() => settingsService.SetValue("WinHelloEnabled", false);
 
         public async Task EnableAsync()
         {
@@ -32,7 +22,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
             {
                 return;
             }
-            ApplicationData.Current.LocalSettings.Values["WinHelloEnabled"] = true;
+            settingsService.SetValue("WinHelloEnabled", true);
         }
 
         public async Task<UserConsentVerificationResult> AuthenticateAsync()
@@ -40,5 +30,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
             ILocalizationService locService = Application.Current.GetService<ILocalizationService>();
             return await UserConsentVerifier.RequestVerificationAsync(locService.GetString("WindowsHelloAuthMessage"));
         }
+
+        private ILocalSettingsService settingsService;
     }
 }
