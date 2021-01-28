@@ -363,6 +363,12 @@
   <data name="SettingsPageHeader.Text" xml:space="preserve">
     <value>设置</value>
   </data>
+  <data name="SettingsPageNotificationSectionHeader.Text" xml:space="preserve">
+    <value>通知</value>
+  </data>
+  <data name="SettingsPageNotificationSectionScheduleSummary.Text" xml:space="preserve">
+    <value>每日课程</value>
+  </data>
   <data name="SettingsPageWindowsHelloSectionDescription.Text" xml:space="preserve">
     <value>启动时使用 Windows Hello 进行身份验证</value>
   </data>

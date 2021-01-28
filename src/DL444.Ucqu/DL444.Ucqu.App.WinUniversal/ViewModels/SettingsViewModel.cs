@@ -15,6 +15,12 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             winHelloService = Application.Current.GetService<IWindowsHelloService>();
         }
 
+        public bool IsScheduleSummaryNotificationEnabled
+        {
+            get => settingsService.GetValue("DailyToastEnabled", true);
+            set => settingsService.SetValue("DailyToastEnabled", value);
+        }
+
         public bool IsWindowsHelloAvailable
         {
             get => _isWindowsHelloAvailable;

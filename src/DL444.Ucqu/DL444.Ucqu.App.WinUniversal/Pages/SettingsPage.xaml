@@ -13,9 +13,15 @@
             <TextBlock x:Uid="SettingsPageHeader" Style="{ThemeResource MiscellaneousPageHeaderTextBlockStyle}" />
 
             <StackPanel Style="{ThemeResource MiscellaneousPageSectionContainerStackPanelStyle}">
+                <TextBlock x:Uid="SettingsPageNotificationSectionHeader" Style="{ThemeResource MiscellaneousPageTitleTextBlockStyle}" />
+                <TextBlock x:Uid="SettingsPageNotificationSectionScheduleSummary" Style="{ThemeResource MiscellaneousPageBodyTextBlockStyle}" />
+                <ToggleSwitch IsOn="{x:Bind ViewModel.IsScheduleSummaryNotificationEnabled, Mode=TwoWay}" />
+            </StackPanel>
+
+            <StackPanel Style="{ThemeResource MiscellaneousPageSectionContainerStackPanelStyle}">
                 <TextBlock x:Uid="SettingsPageWindowsHelloSectionHeader" Style="{ThemeResource MiscellaneousPageTitleTextBlockStyle}" />
                 <TextBlock x:Uid="SettingsPageWindowsHelloSectionDescription" Style="{ThemeResource MiscellaneousPageBodyTextBlockStyle}" />
-                <ToggleSwitch x:Uid="SettingsPageWindowsHelloSwitch" Visibility="{x:Bind ViewModel.IsWindowsHelloAvailable}" IsOn="{x:Bind ViewModel.IsWindowsHelloEnabled}" Toggled="WindowsHello_Toggled" />
+                <ToggleSwitch Visibility="{x:Bind ViewModel.IsWindowsHelloAvailable}" IsOn="{x:Bind ViewModel.IsWindowsHelloEnabled}" Toggled="WindowsHello_Toggled" />
                 <TextBlock x:Uid="SettingsPageWindowsHelloSectionNotAvailable" Style="{ThemeResource MiscellaneousPageWarningTextBlockStyle}"
                            Visibility="{x:Bind ViewModel.IsWindowsHelloAvailable, Converter={StaticResource InvertedVisibilityBooleanConverter}}" />
                 <HyperlinkButton x:Uid="SettingsPageWindowsHelloSectionSetup" NavigateUri="ms-settings:signinoptions" Style="{ThemeResource MiscellaneousPageLinkButtonStyle}"
