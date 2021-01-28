@@ -276,6 +276,39 @@
   <data name="SecondMajorScoreSection.Header" xml:space="preserve">
     <value>辅修</value>
   </data>
+  <data name="SettingsPageDeleteAccountConfirmBulletCalendarSubscription.Text" xml:space="preserve">
+    <value>你的课程日历订阅将会失效</value>
+  </data>
+  <data name="SettingsPageDeleteAccountConfirmBulletDataClear.Text" xml:space="preserve">
+    <value>服务中所有与你相关的数据都将被删除</value>
+  </data>
+  <data name="SettingsPageDeleteAccountConfirmBulletSignOut.Text" xml:space="preserve">
+    <value>你将在所有设备上退出登录</value>
+  </data>
+  <data name="SettingsPageDeleteAccountConfirmButton.Content" xml:space="preserve">
+    <value>继续</value>
+  </data>
+  <data name="SettingsPageDeleteAccountConfirmDescription.Text" xml:space="preserve">
+    <value>帐户删除后：</value>
+  </data>
+  <data name="SettingsPageDeleteAccountConfirmHeader.Text" xml:space="preserve">
+    <value>确定要删除帐户？</value>
+  </data>
+  <data name="SettingsPageDeleteAccountSectionDeleteButton.Content" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="SettingsPageDeleteAccountSectionDeleteFailed.Text" xml:space="preserve">
+    <value>暂时无法删除帐户，请稍后再试</value>
+  </data>
+  <data name="SettingsPageDeleteAccountSectionDeleteReauthRequired.Text" xml:space="preserve">
+    <value>遇到了一些问题，请重新登录后再试</value>
+  </data>
+  <data name="SettingsPageDeleteAccountSectionDescription.Text" xml:space="preserve">
+    <value>从服务中删除所有与你相关的数据</value>
+  </data>
+  <data name="SettingsPageDeleteAccountSectionHeader.Text" xml:space="preserve">
+    <value>删除帐户</value>
+  </data>
   <data name="SettingsPageHeader.Text" xml:space="preserve">
     <value>设置</value>
   </data>

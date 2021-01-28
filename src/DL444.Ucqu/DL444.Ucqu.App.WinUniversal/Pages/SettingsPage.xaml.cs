@@ -27,7 +27,7 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            await ViewModel.Update();
+            await ViewModel.UpdateAsync();
         }
 
         internal SettingsViewModel ViewModel { get; }
@@ -35,7 +35,13 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         private async void WindowsHello_Toggled(object sender, RoutedEventArgs e)
         {
             bool value = ((ToggleSwitch)sender).IsOn;
-            await ViewModel.SetWindowsHelloEnabled(value);
+            await ViewModel.SetWindowsHelloEnabledAsync(value);
+        }
+
+        private async void DeleteAccount_Click(object sender, RoutedEventArgs e)
+        {
+            DeleteAccountConfirmFlyout.Hide();
+            await ViewModel.DeleteAccountAsync();
         }
     }
 }

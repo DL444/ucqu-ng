@@ -696,6 +696,10 @@
                 <Setter Property="Foreground" Value="{ThemeResource NonDestructiveWarningColorBrush}" />
             </Style>
 
+            <Style x:Key="MiscellaneousPageDestructiveWarningTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
+                <Setter Property="Foreground" Value="{ThemeResource DestructiveWarningColorBrush}" />
+            </Style>
+
             <Style x:Key="MiscellaneousPageLinkButtonStyle" TargetType="HyperlinkButton" BasedOn="{StaticResource TextBlockButtonStyle}">
                 <Setter Property="Padding" Value="0" />
             </Style>
