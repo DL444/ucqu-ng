@@ -83,6 +83,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             LocalEndTime = date.Add(endTime);
             ILocalizationService locService = Application.Current.GetService<ILocalizationService>();
             TimeRangeDisplay = locService.Format("ScheduleSummaryTimeRangeFormat", LocalStartTime.TimeOfDay, LocalEndTime.TimeOfDay);
+            TimeRangeRoomDisplay = locService.Format("ScheduleSummaryTimeRangeRoomFormat", LocalStartTime.TimeOfDay, LocalEndTime.TimeOfDay, Room);
         }
 
         public string Name { get; }
@@ -94,5 +95,6 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
         public DateTimeOffset LocalStartTime { get; }
         public DateTimeOffset LocalEndTime { get; }
         public string TimeRangeDisplay { get; }
+        public string TimeRangeRoomDisplay { get; }
     }
 }

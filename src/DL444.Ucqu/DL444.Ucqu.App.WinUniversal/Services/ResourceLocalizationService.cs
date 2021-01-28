@@ -4,7 +4,7 @@
     {
         public string GetString(string key)
         {
-            var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForCurrentView();
+            var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForViewIndependentUse();
             return resourceLoader.GetString(key);
         }
 

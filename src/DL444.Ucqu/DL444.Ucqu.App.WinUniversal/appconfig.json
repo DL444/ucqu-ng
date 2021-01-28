@@ -21,5 +21,11 @@
   },
   "WindowsHello": {
     "AccountName": "UcquLocal"
+  },
+  "Notification": {
+    "TimerTaskUpdateInterval": 15,
+    "TimerTaskStartHour": 7,
+    "TimerTaskEndHour": 22,
+    "NextSessionPreviewMinutes": 10
   }
 }

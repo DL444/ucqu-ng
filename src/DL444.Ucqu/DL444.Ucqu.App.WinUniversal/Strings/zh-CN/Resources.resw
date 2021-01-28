@@ -285,6 +285,15 @@
   <data name="ScheduleSummaryTimeRangeFormat" xml:space="preserve">
     <value>{0:h\:mm} - {1:h\:mm}</value>
   </data>
+  <data name="ScheduleSummaryTimeRangeRoomFormat" xml:space="preserve">
+    <value>{0:h\:mm} - {1:h\:mm}  {2}</value>
+  </data>
+  <data name="ScheduleSummaryToastDescriptionFormat" xml:space="preserve">
+    <value>今日共 {0} 门课程</value>
+  </data>
+  <data name="ScheduleSummaryToastTitle" xml:space="preserve">
+    <value>今日课程</value>
+  </data>
   <data name="ScheduleSummaryTodayCoursesHeader.Text" xml:space="preserve">
     <value>今日课程</value>
   </data>

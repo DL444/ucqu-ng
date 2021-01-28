@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using DL444.Ucqu.App.WinUniversal.Extensions;
+using DL444.Ucqu.App.WinUniversal.Services;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -25,6 +27,12 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         public SchedulePage()
         {
             this.InitializeComponent();
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            Application.Current.GetService<INotificationService>().ClearToast(ToastTypes.ScheduleSummary);
         }
     }
 }

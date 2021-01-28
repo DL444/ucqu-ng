@@ -22,6 +22,8 @@ using Windows.UI;
 using Windows.UI.ViewManagement;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Media.Animation;
+using Windows.ApplicationModel.Background;
+using System.Linq;
 
 namespace DL444.Ucqu.App.WinUniversal
 {
@@ -119,6 +121,7 @@ namespace DL444.Ucqu.App.WinUniversal
 
             services.AddTransient<ILocalizationService, ResourceLocalizationService>();
             services.AddTransient<ILocalSettingsService, LocalSettingsService>();
+            services.AddTransient<INotificationService, NotificationService>();
         }
 
         /// <summary>
@@ -126,10 +129,11 @@ namespace DL444.Ucqu.App.WinUniversal
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
             ConfigureWindow();
             Services.GetService<ILocalSettingsService>().Migrate();
+            await ConfigureBackgroundTasksAsync(false);
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -164,6 +168,22 @@ namespace DL444.Ucqu.App.WinUniversal
             }
         }
 
+        protected override async void OnBackgroundActivated(BackgroundActivatedEventArgs args)
+        {
+            base.OnBackgroundActivated(args);
+            BackgroundTaskDeferral deferral = args.TaskInstance.GetDeferral();
+            switch (args.TaskInstance.Task.Name)
+            {
+                case "BackgroundTaskReconfigureTask":
+                    await ConfigureBackgroundTasksAsync(true);
+                    break;
+                case "NotificationUpdateTimerTask":
+                    await Services.GetService<INotificationService>().UpdateScheduleSummaryNotificationAsync();
+                    break;
+            }
+            deferral.Complete();
+        }
+
         /// <summary>
         /// Invoked when Navigation to a certain page fails
         /// </summary>
@@ -196,6 +216,51 @@ namespace DL444.Ucqu.App.WinUniversal
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;
             titleBar.ButtonBackgroundColor = Colors.Transparent;
             titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
+        }
+
+        private async Task ConfigureBackgroundTasksAsync(bool replaceIfExists)
+        {
+            BackgroundExecutionManager.RemoveAccess();
+            BackgroundAccessStatus requestStatus = await BackgroundExecutionManager.RequestAccessAsync();
+            if (requestStatus == BackgroundAccessStatus.AllowedSubjectToSystemPolicy || requestStatus == BackgroundAccessStatus.AlwaysAllowed)
+            {
+                var builder = new BackgroundTaskBuilder();
+                builder.Name = $"BackgroundTaskReconfigureTask";
+                builder.SetTrigger(new SystemTrigger(SystemTriggerType.ServicingComplete, false));
+                // Do NOT reregister migration task. A running migration task cannot unregister itself, so reregister will crash the app.
+                // To modify this task in a future version, register a new task with a different name, and remove this one.
+                TryRegisterBackgroundTask(builder, false);
+
+                uint updateInterval = Configuration.GetValue<uint>("Notification:TimerTaskUpdateInterval", 15);
+                updateInterval = Math.Max(15, updateInterval);
+                builder = new BackgroundTaskBuilder();
+                builder.Name = $"NotificationUpdateTimerTask";
+                builder.SetTrigger(new TimeTrigger(updateInterval, false));
+                builder.AddCondition(new SystemCondition(SystemConditionType.BackgroundWorkCostNotHigh));
+                TryRegisterBackgroundTask(builder, replaceIfExists);
+            }
+        }
+
+        private bool TryRegisterBackgroundTask(BackgroundTaskBuilder builder, bool replaceIfExists)
+        {
+            if (BackgroundTaskRegistration.AllTasks.Values.Any(x => x.Name.Equals(builder.Name, StringComparison.Ordinal)))
+            {
+                if (replaceIfExists)
+                {
+                    BackgroundTaskRegistration.AllTasks.Values.First(x => x.Name.Equals(builder.Name, StringComparison.Ordinal)).Unregister(true);
+                    builder.Register();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                builder.Register();
+                return true;
+            }
         }
     }
 }

@@ -171,11 +171,13 @@
     <Compile Include="Services\ILocalCacheService.cs" />
     <Compile Include="Services\ILocalizationService.cs" />
     <Compile Include="Services\ILocalSettingsService.cs" />
+    <Compile Include="Services\INotificationService.cs" />
     <Compile Include="Services\ISignInService.cs" />
     <Compile Include="Services\BackendService.cs" />
     <Compile Include="Services\IWindowsHelloService.cs" />
     <Compile Include="Services\LocalCacheService.cs" />
     <Compile Include="Services\LocalSettingsService.cs" />
+    <Compile Include="Services\NotificationService.cs" />
     <Compile Include="Services\ResourceLocalizationService.cs" />
     <Compile Include="Services\UserCredentialService.cs" />
     <Compile Include="Services\WindowsHelloService.cs" />
@@ -291,6 +293,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.10</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications">
+      <Version>6.1.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI">
       <Version>6.1.1</Version>
