@@ -1,0 +1,32 @@
+﻿<Page
+    x:Class="DL444.Ucqu.App.WinUniversal.Pages.AboutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <ScrollViewer HorizontalScrollMode="Disabled">
+        <StackPanel x:DefaultBindMode="OneWay" Margin="28,8,28,0">
+            <TextBlock x:Uid="AboutPageHeader" Style="{ThemeResource MiscellaneousPageHeaderTextBlockStyle}" />
+
+            <TextBlock x:Uid="AppTitle" Style="{ThemeResource AboutPageAppTitleTextBlockStyle}" Foreground="{ThemeResource SystemAccentColor}" />
+            <TextBlock x:Uid="AboutPageAuthor" Style="{ThemeResource MiscellaneousPageBodyTextBlockStyle}" FontWeight="Bold" />
+
+            <StackPanel Style="{ThemeResource MiscellaneousPageSectionContainerStackPanelStyle}">
+                <TextBlock x:Uid="AboutPageContactSectionHeader" Style="{ThemeResource MiscellaneousPageTitleTextBlockStyle}" />
+                <TextBlock x:Uid="AboutPageContactSectionDescription" Style="{ThemeResource MiscellaneousPageBodyTextBlockStyle}" />
+                <HyperlinkButton x:Uid="AboutPageContactSectionGitHubButton" Style="{ThemeResource MiscellaneousPageLinkButtonStyle}" />
+                <HyperlinkButton x:Uid="AboutPageContactSectionEmailButton" Style="{ThemeResource MiscellaneousPageLinkButtonStyle}" />
+            </StackPanel>
+
+            <StackPanel Style="{ThemeResource MiscellaneousPageSectionContainerStackPanelStyle}">
+                <TextBlock x:Uid="AboutPageLegalSectionHeader" Style="{ThemeResource MiscellaneousPageTitleTextBlockStyle}" />
+                <TextBlock x:Uid="AboutPageLegalSectionDisclaimer" Style="{ThemeResource AboutPageLongRunningTextBlockStyle}" />
+                <HyperlinkButton x:Uid="AboutPageLegalSectionPrivacyButton" Style="{ThemeResource MiscellaneousPageLinkButtonStyle}" />
+                <HyperlinkButton x:Uid="AboutPageLegalSectionOpenSourceLicenseButton" Click="LicenseNoticeButton_Click" Style="{ThemeResource MiscellaneousPageLinkButtonStyle}" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

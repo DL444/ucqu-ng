@@ -122,6 +122,9 @@
     </Compile>
     <Compile Include="Controls\MenuFlyoutContentItem.cs" />
     <Compile Include="Controls\NavigationPaneButton.cs" />
+    <Compile Include="Controls\OslNoticeDialog.xaml.cs">
+      <DependentUpon>OslNoticeDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ScheduleSummary.xaml.cs">
       <DependentUpon>ScheduleSummary.xaml</DependentUpon>
     </Compile>
@@ -136,6 +139,9 @@
     <Compile Include="Extensions\HttpClientBuilderExtension.cs" />
     <Compile Include="Extensions\HttpContentExtension.cs" />
     <Compile Include="Models\DataRequestResult.cs" />
+    <Compile Include="Pages\AboutPage.xaml.cs">
+      <DependentUpon>AboutPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\CalendarSubscriptionPage.xaml.cs">
       <DependentUpon>CalendarSubscriptionPage.xaml</DependentUpon>
     </Compile>
@@ -196,6 +202,9 @@
     </None>
     <None Include="Package.StoreAssociation.xml" />
     <Content Include="Assets\SignInBackground.jpg" />
+    <None Include="OSL">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -211,7 +220,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Controls\OslNoticeDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\ScheduleSummary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\AboutPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

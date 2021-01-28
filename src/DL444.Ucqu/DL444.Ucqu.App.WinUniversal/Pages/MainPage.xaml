@@ -175,7 +175,7 @@
                                     </MenuFlyoutItem>
                                     <MenuFlyoutItem x:Uid="MenuItemSettings" Icon="Setting" Click="{x:Bind GoToSettingsPage}" />
                                     <MenuFlyoutItem x:Uid="MenuItemSignOut" Icon="Permissions" Click="{x:Bind SignOut}" />
-                                    <MenuFlyoutItem x:Uid="MenuItemAbout" Icon="Emoji2" />
+                                    <MenuFlyoutItem x:Uid="MenuItemAbout" Icon="Emoji2" Click="{x:Bind GoToAboutPage}" />
                                 </MenuFlyout>
                             </controls:NavigationPaneButton.Flyout>
                         </controls:NavigationPaneButton>

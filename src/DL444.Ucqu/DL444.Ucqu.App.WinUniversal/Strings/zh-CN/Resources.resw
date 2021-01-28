@@ -117,6 +117,42 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AboutPageAuthor.Text" xml:space="preserve">
+    <value>David Lee</value>
+  </data>
+  <data name="AboutPageContactSectionDescription.Text" xml:space="preserve">
+    <value>提交反馈，咨询讨论</value>
+  </data>
+  <data name="AboutPageContactSectionEmailButton.Content" xml:space="preserve">
+    <value>电子邮件</value>
+  </data>
+  <data name="AboutPageContactSectionEmailButton.NavigateUri" xml:space="preserve">
+    <value>mailto:DLPServ@outlook.com?subject=UCQU</value>
+  </data>
+  <data name="AboutPageContactSectionGitHubButton.Content" xml:space="preserve">
+    <value>GitHub</value>
+  </data>
+  <data name="AboutPageContactSectionGitHubButton.NavigateUri" xml:space="preserve">
+    <value>https://github.com/DL444/ucqu-ng</value>
+  </data>
+  <data name="AboutPageContactSectionHeader.Text" xml:space="preserve">
+    <value>联系作者</value>
+  </data>
+  <data name="AboutPageHeader.Text" xml:space="preserve">
+    <value>关于</value>
+  </data>
+  <data name="AboutPageLegalSectionDisclaimer.Text" xml:space="preserve">
+    <value>本应用程序与重庆大学官方无任何关联，亦未经重庆大学官方认可；应用程序作者与重庆大学官方无商业或技术联系。本应用程序按 "原样" 提供。应用程序的缺陷若为用户带来任何损失，应用程序作者不负任何直接、间接或连带责任。用户应自行权衡，决定是否使用任何应用程序功能。</value>
+  </data>
+  <data name="AboutPageLegalSectionHeader.Text" xml:space="preserve">
+    <value>法律信息</value>
+  </data>
+  <data name="AboutPageLegalSectionOpenSourceLicenseButton.Content" xml:space="preserve">
+    <value>开源许可协议</value>
+  </data>
+  <data name="AboutPageLegalSectionPrivacyButton.Content" xml:space="preserve">
+    <value>隐私声明</value>
+  </data>
   <data name="AppTitle.Text" xml:space="preserve">
     <value>UCQU</value>
   </data>
@@ -212,6 +248,12 @@
   </data>
   <data name="NavigationItemScore.Content" xml:space="preserve">
     <value>成绩</value>
+  </data>
+  <data name="OslNoticeDialog.PrimaryButtonText" xml:space="preserve">
+    <value>确定</value>
+  </data>
+  <data name="OslNoticeDialog.Title" xml:space="preserve">
+    <value>开源许可协议</value>
   </data>
   <data name="OverallGradePointFormat" xml:space="preserve">
     <value>总绩点: {0:0.00}</value>

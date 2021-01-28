@@ -707,6 +707,18 @@
             <Style x:Key="MiscellaneousPageButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonRevealStyle}">
                 <Setter Property="MinWidth" Value="100" />
             </Style>
+
+            <Style x:Key="AboutPageAppTitleTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource TitleTextBlockStyle}">
+                <Setter Property="Margin" Value="0,0,0,4" />
+                <Setter Property="Foreground" Value="{ThemeResource SystemAccentColor}" />
+                <Setter Property="FontWeight" Value="Bold" />
+            </Style>
+
+            <Style x:Key="AboutPageLongRunningTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource MiscellaneousPageBodyTextBlockStyle}">
+                <Setter Property="MaxWidth" Value="540" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="Foreground" Value="{ThemeResource SystemBaseMediumColor}" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
