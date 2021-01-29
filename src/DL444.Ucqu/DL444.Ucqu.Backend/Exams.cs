@@ -19,7 +19,7 @@ namespace DL444.Ucqu.Backend
 
         [FunctionName("Exams")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
             [UserIdentity] string? username,
             ILogger log)
         {
