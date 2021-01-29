@@ -177,6 +177,16 @@ namespace DL444.Ucqu.App.WinUniversal.Services
                             }
                         }
                     }
+                },
+                Actions = new ToastActionsCustom()
+                {
+                    ContextMenuItems =
+                    {
+                        new ToastContextMenuItem("ms-resource:ScheduleSummaryToastNeverShow", "ScheduleSummary")
+                        {
+                            ActivationType = ToastActivationType.Background
+                        }
+                    }
                 }
             };
             foreach (ScheduleEntryViewModel entry in schedule)

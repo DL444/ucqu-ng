@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.ApplicationModel.Background;
 using System.Linq;
+using Windows.UI.Notifications;
 
 namespace DL444.Ucqu.App.WinUniversal
 {
@@ -178,6 +179,14 @@ namespace DL444.Ucqu.App.WinUniversal
                 case "NotificationUpdateTimerTask":
                     await Services.GetService<INotificationService>().UpdateScheduleSummaryNotificationAsync();
                     break;
+                case "NotificationSetNeverShowTask":
+                    var settingsService = Services.GetService<ILocalSettingsService>();
+                    var triggerDetails = (ToastNotificationActionTriggerDetail)args.TaskInstance.TriggerDetails;
+                    if ("ScheduleSummary".Equals(triggerDetails.Argument, StringComparison.Ordinal))
+                    {
+                        settingsService.SetValue("DailyToastEnabled", false);
+                    }
+                    break;
             }
             deferral.Complete();
         }
@@ -223,7 +232,7 @@ namespace DL444.Ucqu.App.WinUniversal
             if (requestStatus == BackgroundAccessStatus.AllowedSubjectToSystemPolicy || requestStatus == BackgroundAccessStatus.AlwaysAllowed)
             {
                 var builder = new BackgroundTaskBuilder();
-                builder.Name = $"BackgroundTaskReconfigureTask";
+                builder.Name = "BackgroundTaskReconfigureTask";
                 builder.SetTrigger(new SystemTrigger(SystemTriggerType.ServicingComplete, false));
                 // Do NOT reregister migration task. A running migration task cannot unregister itself, so reregister will crash the app.
                 // To modify this task in a future version, register a new task with a different name, and remove this one.
@@ -232,9 +241,14 @@ namespace DL444.Ucqu.App.WinUniversal
                 uint updateInterval = Configuration.GetValue<uint>("Notification:TimerTaskUpdateInterval", 15);
                 updateInterval = Math.Max(15, updateInterval);
                 builder = new BackgroundTaskBuilder();
-                builder.Name = $"NotificationUpdateTimerTask";
+                builder.Name = "NotificationUpdateTimerTask";
                 builder.SetTrigger(new TimeTrigger(updateInterval, false));
                 builder.AddCondition(new SystemCondition(SystemConditionType.BackgroundWorkCostNotHigh));
+                TryRegisterBackgroundTask(builder, replaceIfExists);
+
+                builder = new BackgroundTaskBuilder();
+                builder.Name = "NotificationSetNeverShowTask";
+                builder.SetTrigger(new ToastNotificationActionTrigger());
                 TryRegisterBackgroundTask(builder, replaceIfExists);
             }
         }

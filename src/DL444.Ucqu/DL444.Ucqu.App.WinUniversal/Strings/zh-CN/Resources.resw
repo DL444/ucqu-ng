@@ -291,6 +291,9 @@
   <data name="ScheduleSummaryToastDescriptionFormat" xml:space="preserve">
     <value>今日共 {0} 门课程</value>
   </data>
+  <data name="ScheduleSummaryToastNeverShow" xml:space="preserve">
+    <value>不再显示今日课程通知</value>
+  </data>
   <data name="ScheduleSummaryToastTitle" xml:space="preserve">
     <value>今日课程</value>
   </data>
