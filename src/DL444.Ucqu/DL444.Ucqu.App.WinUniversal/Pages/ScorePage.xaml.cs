@@ -32,6 +32,7 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+            Application.Current.GetService<INotificationService>().ClearToast(ToastTypes.ScoreChange);
             Task studentInfoUpdateTask = StudentInfoViewModel.UpdateAsync(
                 () => localDataService.GetStudentInfoAsync(),
                 () => remoteDataService.GetStudentInfoAsync(),
