@@ -1,5 +1,6 @@
 using System;
 using Azure.Cosmos;
+using DL444.Ucqu.Backend.Models;
 using DL444.Ucqu.Backend.Services;
 using DL444.Ucqu.Client;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
@@ -7,6 +8,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Polly;
 
 [assembly: WebJobsStartup(typeof(DL444.Ucqu.Backend.Startup))]
 namespace DL444.Ucqu.Backend
@@ -60,11 +62,9 @@ namespace DL444.Ucqu.Backend
             var dbConnection = config.GetValue<string>("Database:ConnectionString");
             builder.Services.AddSingleton(new CosmosClient(dbConnection));
 
-            var databaseId = config.GetValue<string>("Database:Database");
-            var containerId = config.GetValue<string>("Database:Container");
-            builder.Services.AddTransient<IDataAccessService>(
-                services => new DataAccessService(services.GetService<CosmosClient>(), databaseId, containerId, services.GetService<ICredentialEncryptionService>())
-            );
+            builder.Services.AddTransient<IDataAccessService, DataAccessService>();
+
+            builder.Services.AddTransient<IPushDataAccessService, DataAccessService>();
 
             builder.Services.AddSingleton((ILocalizationService)new LocalizationService(config.GetSection("Localization")));
 
@@ -75,6 +75,10 @@ namespace DL444.Ucqu.Backend
             builder.Services.AddTransient<IRefreshFunctionHandlerService, RefreshFunctionHandlerService>();
 
             builder.Services.AddTransient<ICalendarService, CalendarService>();
+
+            int retry = config.GetValue<int>("Notification:Windows:Retry", 2);
+            builder.Services.AddHttpClient<IPushNotificationService<WindowsPushNotification>, WindowsPushNotificationService>()
+                .AddTransientHttpErrorPolicy(policy => policy.WaitAndRetryAsync(retry, x => TimeSpan.FromSeconds(2 << x)));
         }
 
         public void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)

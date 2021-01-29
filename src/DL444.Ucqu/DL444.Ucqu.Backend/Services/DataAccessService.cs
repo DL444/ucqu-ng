@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Azure.Cosmos;
 using DL444.Ucqu.Backend.Models;
 using DL444.Ucqu.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace DL444.Ucqu.Backend.Services
 {
@@ -27,12 +28,24 @@ namespace DL444.Ucqu.Backend.Services
         Task<DataAccessResult<DeveloperMessage>> GetDeveloperMessageAsync();
     }
 
-    internal class DataAccessService : IDataAccessService
+    public interface IPushDataAccessService
     {
-        public DataAccessService(CosmosClient dbClient, string databaseId, string containerId, ICredentialEncryptionService encryptionService)
+        Task<DataAccessResult<PushAccessToken>> GetPushAccessTokenAsync(PushPlatform platform);
+        Task<DataAccessResult> SetPushAccessTokenAsync(PushAccessToken token);
+        Task<DataAccessResult<NotificationChannelCollection>> GetPushChannelsAsync(string username, PushPlatform platform);
+        Task<DataAccessResult> AddPushChannelAsync(string username, PushPlatform platform, string channelIdentifier);
+        Task<DataAccessResult> RemovePushChannelAsync(string username, PushPlatform platform, IEnumerable<string> channelIdentifiers);
+    }
+
+    internal class DataAccessService : IDataAccessService, IPushDataAccessService
+    {
+        public DataAccessService(CosmosClient dbClient, IConfiguration config, ICredentialEncryptionService encryptionService)
         {
+            var databaseId = config.GetValue<string>("Database:Database");
+            var containerId = config.GetValue<string>("Database:Container");
             container = dbClient.GetContainer(databaseId, containerId);
             this.encryptionService = encryptionService;
+            maxChannelCountPerPlatform = config.GetValue<int>("Notification:MaxChannelCountPerPlatform");
         }
 
         public async Task<DataAccessResult<List<string>>> GetUsersAsync()
@@ -64,7 +77,7 @@ namespace DL444.Ucqu.Backend.Services
 
         public async Task<DataAccessResult<StudentCredential>> GetCredentialAsync(string username)
         {
-            DataAccessResult<StudentCredential> fetchResult = await GetResource<StudentCredential>($"Credential-{username}", "Credential");
+            DataAccessResult<StudentCredential> fetchResult = await GetResourceAsync<StudentCredential>($"Credential-{username}", "Credential");
             if (fetchResult.Success)
             {
                 try
@@ -82,11 +95,11 @@ namespace DL444.Ucqu.Backend.Services
         public async Task<DataAccessResult> SetCredentialAsync(StudentCredential credential)
         {
             encryptionService.EncryptCredential(credential);
-            return await SetResource(credential);
+            return await SetResourceAsync(credential);
         }
 
-        public async Task<DataAccessResult<UserInitializeStatus>> GetUserInitializeStatusAsync(string id) => await GetResource<UserInitializeStatus>($"UserInitStatus-{id}", "UserInitStatus");
-        public async Task<DataAccessResult> SetUserInitializeStatusAsync(UserInitializeStatus status) => await SetResource(status);
+        public async Task<DataAccessResult<UserInitializeStatus>> GetUserInitializeStatusAsync(string id) => await GetResourceAsync<UserInitializeStatus>($"UserInitStatus-{id}", "UserInitStatus");
+        public async Task<DataAccessResult> SetUserInitializeStatusAsync(UserInitializeStatus status) => await SetResourceAsync(status);
         public async Task<DataAccessResult> PurgeUserInitializeStatusAsync()
         {
             long threshold = System.DateTimeOffset.UtcNow.AddMinutes(-15).ToUnixTimeMilliseconds();
@@ -114,18 +127,18 @@ namespace DL444.Ucqu.Backend.Services
             return new DataAccessResult(!hasError, 0);
         }
 
-        public async Task<DataAccessResult<StudentInfo>> GetStudentInfoAsync(string username) => await GetResource<StudentInfo>($"Student-{username}", username);
-        public async Task<DataAccessResult> SetStudentInfoAsync(StudentInfo info) => await SetResource(info);
+        public async Task<DataAccessResult<StudentInfo>> GetStudentInfoAsync(string username) => await GetResourceAsync<StudentInfo>($"Student-{username}", username);
+        public async Task<DataAccessResult> SetStudentInfoAsync(StudentInfo info) => await SetResourceAsync(info);
 
-        public async Task<DataAccessResult<Schedule>> GetScheduleAsync(string username) => await GetResource<Schedule>($"Schedule-{username}", username);
-        public async Task<DataAccessResult> SetScheduleAsync(Schedule schedule) => await SetResource(schedule);
+        public async Task<DataAccessResult<Schedule>> GetScheduleAsync(string username) => await GetResourceAsync<Schedule>($"Schedule-{username}", username);
+        public async Task<DataAccessResult> SetScheduleAsync(Schedule schedule) => await SetResourceAsync(schedule);
 
-        public async Task<DataAccessResult<ExamSchedule>> GetExamsAsync(string username) => await GetResource<ExamSchedule>($"Exams-{username}", username);
-        public async Task<DataAccessResult> SetExamsAsync(ExamSchedule exams) => await SetResource(exams);
+        public async Task<DataAccessResult<ExamSchedule>> GetExamsAsync(string username) => await GetResourceAsync<ExamSchedule>($"Exams-{username}", username);
+        public async Task<DataAccessResult> SetExamsAsync(ExamSchedule exams) => await SetResourceAsync(exams);
 
         public async Task<DataAccessResult<ScoreSet>> GetScoreAsync(string username, bool isSecondMajor)
-            => await GetResource<ScoreSet>($"Score-{username}-{(isSecondMajor ? "S" : "M")}", username);
-        public async Task<DataAccessResult> SetScoreAsync(ScoreSet scoreSet) => await SetResource(scoreSet);
+            => await GetResourceAsync<ScoreSet>($"Score-{username}-{(isSecondMajor ? "S" : "M")}", username);
+        public async Task<DataAccessResult> SetScoreAsync(ScoreSet scoreSet) => await SetResourceAsync(scoreSet);
 
         public async Task<DataAccessResult> DeleteUserAsync(string username)
         {
@@ -137,6 +150,7 @@ namespace DL444.Ucqu.Backend.Services
             deleteTasks.Add(container.DeleteItemAsync<object>($"Exams-{username}", new PartitionKey(username)));
             deleteTasks.Add(container.DeleteItemAsync<object>($"Score-{username}-M", new PartitionKey(username)));
             deleteTasks.Add(container.DeleteItemAsync<object>($"Score-{username}-S", new PartitionKey(username)));
+            deleteTasks.Add(container.DeleteItemAsync<object>($"PushChannels-Wns-{username}", new PartitionKey(username)));
             bool hasError = false;
             try
             {
@@ -187,9 +201,73 @@ namespace DL444.Ucqu.Backend.Services
             return DataAccessResult.Ok;
         }
 
-        public async Task<DataAccessResult<DeveloperMessage>> GetDeveloperMessageAsync() => await GetResource<DeveloperMessage>("DevMessage", "DevMessage");
+        public async Task<DataAccessResult<DeveloperMessage>> GetDeveloperMessageAsync() => await GetResourceAsync<DeveloperMessage>("DevMessage", "DevMessage");
 
-        private async Task<DataAccessResult<T>> GetResource<T>(string id, string partitionKey) where T : ICosmosResource
+        public Task<DataAccessResult<PushAccessToken>> GetPushAccessTokenAsync(PushPlatform platform) => GetResourceAsync<PushAccessToken>($"{platform}PushToken", $"{platform}PushToken");
+
+        public Task<DataAccessResult> SetPushAccessTokenAsync(PushAccessToken token) => SetResourceAsync<PushAccessToken>(token);
+
+        public Task<DataAccessResult<NotificationChannelCollection>> GetPushChannelsAsync(string username, PushPlatform platform)
+        {
+            string id = $"PushChannels-{platform}-{username}";
+            return GetResourceAsync<NotificationChannelCollection>(id, username);
+        }
+
+        public async Task<DataAccessResult> AddPushChannelAsync(string username, PushPlatform platform, string channelIdentifier)
+        {
+            DataAccessResult<NotificationChannelCollection> fetchResult = await GetPushChannelsAsync(username, platform);
+            NotificationChannelCollection collection;
+            if (fetchResult.Success)
+            {
+                collection = fetchResult.Resource;
+            }
+            else if (fetchResult.StatusCode == 404)
+            {
+                collection = new NotificationChannelCollection(username, platform);
+            }
+            else
+            {
+                return new DataAccessResult(false, fetchResult.StatusCode);
+            }
+            if (collection.Channels.Exists(x => x.ChannelIdentifier.Equals(channelIdentifier, StringComparison.Ordinal)))
+            {
+                return DataAccessResult.Ok;
+            }
+
+            collection.Channels.Add(new NotificationChannelItem(channelIdentifier));
+            if (collection.Channels.Count > maxChannelCountPerPlatform)
+            {
+                collection.Channels.RemoveAt(0);
+            }
+            return await SetResourceAsync(collection);
+        }
+
+        public async Task<DataAccessResult> RemovePushChannelAsync(string username, PushPlatform platform, IEnumerable<string> channelIdentifiers)
+        {
+            DataAccessResult<NotificationChannelCollection> fetchResult = await GetPushChannelsAsync(username, platform);
+            NotificationChannelCollection collection;
+            if (fetchResult.Success)
+            {
+                collection = fetchResult.Resource;
+            }
+            else
+            {
+                return new DataAccessResult(false, fetchResult.StatusCode);
+            }
+
+            int removedCount = 0;
+            foreach (string id in channelIdentifiers)
+            {
+                removedCount += collection.Channels.RemoveAll(x => x.ChannelIdentifier.Equals(id, StringComparison.Ordinal));
+            }
+            if (removedCount == 0)
+            {
+                return new DataAccessResult(false, 404);
+            }
+            return await SetResourceAsync(collection);
+        }
+
+        private async Task<DataAccessResult<T>> GetResourceAsync<T>(string id, string partitionKey) where T : ICosmosResource
         {
             try
             {
@@ -201,7 +279,7 @@ namespace DL444.Ucqu.Backend.Services
                 return new DataAccessResult<T>(false, default(T), ex.Status);
             }
         }
-        private async Task<DataAccessResult> SetResource<T>(T resource) where T : ICosmosResource
+        private async Task<DataAccessResult> SetResourceAsync<T>(T resource) where T : ICosmosResource
         {
             try
             {
@@ -215,7 +293,8 @@ namespace DL444.Ucqu.Backend.Services
             }
         }
 
-        private CosmosContainer container;
-        private ICredentialEncryptionService encryptionService;
+        private readonly CosmosContainer container;
+        private readonly ICredentialEncryptionService encryptionService;
+        private readonly int maxChannelCountPerPlatform;
     }
 }
