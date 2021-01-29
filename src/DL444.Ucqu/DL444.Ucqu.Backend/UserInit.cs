@@ -22,7 +22,7 @@ namespace DL444.Ucqu.Backend
 
         [FunctionName("UserInit")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "UserInit/{id}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "UserInit/{id}")] HttpRequest req,
             string id,
             ILogger log)
         {

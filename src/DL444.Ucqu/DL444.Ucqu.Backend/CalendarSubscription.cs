@@ -25,7 +25,7 @@ namespace DL444.Ucqu.Backend
 
         [FunctionName("CalendarSubscriptionGet")]
         public async Task<IActionResult> RunGet(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Calendar/{username}/{id}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Calendar/{username}/{id}")] HttpRequest req,
             string? username,
             string? id,
             ILogger log)
@@ -76,7 +76,7 @@ namespace DL444.Ucqu.Backend
 
         [FunctionName("CalendarSubscriptionPost")]
         public async Task<IActionResult> RunPost(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Calendar")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "Calendar")] HttpRequest req,
             [UserIdentity] string? username,
             ILogger log)
         {

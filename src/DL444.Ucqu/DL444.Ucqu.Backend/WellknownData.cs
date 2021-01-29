@@ -24,7 +24,7 @@ namespace DL444.Ucqu.Backend
 
         [FunctionName("WellknownData")]
         public IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "wellknown")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "wellknown")] HttpRequest req,
             ILogger log)
         {
             return new OkObjectResult(new BackendResult<WellknownData>(data));

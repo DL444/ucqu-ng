@@ -21,7 +21,7 @@ namespace DL444.Ucqu.Backend
 
         [FunctionName("DeleteUser")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "user")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = "user")] HttpRequest req,
             [UserIdentity] string? username,
             ILogger log)
         {

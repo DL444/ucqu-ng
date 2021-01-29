@@ -27,7 +27,7 @@ namespace DL444.Ucqu.Backend
 
         [FunctionName("SignIn")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "signIn/{createAccount:bool}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "signIn/{createAccount:bool}")] HttpRequest req,
             [Queue("user-init-queue", Connection = "AzureWebJobsStorage")] IAsyncCollector<Models.UserInitializeCommand> userInitCommandCollector,
             bool createAccount,
             ILogger log)

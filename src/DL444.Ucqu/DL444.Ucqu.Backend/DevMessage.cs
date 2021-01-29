@@ -16,7 +16,7 @@ namespace DL444.Ucqu.Backend
 
         [FunctionName("DevMessage")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "DevMessage/{platform}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "DevMessage/{platform}")] HttpRequest req,
             string platform,
             ILogger log)
         {

@@ -25,7 +25,7 @@ namespace DL444.Ucqu.Backend
 
         [FunctionName("NotificationChannelWns")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "notifyChannel/windows")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "notifyChannel/windows")] HttpRequest req,
             [UserIdentity] string? username,
             ILogger log)
         {
