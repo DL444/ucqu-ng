@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using DL444.Ucqu.App.WinUniversal.Exceptions;
 using DL444.Ucqu.App.WinUniversal.Extensions;
@@ -17,7 +14,7 @@ using Polly.Retry;
 
 namespace DL444.Ucqu.App.WinUniversal.Services
 {
-    internal class BackendService : IDataService, ISignInService, ICalendarSubscriptionService
+    internal class BackendService : IDataService, ISignInService, ICalendarSubscriptionService, INotificationChannelService
     {
         public BackendService(HttpClient httpClient, ICredentialService credentialService)
         {
@@ -205,6 +202,20 @@ namespace DL444.Ucqu.App.WinUniversal.Services
             {
                 return string.Empty;
             }
+        }
+
+        public async Task PostNotificationChannelAsync(NotificationChannelItem channel)
+        {
+            try
+            {
+                HttpResponseMessage response = await retryWithAuthPolicy.ExecuteAsync(() =>
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "notifyChannel/windows").AddToken(credentialService.Token);
+                    request.Content = new JsonStringContent(channel);
+                    return client.SendAsync(request);
+                });
+            }
+            catch (HttpRequestException) { }
         }
 
         // TODO: Add localization service.

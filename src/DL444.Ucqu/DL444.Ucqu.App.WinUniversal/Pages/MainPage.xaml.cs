@@ -10,6 +10,7 @@ using DL444.Ucqu.App.WinUniversal.ViewModels;
 using DL444.Ucqu.Models;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Networking.PushNotifications;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -35,6 +36,7 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
             localDataService = Application.Current.GetService<IDataService>(x => x.DataSource == DataSource.LocalCache);
             remoteDataService = Application.Current.GetService<IDataService>(x => x.DataSource == DataSource.Online);
             cacheService = Application.Current.GetService<ILocalCacheService>();
+            channelService = Application.Current.GetService<INotificationChannelService>();
             NavigationView.SelectedItem = NavigationView.MenuItems.First();
             StudentInfoViewModel = new DataViewModel<StudentInfo, StudentInfoViewModel>(new StudentInfoViewModel());
             WellknownDataViewModel = new DataViewModel<WellknownData, WellknownDataViewModel>(new WellknownDataViewModel(new WellknownData()
@@ -51,19 +53,27 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
             base.OnNavigatedTo(e);
             prevWidth = Window.Current.Bounds.Width;
             Window.Current.SizeChanged += CurrentWindow_SizeChanged;
-            var wellknownUpdateTask = WellknownDataViewModel.UpdateAsync(
+
+            if (e.Parameter is string argument && argument.Equals("ScoreChanged", StringComparison.Ordinal))
+            {
+                NavigationView.SelectedItem = NavigationView.MenuItems.Last();
+            }
+
+            IAsyncOperation<PushNotificationChannel> channelCreationTask = PushNotificationChannelManager.CreatePushNotificationChannelForApplicationAsync();
+            Task wellknownUpdateTask = WellknownDataViewModel.UpdateAsync(
                 () => localDataService.GetWellknownDataAsync(),
                 () => remoteDataService.GetWellknownDataAsync(),
                 x => cacheService.SetWellknownDataAsync(x),
                 x => new WellknownDataViewModel(x),
                 preferLocal: true,
                 x => DateTimeOffset.UtcNow > x.TermEndDate);
-            var studentInfoUpdateTask = StudentInfoViewModel.UpdateAsync(
+            Task studentInfoUpdateTask = StudentInfoViewModel.UpdateAsync(
                 () => localDataService.GetStudentInfoAsync(),
                 () => remoteDataService.GetStudentInfoAsync(),
                 x => cacheService.SetStudentInfoAsync(x),
                 x => new StudentInfoViewModel(x)
             );
+
             await wellknownUpdateTask;
             Task examsUpdateTask = ExamsViewModel.UpdateAsync(
                 () => localDataService.GetExamsAsync(),
@@ -79,7 +89,20 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
                 x => new ScheduleViewModel(x, WellknownDataViewModel.Value.Model),
                 true,
                 _ => DateTimeOffset.UtcNow < WellknownDataViewModel.Value.Model.TermEndDate);
-            await Task.WhenAll(studentInfoUpdateTask, examsUpdateTask, scheduleUpdateTask);
+
+            await studentInfoUpdateTask;
+            Task channelUpdateTask;
+            try
+            {
+                PushNotificationChannel channel = await channelCreationTask;
+                channelUpdateTask = channelService.PostNotificationChannelAsync(new NotificationChannelItem(channel.Uri));
+            }
+            catch (Exception ex)
+            {
+                // TODO: Log exception.
+                channelUpdateTask = Task.CompletedTask;
+            }
+            await Task.WhenAll(examsUpdateTask, scheduleUpdateTask, channelUpdateTask);
         }
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
@@ -213,9 +236,10 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
 
         private async Task SignOut() => await ((App)Application.Current).SignOutAsync();
 
-        private IDataService localDataService;
-        private IDataService remoteDataService;
-        private ILocalCacheService cacheService;
+        private readonly IDataService localDataService;
+        private readonly IDataService remoteDataService;
+        private readonly ILocalCacheService cacheService;
+        private readonly INotificationChannelService channelService;
         private bool topPaneOpen;
         private double prevWidth;
     }

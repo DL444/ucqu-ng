@@ -171,6 +171,7 @@
     <Compile Include="Services\ILocalCacheService.cs" />
     <Compile Include="Services\ILocalizationService.cs" />
     <Compile Include="Services\ILocalSettingsService.cs" />
+    <Compile Include="Services\INotificationChannelService.cs" />
     <Compile Include="Services\INotificationService.cs" />
     <Compile Include="Services\ISignInService.cs" />
     <Compile Include="Services\BackendService.cs" />

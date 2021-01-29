@@ -114,6 +114,10 @@ namespace DL444.Ucqu.App.WinUniversal
             {
                 client.BaseAddress = baseAddress;
             }).AddDefaultPolicy(retryCount, timeout);
+            services.AddHttpClient<INotificationChannelService, BackendService>(client =>
+            {
+                client.BaseAddress = baseAddress;
+            }).AddDefaultPolicy(retryCount, timeout);
 
             LocalCacheService localCacheService = new LocalCacheService(config);
             services.AddSingleton<IDataService>(localCacheService);
@@ -131,28 +135,7 @@ namespace DL444.Ucqu.App.WinUniversal
         /// <param name="e">Details about the launch request and process.</param>
         protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
-            ConfigureWindow();
-            Services.GetService<ILocalSettingsService>().Migrate();
-            await ConfigureBackgroundTasksAsync(false);
-            Frame rootFrame = Window.Current.Content as Frame;
-
-            // Do not repeat app initialization when the Window already has content,
-            // just ensure that the window is active
-            if (rootFrame == null)
-            {
-                // Create a Frame to act as the navigation context and navigate to the first page
-                rootFrame = new Frame();
-
-                rootFrame.NavigationFailed += OnNavigationFailed;
-
-                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
-                {
-                    //TODO: Load state from previously suspended application
-                }
-
-                // Place the frame in the current Window
-                Window.Current.Content = rootFrame;
-            }
+            Frame rootFrame = await InitializeRootFrame(e);
 
             if (e.PrelaunchActivated == false)
             {
@@ -166,6 +149,21 @@ namespace DL444.Ucqu.App.WinUniversal
                 // Ensure the current window is active
                 Window.Current.Activate();
             }
+        }
+
+        protected override async void OnActivated(IActivatedEventArgs args)
+        {
+            base.OnActivated(args);
+            Frame rootFrame = await InitializeRootFrame(args);
+            if (args is ToastNotificationActivatedEventArgs e)
+            {
+                NavigateToFirstPage(e.Argument);
+            }
+            else if (rootFrame.Content == null)
+            {
+                NavigateToFirstPage(null);
+            }
+            Window.Current.Activate();
         }
 
         protected override async void OnBackgroundActivated(BackgroundActivatedEventArgs args)
@@ -189,7 +187,7 @@ namespace DL444.Ucqu.App.WinUniversal
         /// </summary>
         /// <param name="sender">The Frame which failed navigation</param>
         /// <param name="e">Details about the navigation failure</param>
-        void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
+        private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         {
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
         }
@@ -261,6 +259,34 @@ namespace DL444.Ucqu.App.WinUniversal
                 builder.Register();
                 return true;
             }
+        }
+
+        private async Task<Frame> InitializeRootFrame(IActivatedEventArgs e)
+        {
+            ConfigureWindow();
+            Services.GetService<ILocalSettingsService>().Migrate();
+            await ConfigureBackgroundTasksAsync(false);
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            // Do not repeat app initialization when the Window already has content,
+            // just ensure that the window is active
+            if (rootFrame == null)
+            {
+                // Create a Frame to act as the navigation context and navigate to the first page
+                rootFrame = new Frame();
+
+                rootFrame.NavigationFailed += OnNavigationFailed;
+
+                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
+                {
+                    //TODO: Load state from previously suspended application
+                }
+
+                // Place the frame in the current Window
+                Window.Current.Content = rootFrame;
+            }
+
+            return rootFrame;
         }
     }
 }
