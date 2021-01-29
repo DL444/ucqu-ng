@@ -205,6 +205,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Package.StoreAssociation.xml" />
+    <Content Include="Assets\ScoreToastAssets\Excellent.png" />
+    <Content Include="Assets\ScoreToastAssets\Fail.png" />
+    <Content Include="Assets\ScoreToastAssets\Good.png" />
+    <Content Include="Assets\ScoreToastAssets\Mediocre.png" />
     <Content Include="Assets\SignInBackground.jpg" />
     <None Include="OSL">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
