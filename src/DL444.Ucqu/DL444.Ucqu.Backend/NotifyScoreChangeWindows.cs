@@ -66,7 +66,8 @@ namespace DL444.Ucqu.Backend
                             Source = emojiUri,
                         }
                     }
-                }
+                },
+                Launch = "ScoreChanged"
             };
             return new WindowsPushNotification(WindowsNotificationType.Toast, toastContent.GetContent());
         }
