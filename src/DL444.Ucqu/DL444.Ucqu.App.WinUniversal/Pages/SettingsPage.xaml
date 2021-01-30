@@ -16,6 +16,19 @@
                 <TextBlock x:Uid="SettingsPageNotificationSectionHeader" Style="{ThemeResource MiscellaneousPageTitleTextBlockStyle}" />
                 <TextBlock x:Uid="SettingsPageNotificationSectionScheduleSummary" Style="{ThemeResource MiscellaneousPageBodyTextBlockStyle}" />
                 <ToggleSwitch IsOn="{x:Bind ViewModel.IsScheduleSummaryNotificationEnabled, Mode=TwoWay}" />
+                <TextBlock x:Uid="SettingsPageNotificationSectionScoreChanged" Style="{ThemeResource MiscellaneousPageBodyTextBlockStyle}" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.IsScoreChangeNotificationEnabled}" 
+                                  IsEnabled="{x:Bind ViewModel.IsScoreChangedNotificationEnabledUpdateCompleted}" 
+                                  Style="{ThemeResource MiscellaneousPageToggleSwitchStyle}"
+                                  VerticalAlignment="Center"
+                                  Toggled="ScoreChangedNotification_Toggled" />
+                    <muxc:ProgressRing IsActive="True" Visibility="{x:Bind ViewModel.IsScoreChangedNotificationEnabledUpdateInProgress}" VerticalAlignment="Center" />
+                    <TextBlock x:Uid="SettingsPageNotificationSectionScoreChangedUpdateFailed" 
+                               Style="{ThemeResource MiscellaneousPageWarningTextBlockStyle}" 
+                               Visibility="{x:Bind ViewModel.IsScoreChangedNotificationEnabledUpdateFailed}" 
+                               VerticalAlignment="Center" />
+                </StackPanel>
             </StackPanel>
 
             <StackPanel Style="{ThemeResource MiscellaneousPageSectionContainerStackPanelStyle}">

@@ -182,7 +182,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
                 {
                     ContextMenuItems =
                     {
-                        new ToastContextMenuItem("ms-resource:ScheduleSummaryToastNeverShow", "ScheduleSummary")
+                        new ToastContextMenuItem("ms-resource:ScheduleSummaryToastNeverShow", "NeverShowScheduleSummary")
                         {
                             ActivationType = ToastActivationType.Background
                         }

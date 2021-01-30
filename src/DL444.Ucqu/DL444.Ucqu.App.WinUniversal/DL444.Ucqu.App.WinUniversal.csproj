@@ -173,6 +173,7 @@
     <Compile Include="Services\ILocalSettingsService.cs" />
     <Compile Include="Services\INotificationChannelService.cs" />
     <Compile Include="Services\INotificationService.cs" />
+    <Compile Include="Services\IRemoteSettingsService.cs" />
     <Compile Include="Services\ISignInService.cs" />
     <Compile Include="Services\BackendService.cs" />
     <Compile Include="Services\IWindowsHelloService.cs" />

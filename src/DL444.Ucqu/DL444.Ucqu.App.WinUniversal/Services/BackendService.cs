@@ -14,7 +14,7 @@ using Polly.Retry;
 
 namespace DL444.Ucqu.App.WinUniversal.Services
 {
-    internal class BackendService : IDataService, ISignInService, ICalendarSubscriptionService, INotificationChannelService
+    internal class BackendService : IDataService, ISignInService, ICalendarSubscriptionService, INotificationChannelService, IRemoteSettingsService
     {
         public BackendService(HttpClient httpClient, ICredentialService credentialService)
         {
@@ -82,30 +82,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
             }
         }
 
-        public async Task<DataRequestResult<WellknownData>> GetWellknownDataAsync()
-        {
-            try
-            {
-                HttpResponseMessage response = await client.GetAsync("wellknown");
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    var result = await response.Content.ReadAsJsonObjectAsync<BackendResult<WellknownData>>();
-                    return new DataRequestResult<WellknownData>(result.Resource, result.Message);
-                }
-                else
-                {
-                    BackendRequestFailedException exception = new BackendRequestFailedException($"Request failed due to an unexpected response status {response.StatusCode}. Endpoint: wellknown.")
-                    {
-                        DisplayMessage = await GetBackendMessageAsync(response.Content)
-                    };
-                    throw exception;
-                }
-            }
-            catch (HttpRequestException ex)
-            {
-                throw GetDefaultException("wellknown", ex);
-            }
-        }
+        public async Task<DataRequestResult<WellknownData>> GetWellknownDataAsync() => await SendGenericRequestAsync<WellknownData>(HttpMethod.Get, "wellknown", false);
 
         public Task<DataRequestResult<StudentInfo>> GetStudentInfoAsync() => SendGenericRequestAsync<StudentInfo>(HttpMethod.Get, "studentInfo", true);
 
@@ -151,6 +128,57 @@ namespace DL444.Ucqu.App.WinUniversal.Services
         }
 
         public Task<DataRequestResult<CalendarSubscription>> ResetCalendarSubscriptionAsync() => SendGenericRequestAsync<CalendarSubscription>(HttpMethod.Post, "calendar", true);
+
+        public async Task PostNotificationChannelAsync(NotificationChannelItem channel)
+        {
+            try
+            {
+                HttpResponseMessage response = await retryWithAuthPolicy.ExecuteAsync(() =>
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "notifyChannel/windows").AddToken(credentialService.Token);
+                    request.Content = new JsonStringContent(channel);
+                    return client.SendAsync(request);
+                });
+            }
+            catch (HttpRequestException) { }
+        }
+
+        public Task<DataRequestResult<UserPreferences>> GetRemoteSettingsAsync() => SendGenericRequestAsync<UserPreferences>(HttpMethod.Get, "preferences", true);
+        public async Task<DataRequestResult<UserPreferences>> SetRemoteSettingsAsync(UserPreferences preferences)
+        {
+            try
+            {
+                HttpResponseMessage response = await retryWithAuthPolicy.ExecuteAsync(() =>
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "preferences").AddToken(credentialService.Token);
+                    request.Content = new JsonStringContent(preferences);
+                    return client.SendAsync(request);
+                });
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadAsJsonObjectAsync<BackendResult<UserPreferences>>();
+                    return new DataRequestResult<UserPreferences>(result.Resource, result.Message);
+                }
+                else
+                {
+                    BackendRequestFailedException exception;
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        exception = new BackendAuthenticationFailedException("Request failed due to incorrect credentials. Endpoint: preferencePost.");
+                    }
+                    else
+                    {
+                        exception = new BackendRequestFailedException($"Request failed due to an unexpected response status {response.StatusCode}. Endpoint: preferencePost.");
+                    }
+                    exception.DisplayMessage = await GetBackendMessageAsync(response.Content);
+                    throw exception;
+                }
+            }
+            catch (HttpRequestException ex) 
+            {
+                throw GetDefaultException($"preferencePost", ex);
+            }
+        }
 
         private async Task<DataRequestResult<T>> SendGenericRequestAsync<T>(HttpMethod method, string endpoint, bool isAuthenticated)
         {
@@ -202,20 +230,6 @@ namespace DL444.Ucqu.App.WinUniversal.Services
             {
                 return string.Empty;
             }
-        }
-
-        public async Task PostNotificationChannelAsync(NotificationChannelItem channel)
-        {
-            try
-            {
-                HttpResponseMessage response = await retryWithAuthPolicy.ExecuteAsync(() =>
-                {
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "notifyChannel/windows").AddToken(credentialService.Token);
-                    request.Content = new JsonStringContent(channel);
-                    return client.SendAsync(request);
-                });
-            }
-            catch (HttpRequestException) { }
         }
 
         // TODO: Add localization service.

@@ -25,6 +25,7 @@ using Windows.UI.Xaml.Media.Animation;
 using Windows.ApplicationModel.Background;
 using System.Linq;
 using Windows.UI.Notifications;
+using DL444.Ucqu.App.WinUniversal.Exceptions;
 
 namespace DL444.Ucqu.App.WinUniversal
 {
@@ -107,15 +108,23 @@ namespace DL444.Ucqu.App.WinUniversal
             {
                 client.BaseAddress = baseAddress;
             }).AddDefaultPolicy(retryCount, timeout);
+
             services.AddHttpClient<ISignInService, BackendService>(client =>
             {
                 client.BaseAddress = baseAddress;
             }).AddDefaultPolicy(retryCount, timeout);
+
             services.AddHttpClient<ICalendarSubscriptionService, BackendService>(client =>
             {
                 client.BaseAddress = baseAddress;
             }).AddDefaultPolicy(retryCount, timeout);
+
             services.AddHttpClient<INotificationChannelService, BackendService>(client =>
+            {
+                client.BaseAddress = baseAddress;
+            }).AddDefaultPolicy(retryCount, timeout);
+
+            services.AddHttpClient<IRemoteSettingsService, BackendService>(client =>
             {
                 client.BaseAddress = baseAddress;
             }).AddDefaultPolicy(retryCount, timeout);
@@ -179,12 +188,32 @@ namespace DL444.Ucqu.App.WinUniversal
                 case "NotificationUpdateTimerTask":
                     await Services.GetService<INotificationService>().UpdateScheduleSummaryNotificationAsync();
                     break;
-                case "NotificationSetNeverShowTask":
+                case "NotificationActivationTask":
                     var settingsService = Services.GetService<ILocalSettingsService>();
                     var triggerDetails = (ToastNotificationActionTriggerDetail)args.TaskInstance.TriggerDetails;
-                    if ("ScheduleSummary".Equals(triggerDetails.Argument, StringComparison.Ordinal))
+                    if ("NeverShowScheduleSummary".Equals(triggerDetails.Argument, StringComparison.Ordinal))
                     {
                         settingsService.SetValue("DailyToastEnabled", false);
+                    }
+                    else if ("NeverShowScoreChanged".Equals(triggerDetails.Argument, StringComparison.Ordinal))
+                    {
+                        string username = Services.GetService<ICredentialService>().Username;
+                        if (username == null)
+                        {
+                            break;
+                        }
+                        var preferences = new Ucqu.Models.UserPreferences(username)
+                        {
+                            PreferenceItems = new Dictionary<string, string>()
+                            {
+                                { "ScoreChangeNotificationEnabled", "false" }
+                            }
+                        };
+                        try
+                        {
+                            await Services.GetService<IRemoteSettingsService>().SetRemoteSettingsAsync(preferences);
+                        }
+                        catch (BackendRequestFailedException) { }
                     }
                     break;
             }
@@ -247,7 +276,7 @@ namespace DL444.Ucqu.App.WinUniversal
                 TryRegisterBackgroundTask(builder, replaceIfExists);
 
                 builder = new BackgroundTaskBuilder();
-                builder.Name = "NotificationSetNeverShowTask";
+                builder.Name = "NotificationActivationTask";
                 builder.SetTrigger(new ToastNotificationActionTrigger());
                 TryRegisterBackgroundTask(builder, replaceIfExists);
             }

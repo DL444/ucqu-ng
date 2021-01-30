@@ -292,7 +292,7 @@
     <value>今日共 {0} 门课程</value>
   </data>
   <data name="ScheduleSummaryToastNeverShow" xml:space="preserve">
-    <value>不再显示今日课程通知</value>
+    <value>不再显示每日课程通知</value>
   </data>
   <data name="ScheduleSummaryToastTitle" xml:space="preserve">
     <value>今日课程</value>
@@ -305,6 +305,9 @@
   </data>
   <data name="ScheduleSummaryTodayFreeHeader.Text" xml:space="preserve">
     <value>今日无课</value>
+  </data>
+  <data name="ScoreChangedToastNeverShow" xml:space="preserve">
+    <value>不再显示成绩动态通知</value>
   </data>
   <data name="ScoreTableHeaderCourseName.Text" xml:space="preserve">
     <value>课程</value>
@@ -371,6 +374,12 @@
   </data>
   <data name="SettingsPageNotificationSectionScheduleSummary.Text" xml:space="preserve">
     <value>每日课程</value>
+  </data>
+  <data name="SettingsPageNotificationSectionScoreChanged.Text" xml:space="preserve">
+    <value>成绩动态</value>
+  </data>
+  <data name="SettingsPageNotificationSectionScoreChangedUpdateFailed.Text" xml:space="preserve">
+    <value>暂时无法获取设置，请稍后再试</value>
   </data>
   <data name="SettingsPageWindowsHelloSectionDescription.Text" xml:space="preserve">
     <value>启动时使用 Windows Hello 进行身份验证</value>

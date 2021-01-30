@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using DL444.Ucqu.App.WinUniversal.ViewModels;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+﻿using DL444.Ucqu.App.WinUniversal.ViewModels;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace DL444.Ucqu.App.WinUniversal.Pages
@@ -42,6 +31,12 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         {
             DeleteAccountConfirmFlyout.Hide();
             await ViewModel.DeleteAccountAsync();
+        }
+
+        private async void ScoreChangedNotification_Toggled(object sender, RoutedEventArgs e)
+        {
+            bool value = ((ToggleSwitch)sender).IsOn;
+            await ViewModel.SetScoreChangedNotificationEnabledAsync(value);
         }
     }
 }
