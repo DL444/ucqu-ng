@@ -51,8 +51,9 @@ namespace DL444.Ucqu.Backend
 
             // Avoid concurrent requests to upstream server to reduce risks of IP ban.
             SignInContext signInContext = command.SignInContext;
+            _ = signInContext.SignedInUser ?? throw new ArgumentNullException(nameof(signInContext.SignedInUser));
             List<Task<DataAccessResult>> updateTasks = new List<Task<DataAccessResult>>(5);
-            updateTasks.Add(dataService.SetUserPreferences(new UserPreferences(signInContext.SignedInUser)));
+            updateTasks.Add(dataService.SetUserPreferences(GetDefaultUserPreferences(signInContext.SignedInUser)));
             
             try
             {
@@ -119,6 +120,13 @@ namespace DL444.Ucqu.Backend
             {
                 log.LogError("Cannot update user initialization status. Status {statusCode}", statusUpdateResult.StatusCode);
             }
+        }
+
+        private UserPreferences GetDefaultUserPreferences(string username)
+        {
+            UserPreferences preferences = new UserPreferences(username);
+            preferences.PreferenceItems.Add("ScoreChangeNotificationEnabled", "true");
+            return preferences;
         }
 
         private IUcquClient client;
