@@ -7,7 +7,9 @@ using DL444.Ucqu.Client;
 using DL444.Ucqu.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -28,7 +30,7 @@ namespace DL444.Ucqu.Backend
         [FunctionName("SignIn")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "signIn/{createAccount:bool}")] HttpRequest req,
-            [Queue("user-init-queue", Connection = "AzureWebJobsStorage")] IAsyncCollector<Models.UserInitializeCommand> userInitCommandCollector,
+            [EventGrid(TopicEndpointUri = "EventPublish:TopicUri", TopicKeySetting = "EventPublish:TopicKey")] IAsyncCollector<EventGridEvent> userInitCommandCollector,
             bool createAccount,
             ILogger log)
         {
@@ -139,7 +141,7 @@ namespace DL444.Ucqu.Backend
             }
         }
 
-        private async Task<string> StartInitializeUserAsync(SignInContext signInContext, IAsyncCollector<Models.UserInitializeCommand> collector, ILogger log)
+        private async Task<string> StartInitializeUserAsync(SignInContext signInContext, IAsyncCollector<EventGridEvent> collector, ILogger log)
         {
             string id = Guid.NewGuid().ToString();
             string location = $"{serviceBaseAddress}/UserInit/{id}";
@@ -151,7 +153,15 @@ namespace DL444.Ucqu.Backend
             }
             try
             {
-                await collector.AddAsync(new Models.UserInitializeCommand(signInContext, id));
+                var eventGridEvent = new EventGridEvent(
+                    id: $"UserInit={Guid.NewGuid()}",
+                    subject: signInContext.SignedInUser,
+                    data: new Models.UserInitializeCommand(signInContext, id),
+                    eventType: "DL444.Ucqu.UserInit",
+                    eventTime: DateTime.UtcNow,
+                    dataVersion: "1.0"
+                );
+                await collector.AddAsync(eventGridEvent);
             }
             catch (Exception ex)
             {

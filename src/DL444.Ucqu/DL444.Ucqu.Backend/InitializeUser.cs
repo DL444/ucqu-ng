@@ -5,9 +5,13 @@ using DL444.Ucqu.Backend.Models;
 using DL444.Ucqu.Backend.Services;
 using DL444.Ucqu.Client;
 using DL444.Ucqu.Models;
+using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace DL444.Ucqu.Backend
 {
@@ -22,8 +26,29 @@ namespace DL444.Ucqu.Backend
         }
 
         [FunctionName("InitializeUser")]
-        public async Task Run([QueueTrigger("user-init-queue", Connection = "AzureWebJobsStorage")] Models.UserInitializeCommand command, ILogger log)
+        public async Task Run([EventGridTrigger] EventGridEvent eventGridEvent, ILogger log)
         {
+            if (!eventGridEvent.EventType.Equals("DL444.Ucqu.UserInit", StringComparison.Ordinal))
+            {
+                log.LogWarning("Event with unsupported type received. Type {eventType}", eventGridEvent.EventType);
+                return;
+            }
+            if (!(eventGridEvent.Data is JObject obj))
+            {
+                log.LogError("Event data is null.");
+                return;
+            }
+            Models.UserInitializeCommand command;
+            try
+            {
+                command = obj.ToObject<Models.UserInitializeCommand>();
+            }
+            catch (JsonException ex)
+            {
+                log.LogError(ex, "Error trying to deserialize event data.");
+                return;
+            }
+
             // Avoid concurrent requests to upstream server to reduce risks of IP ban.
             SignInContext signInContext = command.SignInContext;
             List<Task<DataAccessResult>> updateTasks = new List<Task<DataAccessResult>>(5);
