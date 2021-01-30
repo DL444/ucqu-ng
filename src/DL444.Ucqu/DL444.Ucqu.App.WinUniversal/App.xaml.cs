@@ -26,6 +26,8 @@ using Windows.ApplicationModel.Background;
 using System.Linq;
 using Windows.UI.Notifications;
 using DL444.Ucqu.App.WinUniversal.Exceptions;
+using DL444.Ucqu.App.WinUniversal.Models;
+using DL444.Ucqu.Models;
 
 namespace DL444.Ucqu.App.WinUniversal
 {
@@ -216,6 +218,9 @@ namespace DL444.Ucqu.App.WinUniversal
                         catch (BackendRequestFailedException) { }
                     }
                     break;
+                case "AppMaintenanceTask":
+                    await PerformAppMaintenance();
+                    break;
             }
             deferral.Complete();
         }
@@ -279,6 +284,13 @@ namespace DL444.Ucqu.App.WinUniversal
                 builder.Name = "NotificationActivationTask";
                 builder.SetTrigger(new ToastNotificationActionTrigger());
                 TryRegisterBackgroundTask(builder, replaceIfExists);
+
+                builder = new BackgroundTaskBuilder();
+                builder.Name = "AppMaintenanceTask";
+                builder.SetTrigger(new MaintenanceTrigger(1440, false));
+                builder.AddCondition(new SystemCondition(SystemConditionType.InternetAvailable));
+                builder.IsNetworkRequested = true;
+                TryRegisterBackgroundTask(builder, replaceIfExists);
             }
         }
 
@@ -330,6 +342,63 @@ namespace DL444.Ucqu.App.WinUniversal
             }
 
             return rootFrame;
+        }
+
+        private async Task PerformAppMaintenance()
+        {
+            IDataService backendService = this.GetService<IDataService>(x => x.DataSource == DataSource.Online);
+            ILocalCacheService cacheService = Services.GetService<ILocalCacheService>();
+            Task<DataRequestResult<WellknownData>> wellknownTask = backendService.GetWellknownDataAsync();
+            try
+            {
+                DataRequestResult<StudentInfo> studentInfo = await backendService.GetStudentInfoAsync();
+                await cacheService.SetStudentInfoAsync(studentInfo.Resource);
+            }
+            catch (BackendRequestFailedException)
+            {
+                return;
+            }
+            catch (LocalCacheRequestFailedException) { }
+
+            Task<DataRequestResult<Schedule>> scheduleTask = backendService.GetScheduleAsync();
+            Task<DataRequestResult<ExamSchedule>> examsTask = backendService.GetExamsAsync();
+            Task<DataRequestResult<ScoreSet>> majorScoreTask = backendService.GetScoreAsync(false);
+            Task<DataRequestResult<ScoreSet>> secondMajorScoreTask = backendService.GetScoreAsync(true);
+
+            try
+            {
+                DataRequestResult<WellknownData> wellknown = await wellknownTask;
+                await cacheService.SetWellknownDataAsync(wellknown.Resource);
+            }
+            catch (Exception ex) when (ex is BackendRequestFailedException || ex is LocalCacheRequestFailedException) { }
+
+            try
+            {
+                DataRequestResult<Schedule> schedule = await scheduleTask;
+                await cacheService.SetScheduleAsync(schedule.Resource);
+            }
+            catch (Exception ex) when (ex is BackendRequestFailedException || ex is LocalCacheRequestFailedException) { }
+
+            try
+            {
+                DataRequestResult<ExamSchedule> exams = await examsTask;
+                await cacheService.SetExamsAsync(exams.Resource);
+            }
+            catch (Exception ex) when (ex is BackendRequestFailedException || ex is LocalCacheRequestFailedException) { }
+
+            try
+            {
+                DataRequestResult<ScoreSet> majorScore = await majorScoreTask;
+                await cacheService.SetScoreAsync(majorScore.Resource);
+            }
+            catch (Exception ex) when (ex is BackendRequestFailedException || ex is LocalCacheRequestFailedException) { }
+
+            try
+            {
+                DataRequestResult<ScoreSet> secondMajorScore = await secondMajorScoreTask;
+                await cacheService.SetScoreAsync(secondMajorScore.Resource);
+            }
+            catch (Exception ex) when (ex is BackendRequestFailedException || ex is LocalCacheRequestFailedException) { }
         }
     }
 }
