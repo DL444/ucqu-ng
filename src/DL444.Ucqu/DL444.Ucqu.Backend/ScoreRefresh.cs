@@ -15,7 +15,7 @@ namespace DL444.Ucqu.Backend
 {
     public class ScoreRefreshFunction : RefreshFunctionBase
     {
-        public ScoreRefreshFunction(IRefreshFunctionHandlerService refreshService) : base(refreshService) { }
+        public ScoreRefreshFunction(IRefreshFunctionHandlerService refreshService, IDataAccessService dataService) : base(refreshService) => this.dataService = dataService;
 
         [FunctionName("ScoreRefresh_Client")]
         public async Task Start(
@@ -39,13 +39,35 @@ namespace DL444.Ucqu.Backend
             [EventGrid(TopicEndpointUri = "EventPublish:TopicUri", TopicKeySetting = "EventPublish:TopicKey")] IAsyncCollector<EventGridEvent> collector,
             ILogger log)
         {
+            bool shouldNotify;
+            DataAccessResult<UserPreferences> preferencesResult = await dataService.GetUserPreferences(username);
+            if (preferencesResult.Success)
+            {
+                string preference = preferencesResult.Resource.GetValue("ScoreChangeNotificationEnabled", "true");
+                bool success = bool.TryParse(preference, out shouldNotify);
+                if (!success)
+                {
+                    log.LogWarning("Failed to parse notification preference value. Value: {prefValue}", preference);
+                    shouldNotify = true;
+                }
+            }
+            else if (preferencesResult.StatusCode == 404)
+            {
+                shouldNotify = true;
+            }
+            else
+            {
+                log.LogError("Failed to fetch notification preference. Username: {username}, Status: {statusCode}", username, preferencesResult.StatusCode);
+                return;
+            }
+
             Task majorTask = RefreshService.HandleRequestAsync(
                 username,
                 dataService => dataService.GetScoreAsync(username, false),
                 (client, context) => client.GetScoreAsync(context, false),
                 (dataService, resource) => dataService.SetScoreAsync(resource),
                 (oldRes, newRes) => ShouldUpdate(oldRes, newRes),
-                (oldRes, newRes) => StartNotificationAsync(username, oldRes, newRes, collector, log),
+                (oldRes, newRes) => StartNotificationAsync(username, shouldNotify, oldRes, newRes, collector, log),
                 log
             );
             Task secondMajorTask = RefreshService.HandleRequestAsync(
@@ -54,7 +76,7 @@ namespace DL444.Ucqu.Backend
                 (client, context) => client.GetScoreAsync(context, true),
                 (dataService, resource) => dataService.SetScoreAsync(resource),
                 (oldRes, newRes) => ShouldUpdate(oldRes, newRes),
-                (oldRes, newRes) => StartNotificationAsync(username, oldRes, newRes, collector, log),
+                (oldRes, newRes) => StartNotificationAsync(username, shouldNotify, oldRes, newRes, collector, log),
                 log
             );
             await Task.WhenAll(majorTask, secondMajorTask);
@@ -96,8 +118,12 @@ namespace DL444.Ucqu.Backend
             return false;
         }
 
-        private async Task StartNotificationAsync(string username, ScoreSet? prev, ScoreSet current, IAsyncCollector<EventGridEvent> collector, ILogger log)
+        private async Task StartNotificationAsync(string username, bool shouldNotify, ScoreSet? prev, ScoreSet current, IAsyncCollector<EventGridEvent> collector, ILogger log)
         {
+            if (!shouldNotify)
+            {
+                return;
+            }
             if (prev == null)
             {
                 if (current.Terms.Count != 1 || current.Terms[0].Courses.Count > 1)
@@ -211,5 +237,7 @@ namespace DL444.Ucqu.Backend
 
         private string GetKey(Course course)
             => $"{course.Name}-{course.Credit}-{course.Category}-{course.IsInitialTake}-{course.Comment}-{course.Lecturer}";
+
+        private readonly IDataAccessService dataService;
     }
 }
