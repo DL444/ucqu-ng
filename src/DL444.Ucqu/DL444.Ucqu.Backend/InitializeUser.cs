@@ -52,7 +52,8 @@ namespace DL444.Ucqu.Backend
             // Avoid concurrent requests to upstream server to reduce risks of IP ban.
             SignInContext signInContext = command.SignInContext;
             List<Task<DataAccessResult>> updateTasks = new List<Task<DataAccessResult>>(5);
-
+            updateTasks.Add(dataService.SetUserPreferences(new UserPreferences(signInContext.SignedInUser)));
+            
             try
             {
                 StudentInfo studentInfo = await client.GetStudentInfoAsync(signInContext);

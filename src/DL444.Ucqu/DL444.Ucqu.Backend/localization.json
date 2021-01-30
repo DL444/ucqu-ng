@@ -8,6 +8,8 @@
                 "UpstreamUnregisteredShowCached": "教务系统暂未开放，将展示缓存信息",
                 "CachedDataNotUpToDate": "缓存信息，可能不是最新数据",
                 "ServiceErrorCannotFetch": "服务存在问题，暂时无法获取最新数据",
+                "ServiceErrorCannotFetchPreferences": "服务存在问题，暂时无法获取设置",
+                "ServiceErrorCannotUpdatePreferences": "服务存在问题，暂时无法更新设置",
                 "UpstreamErrorCannotFetch": "教务系统存在问题，暂时无法获取最新数据",
                 "UpstreamUnregisteredCannotFetch": "教务系统暂未开放，暂时无法获取最新数据",
                 "UserInitPrepare": "正在为首次使用作准备",

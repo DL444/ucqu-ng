@@ -24,6 +24,9 @@ namespace DL444.Ucqu.Backend.Services
         Task<DataAccessResult> SetExamsAsync(ExamSchedule exams);
         Task<DataAccessResult<ScoreSet>> GetScoreAsync(string username, bool isSecondMajor);
         Task<DataAccessResult> SetScoreAsync(ScoreSet scoreSet);
+        Task<DataAccessResult<UserPreferences>> GetUserPreferences(string username);
+        Task<DataAccessResult> SetUserPreferences(UserPreferences preferences);
+
         Task<DataAccessResult> DeleteUserAsync(string username);
         Task<DataAccessResult<DeveloperMessage>> GetDeveloperMessageAsync();
     }
@@ -98,8 +101,8 @@ namespace DL444.Ucqu.Backend.Services
             return await SetResourceAsync(credential);
         }
 
-        public async Task<DataAccessResult<UserInitializeStatus>> GetUserInitializeStatusAsync(string id) => await GetResourceAsync<UserInitializeStatus>($"UserInitStatus-{id}", "UserInitStatus");
-        public async Task<DataAccessResult> SetUserInitializeStatusAsync(UserInitializeStatus status) => await SetResourceAsync(status);
+        public Task<DataAccessResult<UserInitializeStatus>> GetUserInitializeStatusAsync(string id) => GetResourceAsync<UserInitializeStatus>($"UserInitStatus-{id}", "UserInitStatus");
+        public Task<DataAccessResult> SetUserInitializeStatusAsync(UserInitializeStatus status) => SetResourceAsync(status);
         public async Task<DataAccessResult> PurgeUserInitializeStatusAsync()
         {
             long threshold = System.DateTimeOffset.UtcNow.AddMinutes(-15).ToUnixTimeMilliseconds();
@@ -127,18 +130,20 @@ namespace DL444.Ucqu.Backend.Services
             return new DataAccessResult(!hasError, 0);
         }
 
-        public async Task<DataAccessResult<StudentInfo>> GetStudentInfoAsync(string username) => await GetResourceAsync<StudentInfo>($"Student-{username}", username);
-        public async Task<DataAccessResult> SetStudentInfoAsync(StudentInfo info) => await SetResourceAsync(info);
+        public Task<DataAccessResult<StudentInfo>> GetStudentInfoAsync(string username) => GetResourceAsync<StudentInfo>($"Student-{username}", username);
+        public Task<DataAccessResult> SetStudentInfoAsync(StudentInfo info) => SetResourceAsync(info);
 
-        public async Task<DataAccessResult<Schedule>> GetScheduleAsync(string username) => await GetResourceAsync<Schedule>($"Schedule-{username}", username);
-        public async Task<DataAccessResult> SetScheduleAsync(Schedule schedule) => await SetResourceAsync(schedule);
+        public Task<DataAccessResult<Schedule>> GetScheduleAsync(string username) => GetResourceAsync<Schedule>($"Schedule-{username}", username);
+        public Task<DataAccessResult> SetScheduleAsync(Schedule schedule) => SetResourceAsync(schedule);
 
-        public async Task<DataAccessResult<ExamSchedule>> GetExamsAsync(string username) => await GetResourceAsync<ExamSchedule>($"Exams-{username}", username);
-        public async Task<DataAccessResult> SetExamsAsync(ExamSchedule exams) => await SetResourceAsync(exams);
+        public Task<DataAccessResult<ExamSchedule>> GetExamsAsync(string username) => GetResourceAsync<ExamSchedule>($"Exams-{username}", username);
+        public Task<DataAccessResult> SetExamsAsync(ExamSchedule exams) => SetResourceAsync(exams);
 
-        public async Task<DataAccessResult<ScoreSet>> GetScoreAsync(string username, bool isSecondMajor)
-            => await GetResourceAsync<ScoreSet>($"Score-{username}-{(isSecondMajor ? "S" : "M")}", username);
-        public async Task<DataAccessResult> SetScoreAsync(ScoreSet scoreSet) => await SetResourceAsync(scoreSet);
+        public Task<DataAccessResult<ScoreSet>> GetScoreAsync(string username, bool isSecondMajor) => GetResourceAsync<ScoreSet>($"Score-{username}-{(isSecondMajor ? "S" : "M")}", username);
+        public Task<DataAccessResult> SetScoreAsync(ScoreSet scoreSet) => SetResourceAsync(scoreSet);
+
+        public Task<DataAccessResult<UserPreferences>> GetUserPreferences(string username) => GetResourceAsync<UserPreferences>($"Preferences-{username}", username);
+        public Task<DataAccessResult> SetUserPreferences(UserPreferences preferences) => SetResourceAsync(preferences);
 
         public async Task<DataAccessResult> DeleteUserAsync(string username)
         {
@@ -151,6 +156,7 @@ namespace DL444.Ucqu.Backend.Services
             deleteTasks.Add(container.DeleteItemAsync<object>($"Score-{username}-M", new PartitionKey(username)));
             deleteTasks.Add(container.DeleteItemAsync<object>($"Score-{username}-S", new PartitionKey(username)));
             deleteTasks.Add(container.DeleteItemAsync<object>($"PushChannels-Wns-{username}", new PartitionKey(username)));
+            deleteTasks.Add(container.DeleteItemAsync<object>($"Preferences-{username}", new PartitionKey(username)));
             bool hasError = false;
             try
             {
@@ -201,10 +207,9 @@ namespace DL444.Ucqu.Backend.Services
             return DataAccessResult.Ok;
         }
 
-        public async Task<DataAccessResult<DeveloperMessage>> GetDeveloperMessageAsync() => await GetResourceAsync<DeveloperMessage>("DevMessage", "DevMessage");
+        public Task<DataAccessResult<DeveloperMessage>> GetDeveloperMessageAsync() => GetResourceAsync<DeveloperMessage>("DevMessage", "DevMessage");
 
         public Task<DataAccessResult<PushAccessToken>> GetPushAccessTokenAsync(PushPlatform platform) => GetResourceAsync<PushAccessToken>($"{platform}PushToken", $"{platform}PushToken");
-
         public Task<DataAccessResult> SetPushAccessTokenAsync(PushAccessToken token) => SetResourceAsync<PushAccessToken>(token);
 
         public Task<DataAccessResult<NotificationChannelCollection>> GetPushChannelsAsync(string username, PushPlatform platform)
@@ -212,7 +217,6 @@ namespace DL444.Ucqu.Backend.Services
             string id = $"PushChannels-{platform}-{username}";
             return GetResourceAsync<NotificationChannelCollection>(id, username);
         }
-
         public async Task<DataAccessResult> AddPushChannelAsync(string username, PushPlatform platform, string channelIdentifier)
         {
             DataAccessResult<NotificationChannelCollection> fetchResult = await GetPushChannelsAsync(username, platform);
@@ -241,7 +245,6 @@ namespace DL444.Ucqu.Backend.Services
             }
             return await SetResourceAsync(collection);
         }
-
         public async Task<DataAccessResult> RemovePushChannelAsync(string username, PushPlatform platform, IEnumerable<string> channelIdentifiers)
         {
             DataAccessResult<NotificationChannelCollection> fetchResult = await GetPushChannelsAsync(username, platform);
