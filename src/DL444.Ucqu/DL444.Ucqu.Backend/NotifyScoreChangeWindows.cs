@@ -67,6 +67,16 @@ namespace DL444.Ucqu.Backend
                         }
                     }
                 },
+                Actions = new ToastActionsCustom()
+                {
+                    ContextMenuItems =
+                    {
+                        new ToastContextMenuItem("ms-resource:ScoreChangedToastNeverShow", "NeverShowScoreChanged")
+                        {
+                            ActivationType = ToastActivationType.Background
+                        }
+                    }
+                },
                 Launch = "ScoreChanged"
             };
             return new WindowsPushNotification(WindowsNotificationType.Toast, toastContent.GetContent());
