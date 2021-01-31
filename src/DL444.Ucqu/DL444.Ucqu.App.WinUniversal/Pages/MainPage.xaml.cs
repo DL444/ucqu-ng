@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using DL444.Ucqu.App.WinUniversal.Exceptions;
 using DL444.Ucqu.App.WinUniversal.Extensions;
@@ -11,14 +8,10 @@ using DL444.Ucqu.App.WinUniversal.Services;
 using DL444.Ucqu.App.WinUniversal.ViewModels;
 using DL444.Ucqu.Models;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Networking.PushNotifications;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using WinUI = Microsoft.UI.Xaml.Controls;
@@ -122,7 +115,7 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
                 }
             }
 
-            if(signedIn)
+            if (signedIn)
             {
                 INotificationChannelService channelService = Application.Current.GetService<INotificationChannelService>();
                 Task channelUpdateTask;

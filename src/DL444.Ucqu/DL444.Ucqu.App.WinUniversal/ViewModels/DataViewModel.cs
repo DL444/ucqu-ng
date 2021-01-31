@@ -17,7 +17,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             Func<Task<DataRequestResult<TModel>>> localFetchFunc,
             Func<Task<DataRequestResult<TModel>>> remoteFetchFunc,
             Func<TModel, Task> cacheUpdateFunc
-        ) : this( defaultValue, viewModelTransform, localFetchFunc, remoteFetchFunc, cacheUpdateFunc, _ => true) { }
+        ) : this(defaultValue, viewModelTransform, localFetchFunc, remoteFetchFunc, cacheUpdateFunc, _ => true) { }
 
         public DataViewModel(
             TViewModel defaultValue,
@@ -123,7 +123,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
                 return shouldFetchRemote(cachedInfo);
             }
-            catch (LocalCacheRequestFailedException) 
+            catch (LocalCacheRequestFailedException)
             {
                 return true;
             }

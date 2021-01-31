@@ -36,7 +36,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             DayOfWeek = exam.DayOfWeek;
             ShortLocation = exam.ShortLocation;
             Seating = exam.Seating;
-            
+
             ILocalizationService locService = Application.Current.GetService<ILocalizationService>();
             TimeRangeDisplay = locService.Format("ScheduleSummaryTimeRangeFormat", StartTime.ToLocalTime().TimeOfDay, EndTime.ToLocalTime().TimeOfDay);
             if (Countdown < 0)

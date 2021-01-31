@@ -34,10 +34,10 @@ namespace DL444.Ucqu.App.WinUniversal.Controls
                 {
                     ScheduleConsolidationViewModel curr = ((ScheduleTableItem)EntryCanvas.Children[i]).ConsolidatedEntry;
                     ScheduleConsolidationViewModel next = Day.ConsolidatedEntries[i];
-                    if (curr.ConflictCount != next.ConflictCount 
-                        || !curr.DisplayEntry.Name.Equals(next.DisplayEntry.Name, StringComparison.Ordinal) 
-                        || !curr.DisplayEntry.Room.Equals(next.DisplayEntry.Room, StringComparison.Ordinal) 
-                        || curr.DisplayEntry.StartSession != next.DisplayEntry.StartSession 
+                    if (curr.ConflictCount != next.ConflictCount
+                        || !curr.DisplayEntry.Name.Equals(next.DisplayEntry.Name, StringComparison.Ordinal)
+                        || !curr.DisplayEntry.Room.Equals(next.DisplayEntry.Room, StringComparison.Ordinal)
+                        || curr.DisplayEntry.StartSession != next.DisplayEntry.StartSession
                         || curr.DisplayEntry.EndSession != next.DisplayEntry.EndSession)
                     {
                         shouldUpdate = true;

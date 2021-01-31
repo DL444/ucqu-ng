@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using DL444.Ucqu.App.WinUniversal.Extensions;
 using DL444.Ucqu.App.WinUniversal.Services;
+using Windows.Security.Credentials.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using Windows.Security.Credentials.UI;
 
 namespace DL444.Ucqu.App.WinUniversal.Pages
 {

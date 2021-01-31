@@ -54,7 +54,7 @@ namespace DL444.Ucqu.Backend
             _ = signInContext.SignedInUser ?? throw new ArgumentNullException(nameof(signInContext.SignedInUser));
             List<Task<DataAccessResult>> updateTasks = new List<Task<DataAccessResult>>(5);
             updateTasks.Add(dataService.SetUserPreferences(GetDefaultUserPreferences(signInContext.SignedInUser)));
-            
+
             try
             {
                 StudentInfo studentInfo = await client.GetStudentInfoAsync(signInContext);

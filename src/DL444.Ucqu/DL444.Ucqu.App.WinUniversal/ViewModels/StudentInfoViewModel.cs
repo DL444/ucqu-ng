@@ -11,7 +11,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             Major = info.Major;
             SecondMajor = info.SecondMajor;
         }
-        
+
         public string StudentId { get; }
         public string Name { get; }
         public string Major { get; }

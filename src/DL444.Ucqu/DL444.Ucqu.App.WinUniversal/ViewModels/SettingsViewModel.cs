@@ -58,7 +58,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             }
         }
 
-        public bool IsScoreChangedNotificationEnabledUpdateCompleted 
+        public bool IsScoreChangedNotificationEnabledUpdateCompleted
             => !IsScoreChangedNotificationEnabledUpdateInProgress && !IsScoreChangedNotificationEnabledUpdateFailed;
 
         public bool IsWindowsHelloAvailable

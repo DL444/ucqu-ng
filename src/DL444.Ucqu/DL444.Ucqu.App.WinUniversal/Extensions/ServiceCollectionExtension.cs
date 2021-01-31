@@ -6,8 +6,8 @@ namespace DL444.Ucqu.App.WinUniversal.Extensions
 {
     internal static class ServiceCollectionExtension
     {
-        public static void AddMessageHub<TMessage, TImplementation>(this IServiceCollection services) 
-            where TMessage : IMessage 
+        public static void AddMessageHub<TMessage, TImplementation>(this IServiceCollection services)
+            where TMessage : IMessage
             where TImplementation : class, IMessageService<TMessage>
         {
             services.AddSingleton<IMessageService<TMessage>, TImplementation>();

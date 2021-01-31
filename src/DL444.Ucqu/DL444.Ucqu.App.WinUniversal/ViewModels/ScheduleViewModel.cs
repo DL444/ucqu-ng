@@ -54,7 +54,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             WeekNumberDisplay = Application.Current.GetService<ILocalizationService>().Format("ScheduleTableWeekNumberHeaderFormat", week.WeekNumber);
             Days = new ScheduleDayViewModel[7];
             DateTimeOffset weekStartDate = wellknown.TermStartDate.GetLocalDate().AddDays((week.WeekNumber - 1) * 7);
-            foreach(var group in week.Entries.GroupBy(x => x.DayOfWeek))
+            foreach (var group in week.Entries.GroupBy(x => x.DayOfWeek))
             {
                 int dayOfWeek = group.Key;
                 DateTimeOffset day = weekStartDate.AddDays(dayOfWeek - 1);

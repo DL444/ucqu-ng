@@ -265,7 +265,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
                 default:
                     throw new ArgumentOutOfRangeException(nameof(size));
             }
-            
+
             if (addSpacing)
             {
                 subgroup.Children.Add(new AdaptiveText()

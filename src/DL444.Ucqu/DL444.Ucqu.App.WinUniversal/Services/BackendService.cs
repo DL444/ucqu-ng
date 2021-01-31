@@ -62,7 +62,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
             }
         }
 
-        public Task<DataRequestResult<AccessToken>> SignInAsync(bool createAccount = false) 
+        public Task<DataRequestResult<AccessToken>> SignInAsync(bool createAccount = false)
             => SignInAsync(new StudentCredential(credentialService.Username, credentialService.PasswordHash), createAccount);
 
         public async Task WaitForUserInitializationAsync(string location, int pollInterval)
@@ -174,7 +174,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
                     throw exception;
                 }
             }
-            catch (HttpRequestException ex) 
+            catch (HttpRequestException ex)
             {
                 throw GetDefaultException($"preferencePost", ex);
             }
