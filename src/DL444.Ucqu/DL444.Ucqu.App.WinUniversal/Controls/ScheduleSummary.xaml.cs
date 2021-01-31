@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using DL444.Ucqu.App.WinUniversal.Extensions;
+using DL444.Ucqu.App.WinUniversal.Models;
+using DL444.Ucqu.App.WinUniversal.Services;
 using DL444.Ucqu.App.WinUniversal.ViewModels;
 using DL444.Ucqu.Models;
 using Windows.UI.Xaml;
@@ -64,8 +66,6 @@ namespace DL444.Ucqu.App.WinUniversal.Controls
 
         public static readonly DependencyProperty IsOnVacationProperty =
             DependencyProperty.Register(nameof(IsOnVacation), typeof(bool), typeof(ScheduleSummary), new PropertyMetadata(false));
-
-        public event EventHandler<ScheduleSummaryCalendarDateSelectedEventArgs> ScheduleSummaryCalendarDateSelected;
 
         private static void OnScheduleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -154,7 +154,8 @@ namespace DL444.Ucqu.App.WinUniversal.Controls
         {
             if (args.AddedDates.Count > 0)
             {
-                ScheduleSummaryCalendarDateSelected?.Invoke(this, new ScheduleSummaryCalendarDateSelectedEventArgs(args.AddedDates[0]));
+                DaySelectedMessage message = new DaySelectedMessage(args.AddedDates[0]);
+                Application.Current.GetService<IMessageService<DaySelectedMessage>>().SendMessage(message);
             }
         }
 

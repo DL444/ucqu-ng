@@ -145,6 +145,7 @@
     <Compile Include="Extensions\HttpContentExtension.cs" />
     <Compile Include="Extensions\ServiceCollectionExtension.cs" />
     <Compile Include="Models\DataRequestResult.cs" />
+    <Compile Include="Models\DaySelectedMessage.cs" />
     <Compile Include="Pages\AboutPage.xaml.cs">
       <DependentUpon>AboutPage.xaml</DependentUpon>
     </Compile>

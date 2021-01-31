@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using DL444.Ucqu.App.WinUniversal.Extensions;
+using DL444.Ucqu.App.WinUniversal.Models;
+using DL444.Ucqu.App.WinUniversal.Services;
 using DL444.Ucqu.App.WinUniversal.ViewModels;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -9,7 +11,7 @@ using Windows.UI.Xaml.Media.Animation;
 
 namespace DL444.Ucqu.App.WinUniversal.Controls
 {
-    public sealed class ScheduleTable : Control
+    internal sealed class ScheduleTable : Control, IMessageListener<DaySelectedMessage>
     {
         public ScheduleTable()
         {
@@ -26,7 +28,7 @@ namespace DL444.Ucqu.App.WinUniversal.Controls
             nextBtn.Click += NextBtn_Click;
             Button prevBtn = (Button)GetTemplateChild("PrevButton");
             prevBtn.Click += PrevBtn_Click;
-            GoToToday();
+            GoToDate(DateTimeOffset.Now.GetLocalDate());
         }
 
         public ScheduleViewModel Schedule
@@ -35,12 +37,14 @@ namespace DL444.Ucqu.App.WinUniversal.Controls
             set
             {
                 SetValue(ScheduleProperty, value);
-                GoToToday();
+                GoToDate(DateTimeOffset.Now.GetLocalDate());
             }
         }
 
         public static readonly DependencyProperty ScheduleProperty =
             DependencyProperty.Register(nameof(Schedule), typeof(ScheduleViewModel), typeof(ScheduleTable), new PropertyMetadata(null));
+
+        public void OnMessaged(DaySelectedMessage args) => GoToDate(args.SelectedDate.GetLocalDate());
 
         private async Task PlayHeaderAnimation(string weekNumberDisplay, AnimationDirection direction)
         {
@@ -77,36 +81,29 @@ namespace DL444.Ucqu.App.WinUniversal.Controls
             await PlayHeaderAnimation(next.WeekNumberDisplay, prev.WeekNumber < next.WeekNumber ? AnimationDirection.ToLeft : AnimationDirection.ToRight);
         }
 
-        private void NextBtn_Click(object sender, RoutedEventArgs e)
-        {
-            flipView.SelectedIndex = Math.Min(flipView.SelectedIndex + 1, Schedule.Weeks.Count - 1);
-        }
+        private void NextBtn_Click(object sender, RoutedEventArgs e) => flipView.SelectedIndex = Math.Min(flipView.SelectedIndex + 1, Schedule.Weeks.Count - 1);
 
-        private void PrevBtn_Click(object sender, RoutedEventArgs e)
-        {
-            flipView.SelectedIndex = Math.Max(flipView.SelectedIndex - 1, 0);
-        }
+        private void PrevBtn_Click(object sender, RoutedEventArgs e) => flipView.SelectedIndex = Math.Max(flipView.SelectedIndex - 1, 0);
 
-        private void GoToToday()
+        private void GoToDate(DateTimeOffset date)
         {
             if (flipView == null || Schedule.Weeks == null || Schedule.Weeks.Count == 0)
             {
                 return;
             }
-            DateTimeOffset today = DateTimeOffset.Now.GetLocalDate();
             DateTimeOffset startDay = Schedule.Weeks.First().Day0.LocalDate;
-            if (today < startDay)
+            if (date < startDay)
             {
                 flipView.SelectedIndex = 0;
                 return;
             }
             DateTimeOffset endDay = Schedule.Weeks.Last().Day6.LocalDate;
-            if (today > endDay)
+            if (date > endDay)
             {
                 flipView.SelectedIndex = Schedule.Weeks.Count - 1;
                 return;
             }
-            int weekCount = (int)(today - startDay).TotalDays / 7;
+            int weekCount = (int)(date - startDay).TotalDays / 7;
             flipView.SelectedIndex = weekCount;
         }
 

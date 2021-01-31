@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using DL444.Ucqu.App.WinUniversal.Extensions;
+using DL444.Ucqu.App.WinUniversal.Models;
 using DL444.Ucqu.App.WinUniversal.Services;
 using DL444.Ucqu.App.WinUniversal.ViewModels;
 using DL444.Ucqu.Models;
@@ -48,10 +49,16 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+            Application.Current.GetService<IMessageService<DaySelectedMessage>>().Register(ScheduleTable);
             Application.Current.GetService<INotificationService>().ClearToast(ToastTypes.ScheduleSummary);
             bool signedIn = Application.Current.GetService<ICredentialService>().IsSignedIn;
             await WellknownDataViewModel.StartUpdateAsync(signedIn);
             await ScheduleViewModel.StartUpdateAsync(signedIn);
+        }
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+            base.OnNavigatingFrom(e);
+            Application.Current.GetService<IMessageService<DaySelectedMessage>>().Unregister(ScheduleTable);
         }
 
         internal DataViewModel<WellknownData, WellknownDataViewModel> WellknownDataViewModel { get; }

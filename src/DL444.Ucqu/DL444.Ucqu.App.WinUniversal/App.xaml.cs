@@ -121,6 +121,7 @@ namespace DL444.Ucqu.App.WinUniversal
             services.AddTransient<INotificationService, NotificationService>();
 
             services.AddMessageHub<SignInMessage, EventMessageService<SignInMessage>>();
+            services.AddMessageHub<DaySelectedMessage, EventMessageService<DaySelectedMessage>>();
         }
 
         /// <summary>
