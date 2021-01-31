@@ -114,7 +114,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
                         consolidation.Conflicts.Add(potentialConflict);
                     }
                 }
-                if (consolidation.ConflictCount != 0)
+                if (consolidation.ConflictCount > 1)
                 {
                     consolidation.ConflictCountDisplay = locService.Format("ScheduleTableConflictDescriptionFormat", consolidation.ConflictCount - 1);
                 }
