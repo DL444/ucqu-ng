@@ -28,6 +28,10 @@ using Windows.UI.Notifications;
 using DL444.Ucqu.App.WinUniversal.Exceptions;
 using DL444.Ucqu.App.WinUniversal.Models;
 using DL444.Ucqu.Models;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
+using System.Reflection;
 
 namespace DL444.Ucqu.App.WinUniversal
 {
@@ -49,6 +53,12 @@ namespace DL444.Ucqu.App.WinUniversal
             ConfigureConfiguration(configBuilder);
             IConfiguration config = configBuilder.Build();
             Configuration = config;
+
+            var instrumentationKey = config.GetValue<string>("Telemetry:InstrumentationKey");
+            if (instrumentationKey != null)
+            {
+                AppCenter.Start(instrumentationKey, typeof(Analytics), typeof(Crashes));
+            }
 
             var services = new ServiceCollection();
             ConfigureServices(services, config);
@@ -96,7 +106,16 @@ namespace DL444.Ucqu.App.WinUniversal
             }
         }
 
-        private static void ConfigureConfiguration(IConfigurationBuilder builder) => builder.AddJsonFile("appconfig.json");
+        private static void ConfigureConfiguration(IConfigurationBuilder builder)
+        {
+            builder.AddJsonFile("appconfig.json");
+            Stream secretStream = Current.GetType().GetTypeInfo().Assembly.GetManifestResourceStream("DL444.Ucqu.App.WinUniversal.appsecrets.json");
+            if (secretStream != null)
+            {
+                // Don't worry about closing the stream. It will be closed after building.
+                builder.AddJsonStream(secretStream);
+            }
+        }
 
         private static void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
