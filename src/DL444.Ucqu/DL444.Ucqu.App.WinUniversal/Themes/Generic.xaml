@@ -427,4 +427,112 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style TargetType="controls:ScheduleTable">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:ScheduleTable">
+                    <Grid Padding="{TemplateBinding Padding}"
+                          Background="{TemplateBinding Background}"
+                          BorderBrush="{TemplateBinding BorderBrush}"
+                          BorderThickness="{TemplateBinding BorderThickness}"
+                          ColumnSpacing="8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="12" />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock x:Name="ScheduleWeekHeader" Style="{ThemeResource TitleTextBlockStyle}" Grid.ColumnSpan="2" Margin="0,0,0,8">
+                            <TextBlock.RenderTransform>
+                                <TranslateTransform />
+                            </TextBlock.RenderTransform>
+                        </TextBlock>
+
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <controls:NavigationPaneButton x:Name="PrevButton" Icon="Back" />
+                            <controls:NavigationPaneButton x:Name="NextButton" Icon="Forward" />
+                        </StackPanel>
+
+                        <TextBlock Grid.Row="1"  />
+                        <TextBlock Text="1"  Style="{ThemeResource ScheduleTableSessionHeaderTextBlockStyle}" Grid.Row="3"  />
+                        <TextBlock Text="2"  Style="{ThemeResource ScheduleTableSessionHeaderTextBlockStyle}" Grid.Row="4"  />
+                        <TextBlock Text="3"  Style="{ThemeResource ScheduleTableSessionHeaderTextBlockStyle}" Grid.Row="5"  />
+                        <TextBlock Text="4"  Style="{ThemeResource ScheduleTableSessionHeaderTextBlockStyle}" Grid.Row="6"  />
+                        <TextBlock Text="5"  Style="{ThemeResource ScheduleTableSessionHeaderTextBlockStyle}" Grid.Row="7"  />
+                        <TextBlock Text="6"  Style="{ThemeResource ScheduleTableSessionHeaderTextBlockStyle}" Grid.Row="8"  />
+                        <TextBlock Text="7"  Style="{ThemeResource ScheduleTableSessionHeaderTextBlockStyle}" Grid.Row="9"  />
+                        <TextBlock Text="8"  Style="{ThemeResource ScheduleTableSessionHeaderTextBlockStyle}" Grid.Row="10"  />
+                        <TextBlock Text="9"  Style="{ThemeResource ScheduleTableSessionHeaderTextBlockStyle}" Grid.Row="11"  />
+                        <TextBlock Text="10" Style="{ThemeResource ScheduleTableSessionHeaderTextBlockStyle}" Grid.Row="12" />
+                        <TextBlock Text="11" Style="{ThemeResource ScheduleTableSessionHeaderTextBlockStyle}" Grid.Row="13" />
+                        <TextBlock Text="12" Style="{ThemeResource ScheduleTableSessionHeaderTextBlockStyle}" Grid.Row="14" />
+
+                        <FlipView x:Name="Flip" Background="{x:Null}" ItemsSource="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Schedule.Weeks}" 
+                                  Style="{ThemeResource ScheduleTableFlipViewStyle}" Grid.Row="1" Grid.Column="1" Grid.RowSpan="14" Grid.ColumnSpan="2">
+                            <FlipView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:ScheduleWeekViewModel">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition />
+                                            <ColumnDefinition />
+                                            <ColumnDefinition />
+                                            <ColumnDefinition />
+                                            <ColumnDefinition />
+                                            <ColumnDefinition />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+
+                                        <controls:ScheduleDayColumn Grid.Column="0" Day="{Binding Day0}" />
+                                        <controls:ScheduleDayColumn Grid.Column="1" Day="{Binding Day1}" />
+                                        <controls:ScheduleDayColumn Grid.Column="2" Day="{Binding Day2}" />
+                                        <controls:ScheduleDayColumn Grid.Column="3" Day="{Binding Day3}" />
+                                        <controls:ScheduleDayColumn Grid.Column="4" Day="{Binding Day4}" />
+                                        <controls:ScheduleDayColumn Grid.Column="5" Day="{Binding Day5}" />
+                                        <controls:ScheduleDayColumn Grid.Column="6" Day="{Binding Day6}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </FlipView.ItemTemplate>
+                        </FlipView>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="controls:ScheduleTableItem">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:ScheduleTableItem">
+                    <Border
+                        Background="{ThemeResource SystemAccentColor}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="0,0,8,4">
+                        <StackPanel>
+                            <TextBlock Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Entry.Name}" 
+                                       Style="{ThemeResource BaseTextBlockStyle}" TextWrapping="Wrap" MaxLines="2" />
+                            <TextBlock Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Entry.Room}" Style="{ThemeResource BodyTextBlockStyle}" />
+                        </StackPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

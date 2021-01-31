@@ -1,21 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using DL444.Ucqu.App.WinUniversal.Extensions;
 using DL444.Ucqu.App.WinUniversal.Services;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using DL444.Ucqu.App.WinUniversal.ViewModels;
+using DL444.Ucqu.Models;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace DL444.Ucqu.App.WinUniversal.Pages
 {
@@ -27,12 +18,43 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         public SchedulePage()
         {
             this.InitializeComponent();
+            IDataService localDataService = Application.Current.GetService<IDataService>(x => x.DataSource == DataSource.LocalCache);
+            IDataService remoteDataService = Application.Current.GetService<IDataService>(x => x.DataSource == DataSource.Online);
+
+            WellknownDataViewModel = new DataViewModel<WellknownData, WellknownDataViewModel>(
+                defaultValue: new WellknownDataViewModel(new WellknownData()
+                {
+                    TermStartDate = DateTimeOffset.UtcNow.Date,
+                    TermEndDate = DateTimeOffset.UtcNow.Date.AddDays(1)
+                }),
+                viewModelTransform: x => new WellknownDataViewModel(x),
+                localFetchFunc: () => localDataService.GetWellknownDataAsync(),
+                remoteFetchFunc: () => remoteDataService.GetWellknownDataAsync(),
+                cacheUpdateFunc: _ => Task.CompletedTask,
+                shouldFetchRemote: x => DateTimeOffset.UtcNow > x.TermEndDate,
+                remoteRequiresAuth: false
+            );
+
+            ScheduleViewModel = new DataViewModel<Schedule, ScheduleViewModel>(
+                new ScheduleViewModel(),
+                x => new ScheduleViewModel(x, WellknownDataViewModel.Value.Model),
+                () => localDataService.GetScheduleAsync(),
+                () => remoteDataService.GetScheduleAsync(),
+                x => Task.CompletedTask,
+                _ => DateTimeOffset.UtcNow < WellknownDataViewModel.Value.Model.TermEndDate
+            );
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             Application.Current.GetService<INotificationService>().ClearToast(ToastTypes.ScheduleSummary);
+            bool signedIn = Application.Current.GetService<ICredentialService>().IsSignedIn;
+            await WellknownDataViewModel.StartUpdateAsync(signedIn);
+            await ScheduleViewModel.StartUpdateAsync(signedIn);
         }
+
+        internal DataViewModel<WellknownData, WellknownDataViewModel> WellknownDataViewModel { get; }
+        internal DataViewModel<Schedule, ScheduleViewModel> ScheduleViewModel { get; }
     }
 }

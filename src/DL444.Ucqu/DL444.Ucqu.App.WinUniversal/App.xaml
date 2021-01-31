@@ -1015,6 +1015,61 @@
                 </Setter>
             </Style>
 
+            <Style x:Key="ScheduleTableFlipViewStyle" TargetType="FlipView">
+                <Setter Property="Background" Value="{ThemeResource FlipViewBackground}" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="TabNavigation" Value="Once" />
+                <Setter Property="IsTabStop" Value="False" />
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden" />
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Hidden" />
+                <Setter Property="ScrollViewer.IsHorizontalRailEnabled" Value="False" />
+                <Setter Property="ScrollViewer.IsVerticalRailEnabled" Value="False" />
+                <Setter Property="ScrollViewer.IsHorizontalScrollChainingEnabled" Value="True" />
+                <Setter Property="ScrollViewer.IsVerticalScrollChainingEnabled" Value="True" />
+                <Setter Property="ScrollViewer.IsDeferredScrollingEnabled" Value="False" />
+                <Setter Property="ScrollViewer.BringIntoViewOnFocusChange" Value="True" />
+                <Setter Property="UseSystemFocusVisuals" Value="{StaticResource UseSystemFocusVisuals}" />
+                <Setter Property="ItemsPanel">
+                    <Setter.Value>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel AreScrollSnapPointsRegular="True" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="FlipView">
+                            <Grid
+              Background="{TemplateBinding Background}"
+              BorderBrush="{TemplateBinding BorderBrush}"
+              BorderThickness="{TemplateBinding BorderThickness}"
+              CornerRadius="{TemplateBinding CornerRadius}">
+                                <ScrollViewer x:Name="ScrollingHost"
+                VerticalSnapPointsType="MandatorySingle"
+                HorizontalSnapPointsType="MandatorySingle"
+                HorizontalScrollMode="{TemplateBinding ScrollViewer.HorizontalScrollMode}"
+                HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                VerticalScrollMode="{TemplateBinding ScrollViewer.VerticalScrollMode}"
+                VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
+                IsHorizontalRailEnabled="{TemplateBinding ScrollViewer.IsHorizontalRailEnabled}"
+                IsVerticalRailEnabled="{TemplateBinding ScrollViewer.IsVerticalRailEnabled}"
+                IsHorizontalScrollChainingEnabled="{TemplateBinding ScrollViewer.IsHorizontalScrollChainingEnabled}"
+                IsVerticalScrollChainingEnabled="{TemplateBinding ScrollViewer.IsVerticalScrollChainingEnabled}"
+                IsDeferredScrollingEnabled="{TemplateBinding ScrollViewer.IsDeferredScrollingEnabled}"
+                BringIntoViewOnFocusChange="{TemplateBinding ScrollViewer.BringIntoViewOnFocusChange}"
+                Padding="{TemplateBinding Padding}"
+                ZoomMode="Disabled"
+                TabNavigation="{TemplateBinding TabNavigation}"
+                IsTabStop="False"
+                AutomationProperties.AccessibilityView="Raw">
+                                    <ItemsPresenter />
+                                </ScrollViewer>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
             <Style x:Key="ScoreTableCellTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
                 <Setter Property="TextWrapping" Value="NoWrap" />
                 <Setter Property="VerticalAlignment" Value="Center" />
@@ -1080,6 +1135,39 @@
                 <Setter Property="HorizontalAlignment" Value="Left" />
                 <Setter Property="Foreground" Value="{ThemeResource SystemBaseMediumColor}" />
             </Style>
+
+            <Style x:Key="ScheduleTableSessionHeaderTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
+                <Setter Property="Foreground" Value="{ThemeResource SystemBaseMediumColor}" />
+                <Setter Property="HorizontalAlignment" Value="Right" />
+            </Style>
+
+            <Storyboard x:Key="ScheduleWeekHeaderFadeToLeftAnimation">
+                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                 From="0" To="-10" Duration="0:0:0.1" />
+                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                 From="1" To="0" Duration="0:0:0.1" />
+            </Storyboard>
+
+            <Storyboard x:Name="ScheduleWeekHeaderFadeToRightAnimation">
+                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                 From="0" To="10" Duration="0:0:0.1" />
+                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                 From="1" To="0" Duration="0:0:0.1" />
+            </Storyboard>
+
+            <Storyboard x:Name="ScheduleWeekHeaderShowFromLeftAnimation">
+                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                 From="-10" To="0" Duration="0:0:0.1" />
+                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                 From="0" To="1" Duration="0:0:0.1" />
+            </Storyboard>
+
+            <Storyboard x:Name="ScheduleWeekHeaderShowFromRightAnimation">
+                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                 From="10" To="0" Duration="0:0:0.1" />
+                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                 From="0" To="1" Duration="0:0:0.1" />
+            </Storyboard>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

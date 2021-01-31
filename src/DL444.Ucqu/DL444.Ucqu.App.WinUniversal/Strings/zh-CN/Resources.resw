@@ -306,6 +306,33 @@
   <data name="ScheduleSummaryTodayFreeHeader.Text" xml:space="preserve">
     <value>今日无课</value>
   </data>
+  <data name="ScheduleTableDayDisplayFormat" xml:space="preserve">
+    <value>{0:M/d}</value>
+  </data>
+  <data name="ScheduleTableDayOfWeek1Header" xml:space="preserve">
+    <value>一</value>
+  </data>
+  <data name="ScheduleTableDayOfWeek2Header" xml:space="preserve">
+    <value>二</value>
+  </data>
+  <data name="ScheduleTableDayOfWeek3Header" xml:space="preserve">
+    <value>三</value>
+  </data>
+  <data name="ScheduleTableDayOfWeek4Header" xml:space="preserve">
+    <value>四</value>
+  </data>
+  <data name="ScheduleTableDayOfWeek5Header" xml:space="preserve">
+    <value>五</value>
+  </data>
+  <data name="ScheduleTableDayOfWeek6Header" xml:space="preserve">
+    <value>六</value>
+  </data>
+  <data name="ScheduleTableDayOfWeek7Header" xml:space="preserve">
+    <value>日</value>
+  </data>
+  <data name="ScheduleTableWeekNumberHeaderFormat" xml:space="preserve">
+    <value>第 {0} 周</value>
+  </data>
   <data name="ScoreChangedToastNeverShow" xml:space="preserve">
     <value>不再显示成绩动态通知</value>
   </data>

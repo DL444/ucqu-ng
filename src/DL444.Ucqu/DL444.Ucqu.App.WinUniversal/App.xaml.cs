@@ -116,7 +116,7 @@ namespace DL444.Ucqu.App.WinUniversal
             services.AddSingleton<IDataService>(localCacheService);
             services.AddSingleton<ILocalCacheService>(localCacheService);
 
-            services.AddTransient<ILocalizationService, ResourceLocalizationService>();
+            services.AddSingleton<ILocalizationService, ResourceLocalizationService>();
             services.AddTransient<ILocalSettingsService, LocalSettingsService>();
             services.AddTransient<INotificationService, NotificationService>();
 

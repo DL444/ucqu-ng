@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -125,9 +125,14 @@
     <Compile Include="Controls\OslNoticeDialog.xaml.cs">
       <DependentUpon>OslNoticeDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ScheduleDayColumn.xaml.cs">
+      <DependentUpon>ScheduleDayColumn.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ScheduleSummary.xaml.cs">
       <DependentUpon>ScheduleSummary.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ScheduleTable.cs" />
+    <Compile Include="Controls\ScheduleTableItem.cs" />
     <Compile Include="Controls\ScoreTable.cs" />
     <Compile Include="Converters\InvertedVisibilityBooleanConverter.cs" />
     <Compile Include="Exceptions\BackendAuthenticationFailedException.cs" />
@@ -235,6 +240,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Page Include="Controls\OslNoticeDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ScheduleDayColumn.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
