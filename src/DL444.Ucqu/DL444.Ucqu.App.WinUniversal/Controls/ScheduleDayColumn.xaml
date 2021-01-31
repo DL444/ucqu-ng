@@ -24,7 +24,7 @@
         <Canvas x:Name="EntryCanvas" Grid.Row="2">
             <Canvas.ChildrenTransitions>
                 <TransitionCollection>
-                    <ContentThemeTransition />
+                    <EntranceThemeTransition FromVerticalOffset="0" />
                 </TransitionCollection>
             </Canvas.ChildrenTransitions>
         </Canvas>
