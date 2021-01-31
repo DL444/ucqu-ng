@@ -9,9 +9,9 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid x:DefaultBindMode="OneWay" Margin="28,8,28,8">
+    <Grid x:DefaultBindMode="OneWay" Margin="8,8,8,8">
         <muxc:ProgressBar IsIndeterminate="True" Visibility="{x:Bind ScheduleViewModel.IsValueReady, Converter={StaticResource InvertedVisibilityBooleanConverter}}" 
-                          VerticalAlignment="Top" />
+                          VerticalAlignment="Top" Margin="20,0" />
         <controls:ScheduleTable Schedule="{x:Bind ScheduleViewModel.Value}" Visibility="{x:Bind ScheduleViewModel.IsValueReady}" />
     </Grid>
 </Page>

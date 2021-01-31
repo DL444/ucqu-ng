@@ -306,6 +306,9 @@
   <data name="ScheduleSummaryTodayFreeHeader.Text" xml:space="preserve">
     <value>今日无课</value>
   </data>
+  <data name="ScheduleTableConflictDescriptionFormat" xml:space="preserve">
+    <value>冲突 {0}</value>
+  </data>
   <data name="ScheduleTableDayDisplayFormat" xml:space="preserve">
     <value>{0:M/d}</value>
   </data>

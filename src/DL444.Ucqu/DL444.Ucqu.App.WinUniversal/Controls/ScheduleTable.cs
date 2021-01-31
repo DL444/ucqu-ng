@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
+using DL444.Ucqu.App.WinUniversal.Extensions;
 using DL444.Ucqu.App.WinUniversal.ViewModels;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -24,12 +26,17 @@ namespace DL444.Ucqu.App.WinUniversal.Controls
             nextBtn.Click += NextBtn_Click;
             Button prevBtn = (Button)GetTemplateChild("PrevButton");
             prevBtn.Click += PrevBtn_Click;
+            GoToToday();
         }
 
         public ScheduleViewModel Schedule
         {
             get => (ScheduleViewModel)GetValue(ScheduleProperty);
-            set => SetValue(ScheduleProperty, value);
+            set
+            {
+                SetValue(ScheduleProperty, value);
+                GoToToday();
+            }
         }
 
         public static readonly DependencyProperty ScheduleProperty =
@@ -78,6 +85,29 @@ namespace DL444.Ucqu.App.WinUniversal.Controls
         private void PrevBtn_Click(object sender, RoutedEventArgs e)
         {
             flipView.SelectedIndex = Math.Max(flipView.SelectedIndex - 1, 0);
+        }
+
+        private void GoToToday()
+        {
+            if (flipView == null || Schedule.Weeks == null || Schedule.Weeks.Count == 0)
+            {
+                return;
+            }
+            DateTimeOffset today = DateTimeOffset.Now.GetLocalDate();
+            DateTimeOffset startDay = Schedule.Weeks.First().Day0.LocalDate;
+            if (today < startDay)
+            {
+                flipView.SelectedIndex = 0;
+                return;
+            }
+            DateTimeOffset endDay = Schedule.Weeks.Last().Day6.LocalDate;
+            if (today > endDay)
+            {
+                flipView.SelectedIndex = Schedule.Weeks.Count - 1;
+                return;
+            }
+            int weekCount = (int)(today - startDay).TotalDays / 7;
+            flipView.SelectedIndex = weekCount;
         }
 
         private FlipView flipView;

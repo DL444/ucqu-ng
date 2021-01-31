@@ -460,7 +460,7 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock x:Name="ScheduleWeekHeader" Style="{ThemeResource TitleTextBlockStyle}" Grid.ColumnSpan="2" Margin="0,0,0,8">
+                        <TextBlock x:Name="ScheduleWeekHeader" Style="{ThemeResource TitleTextBlockStyle}" Grid.ColumnSpan="2" Margin="20,0,0,8">
                             <TextBlock.RenderTransform>
                                 <TranslateTransform />
                             </TextBlock.RenderTransform>
@@ -485,7 +485,7 @@
                         <TextBlock Text="11" Style="{ThemeResource ScheduleTableSessionHeaderTextBlockStyle}" Grid.Row="13" />
                         <TextBlock Text="12" Style="{ThemeResource ScheduleTableSessionHeaderTextBlockStyle}" Grid.Row="14" />
 
-                        <FlipView x:Name="Flip" Background="{x:Null}" ItemsSource="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Schedule.Weeks}" 
+                        <FlipView x:Name="Flip" Background="{x:Null}" ItemsSource="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Schedule.Weeks}"
                                   Style="{ThemeResource ScheduleTableFlipViewStyle}" Grid.Row="1" Grid.Column="1" Grid.RowSpan="14" Grid.ColumnSpan="2">
                             <FlipView.ItemTemplate>
                                 <DataTemplate x:DataType="vm:ScheduleWeekViewModel">
@@ -525,11 +525,40 @@
                         Background="{ThemeResource SystemAccentColor}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="0,0,8,4">
-                        <StackPanel>
-                            <TextBlock Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Entry.Name}" 
-                                       Style="{ThemeResource BaseTextBlockStyle}" TextWrapping="Wrap" MaxLines="2" />
-                            <TextBlock Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Entry.Room}" Style="{ThemeResource BodyTextBlockStyle}" />
-                        </StackPanel>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup>
+                                <VisualState>
+                                    <VisualState.StateTriggers>
+                                        <AdaptiveTrigger MinWindowHeight="0" />
+                                    </VisualState.StateTriggers>
+                                    <VisualState.Setters>
+                                        <Setter Target="RootGrid.Padding" Value="8,4" />
+                                        <Setter Target="NameTextBlock.Style" Value="{ThemeResource CaptionTextBlockStyle}" />
+                                        <Setter Target="NameTextBlock.FontWeight" Value="Bold" />
+                                        <Setter Target="RoomTextBlock.Style" Value="{ThemeResource CaptionTextBlockStyle}" />
+                                        <Setter Target="ConflictTextBlock.Visibility" Value="Collapsed" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState>
+                                    <VisualState.StateTriggers>
+                                        <AdaptiveTrigger MinWindowHeight="640" />
+                                    </VisualState.StateTriggers>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Grid x:Name="RootGrid" Padding="8">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBlock x:Name="NameTextBlock" Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ConsolidatedEntry.DisplayEntry.Name}" 
+                                       Style="{ThemeResource BaseTextBlockStyle}" TextWrapping="Wrap" MaxLines="5" />
+                            <TextBlock x:Name="RoomTextBlock" Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ConsolidatedEntry.DisplayEntry.Room}" Grid.Row="1" />
+                            <TextBlock x:Name="ConflictTextBlock" Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ConsolidatedEntry.ConflictCountDisplay}"
+                                       Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ConsolidatedEntry.HasConflict}" 
+                                       Style="{ThemeResource CaptionTextBlockStyle}" Grid.Row="2"/>
+                        </Grid>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>

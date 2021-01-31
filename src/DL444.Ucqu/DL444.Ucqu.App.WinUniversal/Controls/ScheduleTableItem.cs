@@ -11,13 +11,13 @@ namespace DL444.Ucqu.App.WinUniversal.Controls
             this.DefaultStyleKey = typeof(ScheduleTableItem);
         }
 
-        public ScheduleEntryViewModel Entry
+        public ScheduleConsolidationViewModel ConsolidatedEntry
         {
-            get => (ScheduleEntryViewModel)GetValue(EntryProperty);
-            set => SetValue(EntryProperty, value);
+            get => (ScheduleConsolidationViewModel)GetValue(ConsolidatedEntryProperty);
+            set => SetValue(ConsolidatedEntryProperty, value);
         }
 
-        public static readonly DependencyProperty EntryProperty =
-            DependencyProperty.Register(nameof(Entry), typeof(ScheduleEntryViewModel), typeof(ScheduleTableItem), new PropertyMetadata(null));
+        public static readonly DependencyProperty ConsolidatedEntryProperty =
+            DependencyProperty.Register(nameof(ConsolidatedEntry), typeof(ScheduleConsolidationViewModel), typeof(ScheduleTableItem), new PropertyMetadata(null));
     }
 }

@@ -96,6 +96,31 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             IsToday = date == DateTimeOffset.Now.GetLocalDate();
             Entries = entries.OrderBy(x => x.StartSession).Select(x => new ScheduleEntryViewModel(x, date, schedule)).ToList();
             Initialized = true;
+
+            ConsolidatedEntries = new List<ScheduleConsolidationViewModel>();
+            for (int i = 0; i < Entries.Count; i++)
+            {
+                ScheduleEntryViewModel currentEntry = Entries[i];
+                ScheduleConsolidationViewModel consolidation = new ScheduleConsolidationViewModel(currentEntry);
+                for (int j = i; j < Entries.Count; j++)
+                {
+                    ScheduleEntryViewModel potentialConflict = Entries[j];
+                    if (potentialConflict.StartSession > currentEntry.EndSession)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        consolidation.Conflicts.Add(potentialConflict);
+                    }
+                }
+                if (consolidation.ConflictCount != 0)
+                {
+                    consolidation.ConflictCountDisplay = locService.Format("ScheduleTableConflictDescriptionFormat", consolidation.ConflictCount - 1);
+                }
+                ConsolidatedEntries.Add(consolidation);
+                i += consolidation.ConflictCount;
+            }
         }
 
         public DateTimeOffset LocalDate { get; }
@@ -106,6 +131,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
         public string DayOfWeekDisplay { get; }
         public bool IsToday { get; }
         public List<ScheduleEntryViewModel> Entries { get; }
+        public List<ScheduleConsolidationViewModel> ConsolidatedEntries { get; }
         public bool Initialized { get; }
     }
 
@@ -139,5 +165,21 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
         public DateTimeOffset LocalEndTime { get; }
         public string TimeRangeDisplay { get; }
         public string TimeRangeRoomDisplay { get; }
+    }
+
+    public struct ScheduleConsolidationViewModel
+    {
+        public ScheduleConsolidationViewModel(ScheduleEntryViewModel displayEntry)
+        {
+            DisplayEntry = displayEntry;
+            ConflictCountDisplay = null;
+            Conflicts = new List<ScheduleEntryViewModel>();
+        }
+
+        public ScheduleEntryViewModel DisplayEntry { get; }
+        public bool HasConflict => ConflictCount > 1;
+        public int ConflictCount => Conflicts.Count;
+        public string ConflictCountDisplay { get; set; }
+        public List<ScheduleEntryViewModel> Conflicts { get; }
     }
 }
