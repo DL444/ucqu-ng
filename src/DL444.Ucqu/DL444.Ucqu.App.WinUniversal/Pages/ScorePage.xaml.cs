@@ -24,33 +24,54 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
             localDataService = Application.Current.GetService<IDataService>(x => x.DataSource == DataSource.LocalCache);
             remoteDataService = Application.Current.GetService<IDataService>(x => x.DataSource == DataSource.Online);
             cacheService = Application.Current.GetService<ILocalCacheService>();
-            MajorScoreViewModel = new DataViewModel<ScoreSet, ScoreSetViewModel>(new ScoreSetViewModel());
-            SecondMajorScoreViewModel = new DataViewModel<ScoreSet, ScoreSetViewModel>(new ScoreSetViewModel());
-            StudentInfoViewModel = new DataViewModel<StudentInfo, StudentInfoViewModel>(new StudentInfoViewModel());
+
+            MajorScoreViewModel = new DataViewModel<ScoreSet, ScoreSetViewModel>(
+                new ScoreSetViewModel(),
+                x => new ScoreSetViewModel(x),
+                () => localDataService.GetScoreAsync(false),
+                () => remoteDataService.GetScoreAsync(false),
+                x => cacheService.SetScoreAsync(x)
+            );
+
+            SecondMajorScoreViewModel = new DataViewModel<ScoreSet, ScoreSetViewModel>(
+                new ScoreSetViewModel(),
+                x => new ScoreSetViewModel(x),
+                () => localDataService.GetScoreAsync(true),
+                () => remoteDataService.GetScoreAsync(true),
+                x => cacheService.SetScoreAsync(x)
+            );
+
+            StudentInfoViewModel = new DataViewModel<StudentInfo, StudentInfoViewModel>(
+                new StudentInfoViewModel(),
+                x => new StudentInfoViewModel(x),
+                () => localDataService.GetStudentInfoAsync(),
+                () => remoteDataService.GetStudentInfoAsync(),
+                x => Task.CompletedTask,
+                _ => false
+            );
         }
 
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             Application.Current.GetService<INotificationService>().ClearToast(ToastTypes.ScoreChange);
-            Task studentInfoUpdateTask = StudentInfoViewModel.UpdateAsync(
-                () => localDataService.GetStudentInfoAsync(),
-                () => remoteDataService.GetStudentInfoAsync(),
-                x => Task.CompletedTask,
-                x => new StudentInfoViewModel(x),
-                preferLocal: true);
-            Task majorUpdateTask = MajorScoreViewModel.UpdateAsync(
-                () => localDataService.GetScoreAsync(false),
-                () => remoteDataService.GetScoreAsync(false),
-                x => cacheService.SetScoreAsync(x),
-                x => new ScoreSetViewModel(x)
-            );
+            bool signedIn = Application.Current.GetService<ICredentialService>().IsSignedIn;
+            Task studentInfoUpdateTask = StudentInfoViewModel.StartUpdateAsync(signedIn);
+            Task majorUpdateTask = MajorScoreViewModel.StartUpdateAsync(signedIn);
             await studentInfoUpdateTask;
             if (StudentInfoViewModel.Value.HasSecondMajor && ScoreSectionsPivot.Items.Count == 1)
             {
                 ScoreSectionsPivot.Items.Add(secondMajorItem);
             }
             await majorUpdateTask;
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
+            MajorScoreViewModel.Dispose();
+            SecondMajorScoreViewModel.Dispose();
+            StudentInfoViewModel.Dispose();
         }
 
         internal DataViewModel<ScoreSet, ScoreSetViewModel> MajorScoreViewModel { get; }
@@ -61,12 +82,8 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         {
             if (!secondMajorFetched && e.AddedItems.Contains(secondMajorItem))
             {
-                await SecondMajorScoreViewModel.UpdateAsync(
-                    () => localDataService.GetScoreAsync(true),
-                    () => remoteDataService.GetScoreAsync(true),
-                    x => cacheService.SetScoreAsync(x),
-                    x => new ScoreSetViewModel(x)
-                );
+                bool signedIn = Application.Current.GetService<ICredentialService>().IsSignedIn;
+                await SecondMajorScoreViewModel.StartUpdateAsync(signedIn);
                 secondMajorFetched = true;
             }
         }

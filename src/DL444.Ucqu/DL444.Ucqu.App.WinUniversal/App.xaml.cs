@@ -106,30 +106,11 @@ namespace DL444.Ucqu.App.WinUniversal
             var baseAddress = new Uri(config.GetValue<string>("Backend:BaseAddress"));
             int retryCount = config.GetValue("Backend:RetryCount", 2);
             int timeout = config.GetValue("Backend:Timeout", 30);
-            services.AddHttpClient<IDataService, BackendService>(client =>
-            {
-                client.BaseAddress = baseAddress;
-            }).AddDefaultPolicy(retryCount, timeout);
-
-            services.AddHttpClient<ISignInService, BackendService>(client =>
-            {
-                client.BaseAddress = baseAddress;
-            }).AddDefaultPolicy(retryCount, timeout);
-
-            services.AddHttpClient<ICalendarSubscriptionService, BackendService>(client =>
-            {
-                client.BaseAddress = baseAddress;
-            }).AddDefaultPolicy(retryCount, timeout);
-
-            services.AddHttpClient<INotificationChannelService, BackendService>(client =>
-            {
-                client.BaseAddress = baseAddress;
-            }).AddDefaultPolicy(retryCount, timeout);
-
-            services.AddHttpClient<IRemoteSettingsService, BackendService>(client =>
-            {
-                client.BaseAddress = baseAddress;
-            }).AddDefaultPolicy(retryCount, timeout);
+            services.AddHttpClientWithDefaultPolicy<IDataService, BackendService>(baseAddress, retryCount, timeout);
+            services.AddHttpClientWithDefaultPolicy<ISignInService, BackendService>(baseAddress, retryCount, timeout);
+            services.AddHttpClientWithDefaultPolicy<ICalendarSubscriptionService, BackendService>(baseAddress, retryCount, timeout);
+            services.AddHttpClientWithDefaultPolicy<INotificationChannelService, BackendService>(baseAddress, retryCount, timeout);
+            services.AddHttpClientWithDefaultPolicy<IRemoteSettingsService, BackendService>(baseAddress, retryCount, timeout);
 
             LocalCacheService localCacheService = new LocalCacheService(config);
             services.AddSingleton<IDataService>(localCacheService);
@@ -138,6 +119,8 @@ namespace DL444.Ucqu.App.WinUniversal
             services.AddTransient<ILocalizationService, ResourceLocalizationService>();
             services.AddTransient<ILocalSettingsService, LocalSettingsService>();
             services.AddTransient<INotificationService, NotificationService>();
+
+            services.AddMessageHub<SignInMessage, EventMessageService<SignInMessage>>();
         }
 
         /// <summary>

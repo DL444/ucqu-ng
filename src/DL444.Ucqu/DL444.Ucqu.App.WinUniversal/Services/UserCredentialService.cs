@@ -32,6 +32,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
         }
 
         public string Token { get; set; }
+        public bool IsSignedIn => Token != null;
 
         public void ClearCredential()
         {

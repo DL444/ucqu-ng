@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using DL444.Ucqu.App.WinUniversal.Exceptions;
 using DL444.Ucqu.App.WinUniversal.Extensions;
+using DL444.Ucqu.App.WinUniversal.Models;
 using DL444.Ucqu.App.WinUniversal.Services;
 using DL444.Ucqu.App.WinUniversal.ViewModels;
 using DL444.Ucqu.Models;
@@ -33,19 +35,50 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         public MainPage()
         {
             this.InitializeComponent();
-            localDataService = Application.Current.GetService<IDataService>(x => x.DataSource == DataSource.LocalCache);
-            remoteDataService = Application.Current.GetService<IDataService>(x => x.DataSource == DataSource.Online);
-            cacheService = Application.Current.GetService<ILocalCacheService>();
-            channelService = Application.Current.GetService<INotificationChannelService>();
+            IDataService localDataService = Application.Current.GetService<IDataService>(x => x.DataSource == DataSource.LocalCache);
+            IDataService remoteDataService = Application.Current.GetService<IDataService>(x => x.DataSource == DataSource.Online);
+            ILocalCacheService cacheService = Application.Current.GetService<ILocalCacheService>();
             NavigationView.SelectedItem = NavigationView.MenuItems.First();
-            StudentInfoViewModel = new DataViewModel<StudentInfo, StudentInfoViewModel>(new StudentInfoViewModel());
-            WellknownDataViewModel = new DataViewModel<WellknownData, WellknownDataViewModel>(new WellknownDataViewModel(new WellknownData()
-            {
-                TermStartDate = DateTimeOffset.UtcNow.Date,
-                TermEndDate = DateTimeOffset.UtcNow.Date.AddDays(1)
-            }));
-            ExamsViewModel = new DataViewModel<ExamSchedule, ExamScheduleViewModel>(new ExamScheduleViewModel());
-            ScheduleViewModel = new DataViewModel<Schedule, ScheduleViewModel>(new ScheduleViewModel());
+
+            StudentInfoViewModel = new DataViewModel<StudentInfo, StudentInfoViewModel>(
+                defaultValue: new StudentInfoViewModel(),
+                viewModelTransform: x => new StudentInfoViewModel(x),
+                localFetchFunc: () => localDataService.GetStudentInfoAsync(),
+                remoteFetchFunc: () => remoteDataService.GetStudentInfoAsync(),
+                cacheUpdateFunc: x => cacheService.SetStudentInfoAsync(x)
+            );
+
+            WellknownDataViewModel = new DataViewModel<WellknownData, WellknownDataViewModel>(
+                defaultValue: new WellknownDataViewModel(new WellknownData()
+                {
+                    TermStartDate = DateTimeOffset.UtcNow.Date,
+                    TermEndDate = DateTimeOffset.UtcNow.Date.AddDays(1)
+                }),
+                viewModelTransform: x => new WellknownDataViewModel(x),
+                localFetchFunc: () => localDataService.GetWellknownDataAsync(),
+                remoteFetchFunc: () => remoteDataService.GetWellknownDataAsync(),
+                cacheUpdateFunc: x => cacheService.SetWellknownDataAsync(x),
+                shouldFetchRemote: x => DateTimeOffset.UtcNow > x.TermEndDate,
+                remoteRequiresAuth: false
+            );
+
+            ExamsViewModel = new DataViewModel<ExamSchedule, ExamScheduleViewModel>(
+                defaultValue: new ExamScheduleViewModel(),
+                viewModelTransform: x => new ExamScheduleViewModel(x, WellknownDataViewModel.Value.Model),
+                localFetchFunc: () => localDataService.GetExamsAsync(),
+                remoteFetchFunc: () => remoteDataService.GetExamsAsync(),
+                cacheUpdateFunc: x => cacheService.SetExamsAsync(x),
+                shouldFetchRemote: _ => DateTimeOffset.UtcNow < WellknownDataViewModel.Value.Model.TermEndDate
+            );
+
+            ScheduleViewModel = new DataViewModel<Schedule, ScheduleViewModel>(
+                new ScheduleViewModel(),
+                x => new ScheduleViewModel(x, WellknownDataViewModel.Value.Model),
+                () => localDataService.GetScheduleAsync(),
+                () => remoteDataService.GetScheduleAsync(),
+                x => cacheService.SetScheduleAsync(x),
+                _ => DateTimeOffset.UtcNow < WellknownDataViewModel.Value.Model.TermEndDate
+            );
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -59,56 +92,66 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
                 NavigationView.SelectedItem = NavigationView.MenuItems.Last();
             }
 
+            bool signedIn = Application.Current.GetService<ICredentialService>().IsSignedIn;
+
             IAsyncOperation<PushNotificationChannel> channelCreationTask = PushNotificationChannelManager.CreatePushNotificationChannelForApplicationAsync();
-            Task wellknownUpdateTask = WellknownDataViewModel.UpdateAsync(
-                () => localDataService.GetWellknownDataAsync(),
-                () => remoteDataService.GetWellknownDataAsync(),
-                x => cacheService.SetWellknownDataAsync(x),
-                x => new WellknownDataViewModel(x),
-                preferLocal: true,
-                x => DateTimeOffset.UtcNow > x.TermEndDate);
-            Task studentInfoUpdateTask = StudentInfoViewModel.UpdateAsync(
-                () => localDataService.GetStudentInfoAsync(),
-                () => remoteDataService.GetStudentInfoAsync(),
-                x => cacheService.SetStudentInfoAsync(x),
-                x => new StudentInfoViewModel(x)
-            );
+            Task wellknownUpdateTask = WellknownDataViewModel.StartUpdateAsync(signedIn);
+            Task studentInfoUpdateTask = StudentInfoViewModel.StartUpdateAsync(signedIn);
 
             await wellknownUpdateTask;
-            Task examsUpdateTask = ExamsViewModel.UpdateAsync(
-                () => localDataService.GetExamsAsync(),
-                () => remoteDataService.GetExamsAsync(),
-                x => cacheService.SetExamsAsync(x),
-                x => new ExamScheduleViewModel(x, WellknownDataViewModel.Value.Model),
-                true,
-                _ => DateTimeOffset.UtcNow < WellknownDataViewModel.Value.Model.TermEndDate);
-            Task scheduleUpdateTask = ScheduleViewModel.UpdateAsync(
-                () => localDataService.GetScheduleAsync(),
-                () => remoteDataService.GetScheduleAsync(),
-                x => cacheService.SetScheduleAsync(x),
-                x => new ScheduleViewModel(x, WellknownDataViewModel.Value.Model),
-                true,
-                _ => DateTimeOffset.UtcNow < WellknownDataViewModel.Value.Model.TermEndDate);
+            Task examsUpdateTask = ExamsViewModel.StartUpdateAsync(signedIn);
+            Task scheduleUpdateTask = ScheduleViewModel.StartUpdateAsync(signedIn);
 
-            await studentInfoUpdateTask;
-            Task channelUpdateTask;
-            try
+            if (!signedIn)
             {
-                PushNotificationChannel channel = await channelCreationTask;
-                channelUpdateTask = channelService.PostNotificationChannelAsync(new NotificationChannelItem(channel.Uri));
+                ISignInService signInService = Application.Current.GetService<ISignInService>();
+                try
+                {
+                    await signInService.SignInAsync(false);
+                    signedIn = true;
+                    Application.Current.GetService<IMessageService<SignInMessage>>().SendMessage(new SignInMessage(true));
+                }
+                catch (BackendAuthenticationFailedException)
+                {
+                    await ((App)Application.Current).SignOutAsync();
+                }
+                catch (BackendRequestFailedException)
+                {
+                    // TODO: Log exception.
+                    Application.Current.GetService<IMessageService<SignInMessage>>().SendMessage(new SignInMessage(false));
+                }
             }
-            catch (Exception ex)
+
+            if(signedIn)
             {
-                // TODO: Log exception.
-                channelUpdateTask = Task.CompletedTask;
+                INotificationChannelService channelService = Application.Current.GetService<INotificationChannelService>();
+                Task channelUpdateTask;
+                try
+                {
+                    PushNotificationChannel channel = await channelCreationTask;
+                    channelUpdateTask = channelService.PostNotificationChannelAsync(new NotificationChannelItem(channel.Uri));
+                }
+                catch (Exception ex)
+                {
+                    // TODO: Log exception.
+                    channelUpdateTask = Task.CompletedTask;
+                }
+                await Task.WhenAll(studentInfoUpdateTask, examsUpdateTask, scheduleUpdateTask, channelUpdateTask);
             }
-            await Task.WhenAll(examsUpdateTask, scheduleUpdateTask, channelUpdateTask);
+            else
+            {
+                await Task.WhenAll(studentInfoUpdateTask, examsUpdateTask, scheduleUpdateTask);
+            }
         }
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
             base.OnNavigatingFrom(e);
             Window.Current.SizeChanged -= CurrentWindow_SizeChanged;
+            StudentInfoViewModel.Dispose();
+            WellknownDataViewModel.Dispose();
+            ExamsViewModel.Dispose();
+            ScheduleViewModel.Dispose();
         }
 
         internal DataViewModel<StudentInfo, StudentInfoViewModel> StudentInfoViewModel { get; }
@@ -236,10 +279,6 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
 
         private async Task SignOut() => await ((App)Application.Current).SignOutAsync();
 
-        private readonly IDataService localDataService;
-        private readonly IDataService remoteDataService;
-        private readonly ILocalCacheService cacheService;
-        private readonly INotificationChannelService channelService;
         private bool topPaneOpen;
         private double prevWidth;
     }
