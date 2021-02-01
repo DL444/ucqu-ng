@@ -219,6 +219,12 @@
   <data name="DefaultScheduleIcsName" xml:space="preserve">
     <value>课程</value>
   </data>
+  <data name="GenericNetworkFailureMessage" xml:space="preserve">
+    <value>网络存在问题，请稍后再试</value>
+  </data>
+  <data name="GenericServiceFailureMessage" xml:space="preserve">
+    <value>服务存在问题，请稍后再试</value>
+  </data>
   <data name="IcsFileTypeName" xml:space="preserve">
     <value>日历文件</value>
   </data>

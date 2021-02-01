@@ -16,10 +16,11 @@ namespace DL444.Ucqu.App.WinUniversal.Services
 {
     internal class BackendService : IDataService, ISignInService, ICalendarSubscriptionService, INotificationChannelService, IRemoteSettingsService
     {
-        public BackendService(HttpClient httpClient, ICredentialService credentialService)
+        public BackendService(HttpClient httpClient, ICredentialService credentialService, ILocalizationService locService)
         {
             client = httpClient;
             this.credentialService = credentialService;
+            this.locService = locService;
             retryWithAuthPolicy = Policy
                 .HandleResult<HttpResponseMessage>(x => x.StatusCode == HttpStatusCode.Unauthorized)
                 .RetryAsync(onRetryAsync: (result, count) => SignInAsync());
@@ -114,11 +115,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
                 }
                 else
                 {
-                    throw new BackendRequestFailedException($"Request failed due to an unexpected response status {response.StatusCode}. Endpoint: calendar/{{user}}/{{id}}.")
-                    {
-                        // TODO: Add localization service.
-                        DisplayMessage = string.Empty
-                    };
+                    throw new BackendRequestFailedException($"Request failed due to an unexpected response status {response.StatusCode}. Endpoint: calendar/{{user}}/{{id}}.");
                 }
             }
             catch (HttpRequestException ex)
@@ -220,25 +217,25 @@ namespace DL444.Ucqu.App.WinUniversal.Services
 
         private async Task<string> GetBackendMessageAsync(HttpContent content)
         {
-            // TODO: Add localization service.
             try
             {
                 var result = await content.ReadAsJsonObjectAsync<BackendResult<object>>();
-                return result.Message ?? string.Empty;
+                return result.Message ?? locService.GetString("GenericServiceFailureMessage");
             }
             catch (JsonException)
             {
-                return string.Empty;
+                return locService.GetString("GenericServiceFailureMessage");
             }
         }
 
-        // TODO: Add localization service.
         private BackendRequestFailedException GetDefaultException(string endpoint, Exception innerException)
-            => new BackendRequestFailedException($"Request failed due to network error. Endpoint: {endpoint}.", innerException, null);
+            => new BackendRequestFailedException($"Request failed due to network error. Endpoint: {endpoint}.", innerException, locService.GetString("GenericNetworkFailureMessage"));
 
         private readonly HttpClient client;
 
         private readonly ICredentialService credentialService;
+
+        private readonly ILocalizationService locService;
 
         private readonly AsyncRetryPolicy<HttpResponseMessage> retryWithAuthPolicy;
 
