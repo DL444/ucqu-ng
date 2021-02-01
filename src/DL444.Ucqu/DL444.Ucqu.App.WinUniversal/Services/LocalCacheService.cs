@@ -17,8 +17,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
     {
         public LocalCacheService(IConfiguration config)
         {
-            string databaseName = config.GetValue<string>("LocalData:DatabaseName");
-            InitializeDatabase(databaseName);
+            databaseName = config.GetValue<string>("LocalData:DatabaseName");
             string keyString = GetEncryptionKey();
             key = Convert.FromBase64String(keyString);
         }
@@ -42,6 +41,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
 
         public async Task<DataRequestResult<object>> DeleteUserAsync()
         {
+            await ConnectDatabaseAsync();
             SqliteCommand command = new SqliteCommand("DELETE FROM cachedData", connection);
             await command.ExecuteNonQueryAsync();
             return new DataRequestResult<object>();
@@ -64,24 +64,28 @@ namespace DL444.Ucqu.App.WinUniversal.Services
 
         public Task ClearCacheAsync() => DeleteUserAsync();
 
-        private async Task<SqliteConnection> ConnectDatabaseAsync(string databaseName)
+        private async Task ConnectDatabaseAsync()
         {
-            await ApplicationData.Current.LocalFolder.CreateFileAsync(databaseName, CreationCollisionOption.OpenIfExists);
-            string path = Path.Combine(ApplicationData.Current.LocalFolder.Path, databaseName);
-            var connection = new SqliteConnection($"Filename={path}");
-            await connection.OpenAsync();
-            return connection;
-        }
-
-        private void InitializeDatabase(string databaseName)
-        {
-            connection = ConnectDatabaseAsync(databaseName).Result;
-            SqliteCommand command = new SqliteCommand("CREATE TABLE IF NOT EXISTS cachedData (recordType INTEGER PRIMARY KEY, iv TEXT, data BLOB)", connection);
-            command.ExecuteNonQuery();
+            if (connection == null)
+            {
+                await ApplicationData.Current.LocalFolder.CreateFileAsync(databaseName, CreationCollisionOption.OpenIfExists);
+                string path = Path.Combine(ApplicationData.Current.LocalFolder.Path, databaseName);
+                lock (connectionCreationLock)
+                {
+                    if (connection == null)
+                    {
+                        connection = new SqliteConnection($"Filename={path}");
+                        connection.Open();
+                        SqliteCommand command = new SqliteCommand("CREATE TABLE IF NOT EXISTS cachedData (recordType INTEGER PRIMARY KEY, iv TEXT, data BLOB)", connection);
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
         }
 
         private async Task<T> GetRecordDataAsync<T>(RecordType type)
         {
+            await ConnectDatabaseAsync();
             SqliteCommand command = new SqliteCommand("SELECT recordType, iv, data FROM cachedData WHERE recordType = @type", connection);
             command.Parameters.AddWithValue("@type", (int)type);
             using (SqliteDataReader reader = await command.ExecuteReaderAsync())
@@ -117,6 +121,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
 
         private async Task SetRecordDataAsync<T>(RecordType type, T data)
         {
+            await ConnectDatabaseAsync();
             Aes aes = Aes.Create();
             aes.Key = key;
             using (var inputStream = new MemoryStream())
@@ -169,6 +174,8 @@ namespace DL444.Ucqu.App.WinUniversal.Services
 
         private SqliteConnection connection;
         private byte[] key;
+        private string databaseName;
+        private object connectionCreationLock = new object();
 
         private enum RecordType
         {
