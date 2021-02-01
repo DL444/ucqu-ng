@@ -153,6 +153,9 @@
   <data name="AboutPageLegalSectionPrivacyButton.Content" xml:space="preserve">
     <value>隐私声明</value>
   </data>
+  <data name="AboutPageLegalSectionPrivacyButton.NavigateUri" xml:space="preserve">
+    <value>https://github.com/DL444/ucqu-ng/tree/master/src/DL444.Ucqu/DL444.Ucqu.App.WinUniversal/PRIVACY.md</value>
+  </data>
   <data name="AppTitle.Text" xml:space="preserve">
     <value>UCQU</value>
   </data>
@@ -263,6 +266,9 @@
   </data>
   <data name="OverallGradePointFormat" xml:space="preserve">
     <value>总绩点: {0:0.00}</value>
+  </data>
+  <data name="PackageAppTitle" xml:space="preserve">
+    <value>UCQU</value>
   </data>
   <data name="ScheduleSummaryExamCountdown0" xml:space="preserve">
     <value>今天</value>
