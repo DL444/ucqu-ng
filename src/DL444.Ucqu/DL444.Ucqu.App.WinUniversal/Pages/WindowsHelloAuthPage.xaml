@@ -36,11 +36,11 @@
                 <Button x:Uid="WindowsHelloAuthButton" MinWidth="100" Click="Authenticate_Click" HorizontalAlignment="Center">
                     <Button.Resources>
                         <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource SystemAccentColor}" />
-                        <SolidColorBrush x:Key="ButtonForeground" Color="#FFFFFF" />
+                        <SolidColorBrush x:Key="ButtonForeground" Color="{ThemeResource ColoredButtonForeground}" />
                         <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource SystemAccentColorLight1}" />
-                        <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#FFFFFF" />
+                        <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="{ThemeResource ColoredButtonForeground}" />
                         <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{ThemeResource SystemAccentColorDark1}" />
-                        <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#FFFFFF" />
+                        <SolidColorBrush x:Key="ButtonForegroundPressed" Color="{ThemeResource ColoredButtonForeground}" />
                     </Button.Resources>
                 </Button>
                 <Button x:Uid="WindowsHelloSignOutButton" MinWidth="100" Click="SignOut_Click" HorizontalAlignment="Center" />

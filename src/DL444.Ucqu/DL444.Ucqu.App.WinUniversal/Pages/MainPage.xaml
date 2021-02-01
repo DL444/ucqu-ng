@@ -28,7 +28,7 @@
             </ObjectAnimationUsingKeyFrames>
             <DoubleAnimation Storyboard.TargetName="TopPaneLightDismissTarget" 
                              Storyboard.TargetProperty="Opacity" 
-                             From="0" To="0.8" Duration="0:0:0.2" />
+                             From="0" To="0.9" Duration="0:0:0.2" />
             <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TopPaneLightDismissTarget"
                                            Storyboard.TargetProperty="Visibility">
                 <DiscreteObjectKeyFrame Value="Visible" KeyTime="0:0:0" />
@@ -53,7 +53,7 @@
             </ObjectAnimationUsingKeyFrames>
             <DoubleAnimation Storyboard.TargetName="TopPaneLightDismissTarget" 
                              Storyboard.TargetProperty="Opacity" 
-                             From="0.8" To="0.0" Duration="0:0:0.2" />
+                             From="0.9" To="0.0" Duration="0:0:0.2" />
             <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TopPaneLightDismissTarget"
                                            Storyboard.TargetProperty="Visibility"
                                            Duration="0:0:0.2">
@@ -99,7 +99,7 @@
 
         <Frame x:Name="ContentFrame" Grid.Row="1" Grid.ColumnSpan="2"/>
 
-        <Grid x:Name="TopPaneLightDismissTarget" Visibility="Collapsed" Background="#000000" Grid.Row="1" Grid.ColumnSpan="2" Tapped="TopPaneLightDismissTarget_Tapped" />
+        <Grid x:Name="TopPaneLightDismissTarget" Visibility="Collapsed" Background="{ThemeResource AppTopPaneLightDismissTargetBackgroundBrush}" Grid.Row="1" Grid.ColumnSpan="2" Tapped="TopPaneLightDismissTarget_Tapped" />
 
         <Grid x:Name="SummaryPane" Background="{ThemeResource AppPaneBackgroundBrush}" Visibility="Collapsed" Grid.Row="1" Grid.ColumnSpan="2" Height="{ThemeResource AppTopPaneOpenLength}" VerticalAlignment="Top">
             <Grid.RenderTransform>

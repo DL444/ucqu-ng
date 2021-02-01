@@ -64,10 +64,10 @@
                                     <TextBlock x:Uid="SettingsPageDeleteAccountConfirmBulletSignOut" Style="{ThemeResource MiscellaneousPageBodyTextBlockStyle}" />
                                     <Button x:Uid="SettingsPageDeleteAccountConfirmButton" MinWidth="100" Click="DeleteAccount_Click" HorizontalAlignment="Right">
                                         <Button.Resources>
-                                            <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource DestructiveWarningColor}" />
-                                            <SolidColorBrush x:Key="ButtonForeground" Color="#FFFFFF" />
-                                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource DestructiveWarningColor}" Opacity="0.6" />
-                                            <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#FFFFFF" />
+                                            <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource DestructiveWarningButtonColor}" />
+                                            <SolidColorBrush x:Key="ButtonForeground" Color="{ThemeResource ColoredButtonForeground}" />
+                                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource DestructiveWarningButtonColor}" Opacity="0.6" />
+                                            <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="{ThemeResource ColoredButtonForeground}" />
                                         </Button.Resources>
                                     </Button>
                                 </StackPanel>

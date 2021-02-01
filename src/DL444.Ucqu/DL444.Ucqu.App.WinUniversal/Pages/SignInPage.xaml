@@ -35,9 +35,9 @@
                             <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource SystemAccentColor}" />
                             <SolidColorBrush x:Key="ButtonForeground" Color="#FFFFFF" />
                             <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource SystemAccentColorLight1}" />
-                            <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#FFFFFF" />
+                            <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="{ThemeResource ColoredButtonForeground}" />
                             <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{ThemeResource SystemAccentColorDark1}" />
-                            <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#FFFFFF" />
+                            <SolidColorBrush x:Key="ButtonForegroundPressed" Color="{ThemeResource ColoredButtonForeground}" />
                         </Button.Resources>
                     </Button>
                     <muxc:ProgressRing Visibility="{x:Bind ViewModel.InProgress, Mode=OneWay}" IsActive="True" VerticalAlignment="Center" Margin="6,0,6,0" />

@@ -20,7 +20,7 @@
             <TextBlock Text="{x:Bind Day.LocalDateDisplay}" Foreground="{ThemeResource SystemBaseMediumColor}" />
         </StackPanel>
         <Rectangle x:Name="TodayBar" Fill="{ThemeResource SystemAccentColor}" x:Load="{x:Bind Day.IsToday}" Margin="0,4,8,4" Grid.Row="1" />
-        <Border Background="{ThemeResource SystemChromeAltHighColor}" Visibility="{x:Bind Day.BackgroundVisibility}" Grid.Row="2" />
+        <Border Background="{ThemeResource ScheduleTableColumnBackgroundBrush}" Visibility="{x:Bind Day.BackgroundVisibility}" Grid.Row="2" />
         <Canvas x:Name="EntryCanvas" Grid.Row="2">
             <Canvas.ChildrenTransitions>
                 <TransitionCollection>

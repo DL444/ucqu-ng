@@ -553,11 +553,11 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <TextBlock x:Name="NameTextBlock" Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ConsolidatedEntry.DisplayEntry.Name}" 
-                                       Style="{ThemeResource BaseTextBlockStyle}" TextWrapping="Wrap" MaxLines="5" />
-                            <TextBlock x:Name="RoomTextBlock" Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ConsolidatedEntry.DisplayEntry.Room}" Grid.Row="1" />
+                                       Style="{ThemeResource BaseTextBlockStyle}" Foreground="White" TextWrapping="Wrap" MaxLines="5" />
+                            <TextBlock x:Name="RoomTextBlock" Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ConsolidatedEntry.DisplayEntry.Room}" Foreground="White" Grid.Row="1" />
                             <TextBlock x:Name="ConflictTextBlock" Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ConsolidatedEntry.ConflictCountDisplay}"
                                        Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ConsolidatedEntry.HasConflict}" 
-                                       Style="{ThemeResource CaptionTextBlockStyle}" Grid.Row="2"/>
+                                       Style="{ThemeResource CaptionTextBlockStyle}" Foreground="White" Grid.Row="2"/>
                         </Grid>
                     </Border>
                 </ControlTemplate>
