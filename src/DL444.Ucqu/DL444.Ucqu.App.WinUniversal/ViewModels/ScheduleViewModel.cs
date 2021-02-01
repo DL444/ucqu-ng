@@ -36,7 +36,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             {
                 int todayDayOfWeek = (int)DateTimeOffset.Now.DayOfWeek;
                 todayDayOfWeek = todayDayOfWeek == 0 ? 7 : todayDayOfWeek;
-                ScheduleDayViewModel day = Weeks[weekNumber].Days[todayDayOfWeek];
+                ScheduleDayViewModel day = Weeks[weekNumber].Days[todayDayOfWeek - 1];
                 Today = day.Entries.Where(x => x.LocalEndTime > DateTimeOffset.Now).ToList() ?? new List<ScheduleEntryViewModel>();
             }
         }
