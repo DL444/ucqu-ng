@@ -411,6 +411,15 @@
   <data name="SettingsPageNotificationSectionScoreChangedUpdateFailed.Text" xml:space="preserve">
     <value>暂时无法获取设置，请稍后再试</value>
   </data>
+  <data name="SettingsPageTelemetrySectionAnonymity.Text" xml:space="preserve">
+    <value>这些数据是匿名的，其中不包含你的个人信息。</value>
+  </data>
+  <data name="SettingsPageTelemetrySectionDescription.Text" xml:space="preserve">
+    <value>发送调试数据，帮助我们在出现问题时改进产品。</value>
+  </data>
+  <data name="SettingsPageTelemetrySectionHeader.Text" xml:space="preserve">
+    <value>反馈</value>
+  </data>
   <data name="SettingsPageWindowsHelloSectionDescription.Text" xml:space="preserve">
     <value>启动时使用 Windows Hello 进行身份验证</value>
   </data>

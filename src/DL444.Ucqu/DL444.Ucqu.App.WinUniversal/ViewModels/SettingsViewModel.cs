@@ -6,6 +6,9 @@ using DL444.Ucqu.App.WinUniversal.Extensions;
 using DL444.Ucqu.App.WinUniversal.Models;
 using DL444.Ucqu.App.WinUniversal.Services;
 using DL444.Ucqu.Models;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using Windows.UI.Xaml;
 
 namespace DL444.Ucqu.App.WinUniversal.ViewModels
@@ -23,7 +26,15 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
         public bool IsScheduleSummaryNotificationEnabled
         {
             get => settingsService.GetValue("DailyToastEnabled", true);
-            set => settingsService.SetValue("DailyToastEnabled", value);
+            set
+            {
+                Analytics.TrackEvent("Settings toggled", new Dictionary<string, string>()
+                {
+                    { "Settings", $"DailyToast" },
+                    { "Value", $"{value}" }
+                });
+                settingsService.SetValue("DailyToastEnabled", value);
+            }
         }
 
         public bool IsScoreChangeNotificationEnabled
@@ -73,6 +84,31 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
 
         public bool IsWindowsHelloEnabled => winHelloService.IsEnabled;
 
+        public bool IsTelemetryEnabled
+        {
+            get => AppCenter.IsEnabledAsync().Result;
+            set
+            {
+                if (value == false)
+                {
+                    Analytics.TrackEvent("Settings toggled", new Dictionary<string, string>()
+                    {
+                        { "Settings", $"Telemetry" },
+                        { "Value", $"{value}" }
+                    });
+                }
+                AppCenter.SetEnabledAsync(value).Wait();
+                if (value == true)
+                {
+                    Analytics.TrackEvent("Settings toggled", new Dictionary<string, string>()
+                    {
+                        { "Settings", $"Telemetry" },
+                        { "Value", $"{value}" }
+                    });
+                }
+            }
+        }
+
         public bool AccountDeleteInProgress
         {
             get => _accountDeleteInProgress;
@@ -120,8 +156,9 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
                 }
                 IsScoreChangeNotificationEnabled = scoreChangeNotificationEnabled;
             }
-            catch (BackendRequestFailedException)
+            catch (BackendRequestFailedException ex)
             {
+                Crashes.TrackError(ex);
                 IsScoreChangedNotificationEnabledUpdateFailed = true;
             }
             finally
@@ -166,8 +203,9 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
                 DataRequestResult<UserPreferences> result = await remoteSettingsService.SetRemoteSettingsAsync(preferences);
                 UpdateRemoteSettings(result.Resource);
             }
-            catch (BackendRequestFailedException)
+            catch (BackendRequestFailedException ex)
             {
+                Crashes.TrackError(ex);
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsScoreChangeNotificationEnabled)));
             }
             finally
@@ -183,14 +221,18 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
             {
                 IDataService backendService = Application.Current.GetService<IDataService>(x => x.DataSource == DataSource.Online);
                 await backendService.DeleteUserAsync();
+                Analytics.TrackEvent("Account deleted");
                 await ((App)Application.Current).SignOutAsync();
             }
-            catch (BackendAuthenticationFailedException)
+            catch (BackendAuthenticationFailedException ex)
             {
+                Crashes.TrackError(ex);
+                Analytics.TrackEvent("Authentication failed");
                 AccountDeleteReauthenticateRequired = true;
             }
-            catch (BackendRequestFailedException)
+            catch (BackendRequestFailedException ex)
             {
+                Crashes.TrackError(ex);
                 AccountDeleteFailed = true;
             }
             finally

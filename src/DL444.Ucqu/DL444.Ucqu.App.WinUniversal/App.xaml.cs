@@ -54,10 +54,14 @@ namespace DL444.Ucqu.App.WinUniversal
                 AppCenter.Start(instrumentationKey, typeof(Analytics), typeof(Crashes));
             }
 
+            Analytics.TrackEvent("Application started");
+
             var services = new ServiceCollection();
             ConfigureServices(services, config);
             services.AddSingleton(config);
             Services = services.BuildServiceProvider();
+
+            Analytics.TrackEvent("Service dependencies built");
         }
 
         public IConfiguration Configuration { get; }
@@ -97,6 +101,7 @@ namespace DL444.Ucqu.App.WinUniversal
                 credentialService.ClearCredential();
                 await cacheService.ClearCacheAsync();
                 rootFrame.Navigate(typeof(Pages.SignInPage), null, new DrillInNavigationTransitionInfo());
+                Analytics.TrackEvent("User signed out");
             }
         }
 
@@ -144,6 +149,7 @@ namespace DL444.Ucqu.App.WinUniversal
         /// <param name="e">Details about the launch request and process.</param>
         protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
+            Analytics.TrackEvent("Application launching");
             Frame rootFrame = await InitializeRootFrame(e);
 
             if (e.PrelaunchActivated == false)
@@ -163,6 +169,7 @@ namespace DL444.Ucqu.App.WinUniversal
         protected override async void OnActivated(IActivatedEventArgs args)
         {
             base.OnActivated(args);
+            Analytics.TrackEvent("Application activating");
             Frame rootFrame = await InitializeRootFrame(args);
             if (args is ToastNotificationActivatedEventArgs e)
             {
@@ -178,6 +185,10 @@ namespace DL444.Ucqu.App.WinUniversal
         protected override async void OnBackgroundActivated(BackgroundActivatedEventArgs args)
         {
             base.OnBackgroundActivated(args);
+            Analytics.TrackEvent("Application background activating", new Dictionary<string, string>()
+            {
+                { "Task", args.TaskInstance.Task.Name }
+            });
             BackgroundTaskDeferral deferral = args.TaskInstance.GetDeferral();
             switch (args.TaskInstance.Task.Name)
             {
@@ -190,6 +201,10 @@ namespace DL444.Ucqu.App.WinUniversal
                 case "NotificationActivationTask":
                     var settingsService = Services.GetService<ILocalSettingsService>();
                     var triggerDetails = (ToastNotificationActionTriggerDetail)args.TaskInstance.TriggerDetails;
+                    Analytics.TrackEvent("Toast interaction", new Dictionary<string, string>()
+                    {
+                        { "Argument", triggerDetails.Argument }
+                    });
                     if ("NeverShowScheduleSummary".Equals(triggerDetails.Argument, StringComparison.Ordinal))
                     {
                         settingsService.SetValue("DailyToastEnabled", false);
@@ -201,7 +216,7 @@ namespace DL444.Ucqu.App.WinUniversal
                         {
                             break;
                         }
-                        var preferences = new Ucqu.Models.UserPreferences(username)
+                        var preferences = new UserPreferences(username)
                         {
                             PreferenceItems = new Dictionary<string, string>()
                             {
@@ -212,11 +227,15 @@ namespace DL444.Ucqu.App.WinUniversal
                         {
                             await Services.GetService<IRemoteSettingsService>().SetRemoteSettingsAsync(preferences);
                         }
-                        catch (BackendRequestFailedException) { }
+                        catch (BackendRequestFailedException ex)
+                        {
+                            Crashes.TrackError(ex);
+                        }
                     }
                     break;
                 case "AppMaintenanceTask":
-                    await PerformAppMaintenance();
+                    await PerformAppMaintenanceAsync();
+                    Analytics.TrackEvent("Maintenance complete");
                     break;
             }
             deferral.Complete();
@@ -242,7 +261,7 @@ namespace DL444.Ucqu.App.WinUniversal
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
-            //TODO: Save application state and stop any background activity
+            Analytics.TrackEvent("Application suspending");
             deferral.Complete();
         }
 
@@ -262,6 +281,7 @@ namespace DL444.Ucqu.App.WinUniversal
             BackgroundAccessStatus requestStatus = await BackgroundExecutionManager.RequestAccessAsync();
             if (requestStatus == BackgroundAccessStatus.AllowedSubjectToSystemPolicy || requestStatus == BackgroundAccessStatus.AlwaysAllowed)
             {
+                Analytics.TrackEvent("Background task configuration");
                 var builder = new BackgroundTaskBuilder();
                 builder.Name = "BackgroundTaskReconfigureTask";
                 builder.SetTrigger(new SystemTrigger(SystemTriggerType.ServicingComplete, false));
@@ -288,6 +308,10 @@ namespace DL444.Ucqu.App.WinUniversal
                 builder.AddCondition(new SystemCondition(SystemConditionType.InternetAvailable));
                 builder.IsNetworkRequested = true;
                 TryRegisterBackgroundTask(builder, replaceIfExists);
+            }
+            else
+            {
+                Analytics.TrackEvent("Background access not granted");
             }
         }
 
@@ -331,7 +355,7 @@ namespace DL444.Ucqu.App.WinUniversal
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
-                    //TODO: Load state from previously suspended application
+                    // Load state from previously suspended application
                 }
 
                 // Place the frame in the current Window
@@ -341,7 +365,7 @@ namespace DL444.Ucqu.App.WinUniversal
             return rootFrame;
         }
 
-        private async Task PerformAppMaintenance()
+        private async Task PerformAppMaintenanceAsync()
         {
             IDataService backendService = this.GetService<IDataService>(x => x.DataSource == DataSource.Online);
             ILocalCacheService cacheService = Services.GetService<ILocalCacheService>();
@@ -351,11 +375,15 @@ namespace DL444.Ucqu.App.WinUniversal
                 DataRequestResult<StudentInfo> studentInfo = await backendService.GetStudentInfoAsync();
                 await cacheService.SetStudentInfoAsync(studentInfo.Resource);
             }
-            catch (BackendRequestFailedException)
+            catch (BackendRequestFailedException ex)
             {
+                Crashes.TrackError(ex);
                 return;
             }
-            catch (LocalCacheRequestFailedException) { }
+            catch (LocalCacheRequestFailedException ex)
+            {
+                Crashes.TrackError(ex);
+            }
 
             Task<DataRequestResult<Schedule>> scheduleTask = backendService.GetScheduleAsync();
             Task<DataRequestResult<ExamSchedule>> examsTask = backendService.GetExamsAsync();
@@ -367,35 +395,50 @@ namespace DL444.Ucqu.App.WinUniversal
                 DataRequestResult<WellknownData> wellknown = await wellknownTask;
                 await cacheService.SetWellknownDataAsync(wellknown.Resource);
             }
-            catch (Exception ex) when (ex is BackendRequestFailedException || ex is LocalCacheRequestFailedException) { }
+            catch (Exception ex) when (ex is BackendRequestFailedException || ex is LocalCacheRequestFailedException)
+            {
+                Crashes.TrackError(ex);
+            }
 
             try
             {
                 DataRequestResult<Schedule> schedule = await scheduleTask;
                 await cacheService.SetScheduleAsync(schedule.Resource);
             }
-            catch (Exception ex) when (ex is BackendRequestFailedException || ex is LocalCacheRequestFailedException) { }
+            catch (Exception ex) when (ex is BackendRequestFailedException || ex is LocalCacheRequestFailedException)
+            {
+                Crashes.TrackError(ex);
+            }
 
             try
             {
                 DataRequestResult<ExamSchedule> exams = await examsTask;
                 await cacheService.SetExamsAsync(exams.Resource);
             }
-            catch (Exception ex) when (ex is BackendRequestFailedException || ex is LocalCacheRequestFailedException) { }
+            catch (Exception ex) when (ex is BackendRequestFailedException || ex is LocalCacheRequestFailedException)
+            {
+                Crashes.TrackError(ex);
+            }
 
             try
             {
                 DataRequestResult<ScoreSet> majorScore = await majorScoreTask;
                 await cacheService.SetScoreAsync(majorScore.Resource);
             }
-            catch (Exception ex) when (ex is BackendRequestFailedException || ex is LocalCacheRequestFailedException) { }
+            catch (Exception ex) when (ex is BackendRequestFailedException || ex is LocalCacheRequestFailedException)
+            {
+                Crashes.TrackError(ex);
+            }
 
             try
             {
                 DataRequestResult<ScoreSet> secondMajorScore = await secondMajorScoreTask;
                 await cacheService.SetScoreAsync(secondMajorScore.Resource);
             }
-            catch (Exception ex) when (ex is BackendRequestFailedException || ex is LocalCacheRequestFailedException) { }
+            catch (Exception ex) when (ex is BackendRequestFailedException || ex is LocalCacheRequestFailedException)
+            {
+                Crashes.TrackError(ex);
+            }
         }
     }
 }

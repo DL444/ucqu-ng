@@ -7,6 +7,8 @@ using DL444.Ucqu.App.WinUniversal.Extensions;
 using DL444.Ucqu.App.WinUniversal.Models;
 using DL444.Ucqu.App.WinUniversal.Services;
 using DL444.Ucqu.Models;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using Windows.UI.Xaml;
 
 namespace DL444.Ucqu.App.WinUniversal.ViewModels
@@ -125,13 +127,16 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
                     Initialize(infoResult.Resource.SubscriptionId);
                 }
             }
-            catch (BackendAuthenticationFailedException)
+            catch (BackendAuthenticationFailedException ex)
             {
+                Crashes.TrackError(ex);
+                Analytics.TrackEvent("Authentication failed");
                 await ((App)Application.Current).SignOutAsync();
                 return;
             }
-            catch (BackendRequestFailedException)
+            catch (BackendRequestFailedException ex)
             {
+                Crashes.TrackError(ex);
                 UpdateFailed = true;
             }
             finally
@@ -150,13 +155,16 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
                 ResetSuccess = true;
                 return true;
             }
-            catch (BackendAuthenticationFailedException)
+            catch (BackendAuthenticationFailedException ex)
             {
+                Crashes.TrackError(ex);
+                Analytics.TrackEvent("Authentication failed");
                 await ((App)Application.Current).SignOutAsync();
                 return false;
             }
-            catch (BackendRequestFailedException)
+            catch (BackendRequestFailedException ex)
             {
+                Crashes.TrackError(ex);
                 ResetFailed = true;
                 return false;
             }
@@ -179,8 +187,9 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
                 }
                 return subscriptionContent;
             }
-            catch (BackendRequestFailedException)
+            catch (BackendRequestFailedException ex)
             {
+                Crashes.TrackError(ex);
                 GetContentFailed = true;
                 return null;
             }

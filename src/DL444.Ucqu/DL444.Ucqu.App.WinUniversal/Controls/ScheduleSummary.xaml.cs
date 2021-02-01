@@ -5,6 +5,7 @@ using DL444.Ucqu.App.WinUniversal.Models;
 using DL444.Ucqu.App.WinUniversal.Services;
 using DL444.Ucqu.App.WinUniversal.ViewModels;
 using DL444.Ucqu.Models;
+using Microsoft.AppCenter.Analytics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -152,6 +153,7 @@ namespace DL444.Ucqu.App.WinUniversal.Controls
 
         private void Calendar_SelectedDatesChanged(CalendarView sender, CalendarViewSelectedDatesChangedEventArgs args)
         {
+            Analytics.TrackEvent("Schedule summary interaction");
             if (args.AddedDates.Count > 0)
             {
                 DaySelectedMessage message = new DaySelectedMessage(args.AddedDates[0]);
@@ -160,13 +162,6 @@ namespace DL444.Ucqu.App.WinUniversal.Controls
         }
 
         private Dictionary<string, SummaryCalendarDayViewModel> days = new Dictionary<string, SummaryCalendarDayViewModel>();
-    }
-
-    public class ScheduleSummaryCalendarDateSelectedEventArgs : EventArgs
-    {
-        public ScheduleSummaryCalendarDateSelectedEventArgs(DateTimeOffset selectedDate) => SelectedDate = selectedDate;
-
-        public DateTimeOffset SelectedDate { get; set; }
     }
 
     internal class ScheduleSummaryRecentExamsItemTemplateSelector : DataTemplateSelector

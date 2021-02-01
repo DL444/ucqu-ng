@@ -4,6 +4,8 @@ using DL444.Ucqu.App.WinUniversal.Exceptions;
 using DL444.Ucqu.App.WinUniversal.Models;
 using DL444.Ucqu.App.WinUniversal.Services;
 using DL444.Ucqu.Models;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using Microsoft.Extensions.Configuration;
 
 namespace DL444.Ucqu.App.WinUniversal.ViewModels
@@ -88,14 +90,17 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
                 }
                 return true;
             }
-            catch (BackendAuthenticationFailedException)
+            catch (BackendAuthenticationFailedException ex)
             {
+                Crashes.TrackError(ex);
+                Analytics.TrackEvent("Authentication failed");
                 _canSignIn = false;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanSignIn)));
                 throw;
             }
             catch (BackendRequestFailedException ex)
             {
+                Crashes.TrackError(ex);
                 Message = ex.DisplayMessage;
                 return false;
             }

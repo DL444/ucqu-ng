@@ -1,8 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using DL444.Ucqu.App.WinUniversal.Extensions;
 using DL444.Ucqu.App.WinUniversal.Services;
 using DL444.Ucqu.App.WinUniversal.ViewModels;
 using DL444.Ucqu.Models;
+using Microsoft.AppCenter.Analytics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -54,6 +56,10 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+            Analytics.TrackEvent("Navigation", new Dictionary<string, string>()
+            {
+                { "Page", "Score" }
+            });
             Application.Current.GetService<INotificationService>().ClearToast(ToastTypes.ScoreChange);
             bool signedIn = Application.Current.GetService<ICredentialService>().IsSignedIn;
             Task studentInfoUpdateTask = StudentInfoViewModel.StartUpdateAsync(signedIn);

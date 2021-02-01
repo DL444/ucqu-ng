@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using DL444.Ucqu.App.WinUniversal.Exceptions;
 using DL444.Ucqu.App.WinUniversal.Extensions;
@@ -7,6 +9,8 @@ using DL444.Ucqu.App.WinUniversal.Models;
 using DL444.Ucqu.App.WinUniversal.Services;
 using DL444.Ucqu.App.WinUniversal.ViewModels;
 using DL444.Ucqu.Models;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using Windows.Foundation;
 using Windows.Networking.PushNotifications;
 using Windows.UI.Xaml;
@@ -28,6 +32,7 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         public MainPage()
         {
             this.InitializeComponent();
+            Analytics.TrackEvent("Initialize main page");
             IDataService localDataService = Application.Current.GetService<IDataService>(x => x.DataSource == DataSource.LocalCache);
             IDataService remoteDataService = Application.Current.GetService<IDataService>(x => x.DataSource == DataSource.Online);
             ILocalCacheService cacheService = Application.Current.GetService<ILocalCacheService>();
@@ -77,12 +82,23 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+            Analytics.TrackEvent("Main page reached", new Dictionary<string, string>()
+            {
+                { "Size", $"{Window.Current.Bounds}" }
+            });
             prevWidth = Window.Current.Bounds.Width;
             Window.Current.SizeChanged += CurrentWindow_SizeChanged;
 
-            if (e.Parameter is string argument && argument.Equals("ScoreChanged", StringComparison.Ordinal))
+            if (e.Parameter is string argument)
             {
-                NavigationView.SelectedItem = NavigationView.MenuItems.Last();
+                Analytics.TrackEvent("Launched with parameter", new Dictionary<string, string>()
+                {
+                    { "Parameter", argument }
+                });
+                if (argument.Equals("ScoreChanged", StringComparison.Ordinal))
+                {
+                    NavigationView.SelectedItem = NavigationView.MenuItems.Last();
+                }
             }
 
             bool signedIn = Application.Current.GetService<ICredentialService>().IsSignedIn;
@@ -104,13 +120,15 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
                     signedIn = true;
                     Application.Current.GetService<IMessageService<SignInMessage>>().SendMessage(new SignInMessage(true));
                 }
-                catch (BackendAuthenticationFailedException)
+                catch (BackendAuthenticationFailedException ex)
                 {
+                    Crashes.TrackError(ex);
+                    Analytics.TrackEvent("Authentication failed");
                     await ((App)Application.Current).SignOutAsync();
                 }
-                catch (BackendRequestFailedException)
+                catch (BackendRequestFailedException ex)
                 {
-                    // TODO: Log exception.
+                    Crashes.TrackError(ex);
                     Application.Current.GetService<IMessageService<SignInMessage>>().SendMessage(new SignInMessage(false));
                 }
             }
@@ -126,7 +144,7 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
                 }
                 catch (Exception ex)
                 {
-                    // TODO: Log exception.
+                    Crashes.TrackError(ex);
                     channelUpdateTask = Task.CompletedTask;
                 }
                 await Task.WhenAll(studentInfoUpdateTask, examsUpdateTask, scheduleUpdateTask, channelUpdateTask);
@@ -154,18 +172,39 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
 
         private void PaneToggleButton_Click(object sender, RoutedEventArgs e)
         {
+            Analytics.TrackEvent("Top pane toggled", new Dictionary<string, string>()
+            {
+                { "Method", "Button" },
+                { "State", $"{!topPaneOpen}" }
+            });
             SetTopPaneOpenAsync(!topPaneOpen, true);
         }
 
         private void TopPaneLightDismissTarget_Tapped(object sender, TappedRoutedEventArgs e)
         {
+            Analytics.TrackEvent("Top pane toggled", new Dictionary<string, string>()
+            {
+                { "Method", "LightDismiss" },
+                { "State", "Closed" }
+            });
             SetTopPaneOpenAsync(false, true);
         }
 
         private void CurrentWindow_SizeChanged(object sender, Windows.UI.Core.WindowSizeChangedEventArgs e)
         {
+            if (cancelTokenSource != null)
+            {
+                cancelTokenSource.Cancel();
+            }
+            cancelTokenSource = new CancellationTokenSource();
+            _ = ReportWindowSizeChange(e.Size, cancelTokenSource.Token);
             if (prevWidth >= 1008 && e.Size.Width < 1008)
             {
+                Analytics.TrackEvent("Top pane toggled", new Dictionary<string, string>()
+                {
+                    { "Method", "Resize" },
+                    { "State", "Closed" }
+                });
                 SetTopPaneOpenAsync(false, false);
             }
             prevWidth = e.Size.Width;
@@ -272,7 +311,21 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
 
         private async Task SignOut() => await ((App)Application.Current).SignOutAsync();
 
+        private async Task ReportWindowSizeChange(Size size, CancellationToken cancellation)
+        {
+            await Task.Delay(2000);
+            if (!cancellation.IsCancellationRequested)
+            {
+                Analytics.TrackEvent("Window size changed", new Dictionary<string, string>()
+                {
+                    { "Size", $"{size}" }
+                });
+                cancelTokenSource = null;
+            }
+        }
+
         private bool topPaneOpen;
         private double prevWidth;
+        private CancellationTokenSource cancelTokenSource;
     }
 }

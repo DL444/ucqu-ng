@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using DL444.Ucqu.App.WinUniversal.Exceptions;
 using DL444.Ucqu.App.WinUniversal.Extensions;
 using DL444.Ucqu.App.WinUniversal.Models;
 using DL444.Ucqu.App.WinUniversal.Services;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using Windows.UI.Xaml;
 
 namespace DL444.Ucqu.App.WinUniversal.ViewModels
@@ -114,6 +117,7 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
 
         private async Task<bool> FetchLocal()
         {
+            Analytics.TrackEvent("Local data fetch started");
             try
             {
                 TModel cachedInfo = (await localFetchFunc()).Resource;
@@ -123,13 +127,19 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
                 return shouldFetchRemote(cachedInfo);
             }
-            catch (LocalCacheRequestFailedException)
+            catch (LocalCacheRequestFailedException ex)
             {
+                Crashes.TrackError(ex, new Dictionary<string, string>()
+                {
+                    { "DataType", typeof(TModel).ToString() },
+                    { "Stage", "LocalFetch" }
+                });
                 return true;
             }
         }
         private async Task FetchRemote()
         {
+            Analytics.TrackEvent("Remote data fetch started");
             Task<DataRequestResult<TModel>> remoteTask = remoteFetchFunc();
             TModel remoteInfo = default;
             bool remoteFetchSuccess = false;
@@ -143,13 +153,24 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
                 Status = DataStatus.Ok;
             }
-            catch (BackendAuthenticationFailedException)
+            catch (BackendAuthenticationFailedException ex)
             {
+                Crashes.TrackError(ex, new Dictionary<string, string>()
+                {
+                    { "DataType", typeof(TModel).ToString() },
+                    { "Stage", "RemoteUpdate" }
+                });
+                Analytics.TrackEvent("Authentication failed");
                 await ((App)Application.Current).SignOutAsync();
                 return;
             }
-            catch (BackendRequestFailedException)
+            catch (BackendRequestFailedException ex)
             {
+                Crashes.TrackError(ex, new Dictionary<string, string>()
+                {
+                    { "DataType", typeof(TModel).ToString() },
+                    { "Stage", "RemoteUpdate" }
+                });
                 Status = IsValueReady ? DataStatus.Stale : DataStatus.Error;
             }
 
@@ -159,7 +180,14 @@ namespace DL444.Ucqu.App.WinUniversal.ViewModels
                 {
                     await cacheUpdateFunc(remoteInfo);
                 }
-                catch (LocalCacheRequestFailedException) { }
+                catch (LocalCacheRequestFailedException ex)
+                {
+                    Crashes.TrackError(ex, new Dictionary<string, string>()
+                    {
+                        { "DataType", typeof(TModel).ToString() },
+                        { "Stage", "LocalUpdate" }
+                    });
+                }
             }
         }
 

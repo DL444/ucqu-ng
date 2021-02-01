@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using DL444.Ucqu.App.WinUniversal.Extensions;
 using DL444.Ucqu.App.WinUniversal.Services;
+using Microsoft.AppCenter.Analytics;
 using Windows.Security.Credentials.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -19,6 +21,7 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+            Analytics.TrackEvent("Windows Hello page reached");
             if (e.Parameter is string args)
             {
                 arguments = args;
@@ -41,6 +44,10 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         {
             VisualStateManager.GoToState(this, "InProgress", false);
             UserConsentVerificationResult result = await winHelloService.AuthenticateAsync();
+            Analytics.TrackEvent("Windows Hello authentication complete", new Dictionary<string, string>()
+            {
+                { "Result", result.ToString() }
+            });
             switch (result)
             {
                 case UserConsentVerificationResult.Verified:

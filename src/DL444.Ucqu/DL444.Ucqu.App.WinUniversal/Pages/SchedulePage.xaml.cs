@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DL444.Ucqu.App.WinUniversal.Extensions;
 using DL444.Ucqu.App.WinUniversal.Models;
 using DL444.Ucqu.App.WinUniversal.Services;
 using DL444.Ucqu.App.WinUniversal.ViewModels;
 using DL444.Ucqu.Models;
+using Microsoft.AppCenter.Analytics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -49,6 +51,10 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+            Analytics.TrackEvent("Navigation", new Dictionary<string, string>()
+            {
+                { "Page", "Schedule" }
+            });
             Application.Current.GetService<IMessageService<DaySelectedMessage>>().Register(ScheduleTable);
             Application.Current.GetService<INotificationService>().ClearToast(ToastTypes.ScheduleSummary);
             bool signedIn = Application.Current.GetService<ICredentialService>().IsSignedIn;
