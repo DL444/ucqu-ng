@@ -27,7 +27,7 @@ namespace DL444.Ucqu.Client
                 throw new FormatException("Page is empty.");
             }
             Regex nameRegex = new Regex("姓.*?名</td>.*?>(.*?)<br>");
-            Regex classRegex = new Regex("行政班级</td>.*?>(\\d*)(\\D*)(\\d*)<br>");
+            Regex classRegex = new Regex("行政班级</td>.*?>(\\d*)(\\D*)(\\d*)班?<br>");
             Regex secondMajorRegex = new Regex("辅修专业</td>.*?>(.*?)<br>");
             Match classMatch = classRegex.Match(page);
             if (!classMatch.Success)
