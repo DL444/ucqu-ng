@@ -57,7 +57,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
                     throw exception;
                 }
             }
-            catch (HttpRequestException ex)
+            catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException)
             {
                 throw GetDefaultException($"signIn", ex);
             }
@@ -79,7 +79,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
                         return;
                     }
                 }
-                catch (HttpRequestException) { }
+                catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException) { }
             }
         }
 
@@ -118,7 +118,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
                     throw new BackendRequestFailedException($"Request failed due to an unexpected response status {response.StatusCode}. Endpoint: calendar/{{user}}/{{id}}.");
                 }
             }
-            catch (HttpRequestException ex)
+            catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException)
             {
                 throw GetDefaultException("calendar/{user}/{id}", ex);
             }
@@ -137,7 +137,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
                     return client.SendAsync(request);
                 });
             }
-            catch (HttpRequestException) { }
+            catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException) { }
         }
 
         public Task<DataRequestResult<UserPreferences>> GetRemoteSettingsAsync() => SendGenericRequestAsync<UserPreferences>(HttpMethod.Get, "preferences", true);
@@ -171,7 +171,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
                     throw exception;
                 }
             }
-            catch (HttpRequestException ex)
+            catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException)
             {
                 throw GetDefaultException($"preferencePost", ex);
             }
@@ -209,7 +209,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
                     throw exception;
                 }
             }
-            catch (HttpRequestException ex)
+            catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException)
             {
                 throw GetDefaultException(endpoint, ex);
             }
