@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using DL444.Ucqu.App.WinUniversal.Extensions;
+using Windows.ApplicationModel.Background;
 using Windows.Storage;
 using Windows.UI.Xaml;
 
@@ -33,7 +35,7 @@ namespace DL444.Ucqu.App.WinUniversal.Services
         {
             if (!latestSettingsVersion.Equals(CurrentVersion, StringComparison.Ordinal))
             {
-                MigrateTo20();
+                MigrateTo201();
             }
             CurrentVersion = latestSettingsVersion;
         }
@@ -44,11 +46,35 @@ namespace DL444.Ucqu.App.WinUniversal.Services
             set => SetValue("SettingsVersion", value);
         }
 
+        private void MigrateTo201()
+        {
+            if ("2.0.1".Equals(CurrentVersion, StringComparison.Ordinal))
+            {
+                return;
+            }
+            MigrateTo20();
+            IBackgroundTaskRegistration legacyTimerUpdateTask = BackgroundTaskRegistration.AllTasks.Values.FirstOrDefault(x => "Hourly Tile Update Task".Equals(x.Name, StringComparison.Ordinal));
+            if (legacyTimerUpdateTask != null)
+            {
+                legacyTimerUpdateTask.Unregister(false);
+            }
+            IBackgroundTaskRegistration legacyLoginUpdateTask = BackgroundTaskRegistration.AllTasks.Values.FirstOrDefault(x => "Login Tile Update Task".Equals(x.Name, StringComparison.Ordinal));
+            if (legacyLoginUpdateTask != null)
+            {
+                legacyLoginUpdateTask.Unregister(false);
+            }
+            CurrentVersion = "2.0.1";
+        }
+
         private void MigrateTo20()
         {
+            if ("2.0".Equals(CurrentVersion, StringComparison.Ordinal))
+            {
+                return;
+            }
             string studentId = GetValue<string>("id", null);
             string passwordHash = GetValue<string>("pwdHash", null);
-            bool dailyToastSwitchOn = GetValue("dailyToastSwitch", true);
+            string dailyToastSwitchOn = GetValue("dailyToastSwitch", "on");
             container.Values.Clear();
             ICredentialService credentialService = Application.Current.GetService<ICredentialService>();
             if (!string.IsNullOrEmpty(studentId) && !string.IsNullOrEmpty(passwordHash))
@@ -61,10 +87,18 @@ namespace DL444.Ucqu.App.WinUniversal.Services
                 // So clear it on initial migration.
                 credentialService.ClearCredential();
             }
-            SetValue("DailyToastEnabled", dailyToastSwitchOn);
+            if ("off".Equals(dailyToastSwitchOn, StringComparison.Ordinal))
+            {
+                SetValue("DailyToastEnabled", false);
+            }
+            else
+            {
+                SetValue("DailyToastEnabled", true);
+            }
+            CurrentVersion = "2.0";
         }
 
         private readonly ApplicationDataContainer container = ApplicationData.Current.LocalSettings;
-        private readonly string latestSettingsVersion = "2.0";
+        private readonly string latestSettingsVersion = "2.0.1";
     }
 }
