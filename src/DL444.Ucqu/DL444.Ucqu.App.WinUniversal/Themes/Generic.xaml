@@ -536,6 +536,7 @@
                                         <Setter Target="NameTextBlock.Style" Value="{ThemeResource CaptionTextBlockStyle}" />
                                         <Setter Target="NameTextBlock.FontWeight" Value="Bold" />
                                         <Setter Target="RoomTextBlock.Style" Value="{ThemeResource CaptionTextBlockStyle}" />
+                                        <Setter Target="LecturerTextBlock.Visibility" Value="Collapsed" />
                                         <Setter Target="ConflictTextBlock.Visibility" Value="Collapsed" />
                                     </VisualState.Setters>
                                 </VisualState>
@@ -551,13 +552,16 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition />
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <TextBlock x:Name="NameTextBlock" Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ConsolidatedEntry.DisplayEntry.Name}" 
                                        Style="{ThemeResource BaseTextBlockStyle}" Foreground="White" TextWrapping="Wrap" MaxLines="5" />
                             <TextBlock x:Name="RoomTextBlock" Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ConsolidatedEntry.DisplayEntry.Room}" Foreground="White" Grid.Row="1" />
+                            <TextBlock x:Name="LecturerTextBlock" Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ConsolidatedEntry.DisplayEntry.Lecturer}" 
+                                       Style="{ThemeResource CaptionTextBlockStyle}" Foreground="White" Grid.Row="2" />
                             <TextBlock x:Name="ConflictTextBlock" Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ConsolidatedEntry.ConflictCountDisplay}"
                                        Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ConsolidatedEntry.HasConflict}" 
-                                       Style="{ThemeResource CaptionTextBlockStyle}" Foreground="White" Grid.Row="2"/>
+                                       Style="{ThemeResource CaptionTextBlockStyle}" Foreground="White" Grid.Row="3"/>
                         </Grid>
                     </Border>
                 </ControlTemplate>

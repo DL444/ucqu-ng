@@ -9,7 +9,7 @@
   <Identity
     Name="47235DL444.UCQU"
     Publisher="CN=75C26479-7E83-44B4-B7BF-AFB871353206"
-    Version="2.0.0.0" />
+    Version="2.0.1.0" />
 
   <mp:PhoneIdentity PhoneProductId="b5a7b274-5f56-41ea-8398-39cde2631f62" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
