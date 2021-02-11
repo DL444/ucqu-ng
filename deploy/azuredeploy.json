@@ -1,0 +1,662 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "cosmosDatabase": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Cosmos DB database that stores app data."
+            },
+            "defaultValue": "SharedDb"
+        },
+        "cosmosContainer": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Cosmos DB container that stores app data."
+            },
+            "defaultValue": "Ucqu"
+        },
+        "cosmosUseFreeTier": {
+            "type": "bool",
+            "metadata": {
+                "description": "Whether to use Cosmos DB Free Tier account or not. Note that there can only be one such account per subscription."
+            },
+            "defaultValue": false
+        },
+        "cosmosThroughput": {
+            "type": "int",
+            "metadata": {
+                "description": "The throughput provisioned for the shared database."
+            },
+            "defaultValue": 400,
+            "minValue": 400
+        },
+        "credentialKey": {
+            "type": "securestring",
+            "metadata": {
+                "description": "AES key used to encrypt user credentials."
+            }
+        },
+        "tokenIssuer": {
+            "type": "string",
+            "metadata": {
+                "description": "The iss field of JWT tokens issued by this service."
+            },
+            "defaultValue": "[concat(ucqu.uniqueName('backend'), '.azurewebsites.net')]"
+        },
+        "tokenSigningKey": {
+            "type": "securestring",
+            "metadata": {
+                "description": "SHA-256 key used to sign the JWT tokens issued by this service."
+            }
+        },
+        "notificationWindowsPackageSid": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The package SID for the Windows UWP client."
+            }
+        },
+        "notificationWindowsSecret": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The WNS secret for the Windows UWP client."
+            }
+        },
+        "serviceBaseAddress": {
+            "type": "string",
+            "metadata": {
+                "description": "Base address of the service. Used to generate calendar subscription address. Include the protocol name. Do not include a trailing slash. Example: https://ucqu.example.com/api"
+            },
+            "defaultValue": "[concat('https://', ucqu.uniqueName('backend'), '.azurewebsites.net/api')]"
+        },
+        "termId": {
+            "type": "string",
+            "metadata": {
+                "description": "Current term ID in format YYYYT. YYYY is the beginning calendar year of the academic year. T is 0 for the first term, and 1 for the second. Example: 20200"
+            },
+            "minLength": 5,
+            "maxLength": 5
+        },
+        "termStartDate": {
+            "type": "string",
+            "metadata": {
+                "description": "The first day of the current term in ISO 8601 format. Example: 2021-01-01T00:00:00+08:00"
+            }
+        },
+        "termEndDate": {
+            "type": "string",
+            "metadata": {
+                "description": "The first day of the vacation after the current term in ISO 8601 format. Note that this day is outside of the current term. Example: 2021-01-01T00:00:00+08:00"
+            }
+        }
+    },
+    "functions": [
+        {
+            "namespace": "ucqu",
+            "members": {
+                "uniqueName": {
+                    "parameters": [
+                        {
+                            "name": "resourceType",
+                            "type": "string"
+                        }
+                    ],
+                    "output": {
+                        "value": "[concat('ucqu-', parameters('resourceType'), '-', uniqueString(resourceGroup().id, subscription().id))]",
+                        "type": "string"
+                    }
+                },
+                "keyVaultReference": {
+                    "parameters": [
+                        {
+                            "name": "vaultName",
+                            "type": "string"
+                        },
+                        {
+                            "name": "secretName",
+                            "type": "string"
+                        }
+                    ],
+                    "output": {
+                        "value": "[concat('@Microsoft.KeyVault(SecretUri=https://', parameters('vaultName'), '.vault.azure.net/secrets/', parameters('secretName'),')')]",
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    ],
+    "variables": {
+        "storageName": "[concat('ucqustorage', uniqueString(resourceGroup().id, subscription().id))]",
+        "planName": "[ucqu.uniqueName('plan')]",
+        "cosmosName": "[ucqu.uniqueName('cosmos')]",
+        "eventTopicName": "[ucqu.uniqueName('events')]",
+        "insightsName": "[ucqu.uniqueName('insights')]",
+        "keyVaultName": "[ucqu.uniqueName('keys')]",
+        "backendFunctionName": "[ucqu.uniqueName('backend')]"
+    },
+    "resources": [
+        {
+            "name": "[variables('storageName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "properties": {
+                "minimumTlsVersion": "TLS1_2"
+            }
+        },
+        {
+            "name": "[variables('planName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Y1",
+                "tier": "Dynamic"
+            },
+            "properties": {}
+        },
+        {
+            "name": "[variables('cosmosName')]",
+            "type": "Microsoft.DocumentDB/databaseAccounts",
+            "apiVersion": "2020-09-01",
+            "location": "[resourceGroup().location]",
+            "kind": "GlobalDocumentDB",
+            "properties": {
+                "locations": [
+                    {
+                        "locationName": "[resourceGroup().location]",
+                        "failoverPriority": 0
+                    }
+                ],
+                "databaseAccountOfferType": "Standard",
+                "ipRules": [
+                    {
+                        "ipAddressOrRange": "0.0.0.0"
+                    }
+                ],
+                "enableFreeTier": "[parameters('cosmosUseFreeTier')]"
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.DocumentDB/databaseAccounts/apis/databases",
+                    "name": "[concat(variables('cosmosName'), '/sql/', parameters('cosmosDatabase'))]",
+                    "apiVersion": "2016-03-31",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.DocumentDB/databaseAccounts/', variables('cosmosName'))]"
+                    ],
+                    "properties": {
+                        "resource": {
+                            "id": "[parameters('cosmosDatabase')]"
+                        },
+                        "options": {
+                            "throughput": "[parameters('cosmosThroughput')]"
+                        }
+                    },
+                    "resources": [
+                        {
+                            "type": "Microsoft.DocumentDb/databaseAccounts/apis/databases/containers",
+                            "name": "[concat(variables('cosmosName'), '/sql/', parameters('cosmosDatabase'), '/', parameters('cosmosContainer'))]",
+                            "apiVersion": "2016-03-31",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.DocumentDB/databaseAccounts/apis/databases', variables('cosmosName'), 'sql', parameters('cosmosDatabase'))]"
+                            ],
+                            "properties": {
+                                "resource": {
+                                    "id": "[parameters('cosmosContainer')]",
+                                    "partitionKey": {
+                                        "paths": [
+                                            "/pk"
+                                        ],
+                                        "kind": "hash"
+                                    },
+                                    "indexingPolicy": {
+                                        "indexingMode": "consistent",
+                                        "includedPaths": [
+                                            {
+                                                "path": "/*",
+                                                "indexes": [
+                                                    {
+                                                        "kind": "Hash",
+                                                        "dataType": "String",
+                                                        "precision": -1
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "path": "/Resource/LastUpdateTimestamp/?"
+                                            }
+                                        ],
+                                        "excludedPaths": [
+                                            {
+                                                "path": "/Resource/*"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "options": {}
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "[variables('eventTopicName')]",
+            "type": "Microsoft.EventGrid/topics",
+            "apiVersion": "2020-06-01",
+            "location": "[resourceGroup().location]",
+            "properties": {}
+        },
+        {
+            "name": "[variables('insightsName')]",
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2018-05-01-preview",
+            "location": "[resourceGroup().location]",
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web"
+            }
+        },
+        {
+            "name": "[variables('backendFunctionName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "location": "[resourceGroup().location]",
+            "kind": "functionapp",
+            "tags": {
+                "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('planName'))]": "Resource"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
+            ],
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2019-06-01').keys[0].value)]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "[variables('keyVaultName')]",
+            "type": "Microsoft.KeyVault/vaults",
+            "apiVersion": "2016-10-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "tenantId": "[subscription().tenantId]",
+                "sku": {
+                    "family": "A",
+                    "name": "standard"
+                },
+                "accessPolicies": [
+                    {
+                        "tenantId": "[subscription().tenantId]",
+                        "objectId": "[reference(resourceId('Microsoft.Web/sites', variables('backendFunctionName')), '2018-11-01', 'Full').identity.principalId]",
+                        "permissions": {
+                            "secrets": [
+                                "get"
+                            ]
+                        }
+                    }
+                ],
+                "enableSoftDelete": true
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('backendFunctionName'))]"
+            ]
+        },
+        {
+            "name": "[concat(variables('keyVaultName'), '/ucqu-storage-connection')]",
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2016-10-01",
+            "properties": {
+                "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2019-06-01').keys[0].value)]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
+            ]
+        },
+        {
+            "name": "[concat(variables('keyVaultName'), '/ucqu-credential-key')]",
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2016-10-01",
+            "properties": {
+                "value": "[parameters('credentialKey')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+            ]
+        },
+        {
+            "name": "[concat(variables('keyVaultName'), '/ucqu-cosmos-connection')]",
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2016-10-01",
+            "properties": {
+                "value": "[listConnectionStrings(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName')), '2019-12-12').connectionStrings[0].connectionString]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ]
+        },
+        {
+            "name": "[concat(variables('keyVaultName'), '/ucqu-eventgrid-key')]",
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2016-10-01",
+            "properties": {
+                "value": "[listKeys(resourceId('Microsoft.EventGrid/topics', variables('eventTopicName')), '2020-06-01').key1]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+                "[resourceId('Microsoft.EventGrid/topics', variables('eventTopicName'))]"
+            ]
+        },
+        {
+            "name": "[concat(variables('keyVaultName'), '/ucqu-wns-id')]",
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2016-10-01",
+            "properties": {
+                "value": "[parameters('notificationWindowsPackageSid')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+            ]
+        },
+        {
+            "name": "[concat(variables('keyVaultName'), '/ucqu-wns-secret')]",
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2016-10-01",
+            "properties": {
+                "value": "[parameters('notificationWindowsSecret')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+            ]
+        },
+        {
+            "name": "[concat(variables('keyVaultName'), '/ucqu-token-key')]",
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2016-10-01",
+            "properties": {
+                "value": "[parameters('tokenSigningKey')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+            ]
+        },
+        {
+            "name": "postAppCreation",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-06-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]",
+                "[resourceId('Microsoft.EventGrid/topics', variables('eventTopicName'))]",
+                "[resourceId('Microsoft.Insights/components', variables('insightsName'))]",
+                "[resourceId('Microsoft.Web/sites', variables('backendFunctionName'))]",
+                "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ucqu-cosmos-connection')]",
+                "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ucqu-credential-key')]",
+                "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ucqu-eventgrid-key')]",
+                "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ucqu-storage-connection')]",
+                "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ucqu-token-key')]",
+                "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ucqu-wns-id')]",
+                "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ucqu-wns-secret')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "name": "[variables('backendFunctionName')]",
+                            "type": "Microsoft.Web/sites",
+                            "apiVersion": "2018-11-01",
+                            "location": "[resourceGroup().location]",
+                            "kind": "functionapp",
+                            "tags": {
+                                "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('planName'))]": "Resource"
+                            },
+                            "identity": {
+                                "type": "SystemAssigned"
+                            },
+                            "properties": {
+                                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
+                                "siteConfig": {
+                                    "appSettings": [
+                                        {
+                                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                                            "value": "[reference(resourceId('microsoft.insights/components', variables('insightsName')), '2018-05-01-preview').InstrumentationKey]"
+                                        },
+                                        {
+                                            "name": "AzureWebJobsStorage",
+                                            "value": "[ucqu.keyVaultReference(variables('keyVaultName'), 'ucqu-storage-connection')]"
+                                        },
+                                        {
+                                            "name": "Credential__EncryptionKey",
+                                            "value": "[ucqu.keyVaultReference(variables('keyVaultName'), 'ucqu-credential-key')]"
+                                        },
+                                        {
+                                            "name": "Database__ConnectionString",
+                                            "value": "[ucqu.keyVaultReference(variables('keyVaultName'), 'ucqu-cosmos-connection')]"
+                                        },
+                                        {
+                                            "name": "Database__Container",
+                                            "value": "[parameters('cosmosContainer')]"
+                                        },
+                                        {
+                                            "name": "Database__Database",
+                                            "value": "[parameters('cosmosDatabase')]"
+                                        },
+                                        {
+                                            "name": "EventPublish__TopicKey",
+                                            "value": "[ucqu.keyVaultReference(variables('keyVaultName'), 'ucqu-eventgrid-key')]"
+                                        },
+                                        {
+                                            "name": "EventPublish__TopicUri",
+                                            "value": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventTopicName')), '2020-06-01').endpoint]"
+                                        },
+                                        {
+                                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                                            "value": "~3"
+                                        },
+                                        {
+                                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                                            "value": "dotnet"
+                                        },
+                                        {
+                                            "name": "Host__ServiceBaseAddress",
+                                            "value": "[parameters('serviceBaseAddress')]"
+                                        },
+                                        {
+                                            "name": "Notification__MaxChannelCountPerPlatform",
+                                            "value": "10"
+                                        },
+                                        {
+                                            "name": "Notification__Windows__PackageSid",
+                                            "value": "[ucqu.keyVaultReference(variables('keyVaultName'), 'ucqu-wns-id')]"
+                                        },
+                                        {
+                                            "name": "Notification__Windows__Retry",
+                                            "value": "2"
+                                        },
+                                        {
+                                            "name": "Notification__Windows__Secret",
+                                            "value": "[ucqu.keyVaultReference(variables('keyVaultName'), 'ucqu-wns-secret')]"
+                                        },
+                                        {
+                                            "name": "Notification__Windows__TokenRequestScope",
+                                            "value": "notify.windows.com"
+                                        },
+                                        {
+                                            "name": "Notification__Windows__TokenRequestUri",
+                                            "value": "https://login.live.com/accesstoken.srf"
+                                        },
+                                        {
+                                            "name": "Notification__Windows__ValidChannelHost",
+                                            "value": "notify.windows.com"
+                                        },
+                                        {
+                                            "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+                                            "value": "0"
+                                        },
+                                        {
+                                            "name": "Term__CurrentTerm",
+                                            "value": "[parameters('termId')]"
+                                        },
+                                        {
+                                            "name": "Term__TermEndDate",
+                                            "value": "[parameters('termEndDate')]"
+                                        },
+                                        {
+                                            "name": "Term__TermStartDate",
+                                            "value": "[parameters('termStartDate')]"
+                                        },
+                                        {
+                                            "name": "Token__Issuer",
+                                            "value": "[parameters('tokenIssuer')]"
+                                        },
+                                        {
+                                            "name": "Token__SigningKey",
+                                            "value": "[ucqu.keyVaultReference(variables('keyVaultName'), 'ucqu-token-key')]"
+                                        },
+                                        {
+                                            "name": "Token__ValidMinutes",
+                                            "value": "15"
+                                        },
+                                        {
+                                            "name": "Upstream__Host",
+                                            "value": "202.202.1.41"
+                                        },
+                                        {
+                                            "name": "Upstream__Timeout",
+                                            "value": "30"
+                                        },
+                                        {
+                                            "name": "Upstream__UseTls",
+                                            "value": "false"
+                                        },
+                                        {
+                                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                                            "value": "[ucqu.keyVaultReference(variables('keyVaultName'), 'ucqu-storage-connection')]"
+                                        },
+                                        {
+                                            "name": "WEBSITE_CONTENTSHARE",
+                                            "value": "[toLower(variables('backendFunctionName'))]"
+                                        }
+                                    ]
+                                }
+                            },
+                            "resources": [
+                                {
+                                    "name": "InitializeUser",
+                                    "type": "functions",
+                                    "apiVersion": "2018-11-01",
+                                    "properties": {
+                                        "config": {
+                                            "disabled": true,
+                                            "bindings": [
+                                                {
+                                                    "type": "eventGridTrigger",
+                                                    "name": "eventGridEvent",
+                                                    "direction": "in"
+                                                }
+                                            ]
+                                        },
+                                        "href": "[concat('https://', variables('backendFunctionName'), '.azurewebsites.net/admin/functions/InitializeUser')]"
+                                    },
+                                    "dependsOn": [
+                                        "[resourceId('Microsoft.Web/sites', variables('backendFunctionName'))]"
+                                    ]
+                                },
+                                {
+                                    "name": "NotifyScoreChangeWindows",
+                                    "type": "functions",
+                                    "apiVersion": "2018-11-01",
+                                    "properties": {
+                                        "config": {
+                                            "disabled": true,
+                                            "bindings": [
+                                                {
+                                                    "type": "eventGridTrigger",
+                                                    "name": "eventGridEvent",
+                                                    "direction": "in"
+                                                }
+                                            ]
+                                        },
+                                        "href": "[concat('https://', variables('backendFunctionName'), '.azurewebsites.net/admin/functions/NotifyScoreChangeWindows')]"
+                                    },
+                                    "dependsOn": [
+                                        "[resourceId('Microsoft.Web/sites', variables('backendFunctionName'))]"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "score-change",
+                            "type": "Microsoft.EventGrid/eventSubscriptions",
+                            "apiVersion": "2020-06-01",
+                            "location": "[resourceGroup().location]",
+                            "scope": "[concat('Microsoft.EventGrid/topics/', variables('eventTopicName'))]",
+                            "properties": {
+                                "destination": {
+                                    "endpointType": "AzureFunction",
+                                    "properties": {
+                                        "resourceId": "[resourceId('Microsoft.Web/sites/functions', variables('backendFunctionName'), 'NotifyScoreChangeWindows')]"
+                                    }
+                                },
+                                "filter": {
+                                    "includedEventTypes": [
+                                        "DL444.Ucqu.ScoreChanged"
+                                    ]
+                                }
+                            },
+                            "dependsOn": [
+                                "[resourceId('Microsoft.Web/sites/functions', variables('backendFunctionName'), 'NotifyScoreChangeWindows')]"
+                            ]
+                        },
+                        {
+                            "name": "user-init",
+                            "type": "Microsoft.EventGrid/eventSubscriptions",
+                            "apiVersion": "2020-06-01",
+                            "location": "[resourceGroup().location]",
+                            "scope": "[concat('Microsoft.EventGrid/topics/', variables('eventTopicName'))]",
+                            "properties": {
+                                "destination": {
+                                    "endpointType": "AzureFunction",
+                                    "properties": {
+                                        "resourceId": "[resourceId('Microsoft.Web/sites/functions', variables('backendFunctionName'), 'InitializeUser')]"
+                                    }
+                                },
+                                "filter": {
+                                    "includedEventTypes": [
+                                        "DL444.Ucqu.UserInit"
+                                    ]
+                                }
+                            },
+                            "dependsOn": [
+                                "[resourceId('Microsoft.Web/sites/functions', variables('backendFunctionName'), 'InitializeUser')]"
+                            ]
+                        }
+                    ],
+                    "outputs": {}
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
