@@ -121,6 +121,11 @@ namespace DL444.Ucqu.Backend.Services
         }
         private async Task<string?> RenewTokenAsync(ILogger log)
         {
+            if (string.IsNullOrEmpty(packageId) || string.IsNullOrEmpty(secret))
+            {
+                return null;
+            }
+
             Dictionary<string, string> content = new Dictionary<string, string>()
             {
                 { "grant_type", "client_credentials" },

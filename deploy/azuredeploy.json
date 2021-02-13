@@ -54,13 +54,15 @@
             "type": "securestring",
             "metadata": {
                 "description": "The package SID for the Windows UWP client."
-            }
+            },
+            "defaultValue": ""
         },
         "notificationWindowsSecret": {
             "type": "securestring",
             "metadata": {
                 "description": "The WNS secret for the Windows UWP client."
-            }
+            },
+            "defaultValue": ""
         },
         "serviceBaseAddress": {
             "type": "string",
