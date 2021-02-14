@@ -19,7 +19,7 @@ namespace DL444.Ucqu.Backend
 
         [FunctionName("ScoreRefresh_Client")]
         public async Task Start(
-            [TimerTrigger("0 */5 0-14,23 * * *")] TimerInfo timer,
+            [TimerTrigger("%Refresh:ScoreRefreshTimer%")] TimerInfo timer,
             [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
