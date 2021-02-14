@@ -13,10 +13,11 @@ namespace DL444.Ucqu.Backend
 {
     public class DeleteUser
     {
-        public DeleteUser(IDataAccessService dataService, ILocalizationService locService)
+        public DeleteUser(IDataAccessService dataService, ILocalizationService locService, IClientAuthenticationService clientAuthService)
         {
             this.dataService = dataService;
             this.locService = locService;
+            this.clientAuthService = clientAuthService;
         }
 
         [FunctionName("DeleteUser")]
@@ -25,6 +26,10 @@ namespace DL444.Ucqu.Backend
             [UserIdentity] string? username,
             ILogger log)
         {
+            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
+            {
+                return new ForbidResult();
+            }
             if (username == null)
             {
                 return new UnauthorizedResult();
@@ -44,7 +49,8 @@ namespace DL444.Ucqu.Backend
             }
         }
 
-        private IDataAccessService dataService;
-        private ILocalizationService locService;
+        private readonly IDataAccessService dataService;
+        private readonly ILocalizationService locService;
+        private readonly IClientAuthenticationService clientAuthService;
     }
 }

@@ -18,13 +18,14 @@ namespace DL444.Ucqu.Backend
 {
     public class SignInFunction
     {
-        public SignInFunction(ITokenService tokenService, IUcquClient client, IDataAccessService dataService, ILocalizationService localizationService, IConfiguration config)
+        public SignInFunction(ITokenService tokenService, IUcquClient client, IDataAccessService dataService, ILocalizationService localizationService, IConfiguration config, IClientAuthenticationService clientAuthService)
         {
             this.tokenService = tokenService;
             this.client = client;
             this.dataService = dataService;
             this.locService = localizationService;
             serviceBaseAddress = config.GetValue<string>("Host:ServiceBaseAddress");
+            this.clientAuthService = clientAuthService;
         }
 
         [FunctionName("SignIn")]
@@ -34,6 +35,10 @@ namespace DL444.Ucqu.Backend
             bool createAccount,
             ILogger log)
         {
+            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
+            {
+                return new ForbidResult();
+            }
             StudentCredential? credential = null;
             try
             {
@@ -170,10 +175,11 @@ namespace DL444.Ucqu.Backend
             return location;
         }
 
-        private ITokenService tokenService;
-        private IUcquClient client;
-        private IDataAccessService dataService;
-        private ILocalizationService locService;
-        private string serviceBaseAddress;
+        private readonly ITokenService tokenService;
+        private readonly IUcquClient client;
+        private readonly IDataAccessService dataService;
+        private readonly ILocalizationService locService;
+        private readonly string serviceBaseAddress;
+        private readonly IClientAuthenticationService clientAuthService;
     }
 }

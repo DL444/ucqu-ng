@@ -11,10 +11,11 @@ namespace DL444.Ucqu.Backend
 {
     public class ScheduleFunction
     {
-        public ScheduleFunction(IGetFunctionHandlerService getHandler, IWellknownDataService wellknown)
+        public ScheduleFunction(IGetFunctionHandlerService getHandler, IWellknownDataService wellknown, IClientAuthenticationService clientAuthService)
         {
             this.getHandler = getHandler;
             this.currentTerm = wellknown.CurrentTerm;
+            this.clientAuthService = clientAuthService;
         }
 
         [FunctionName("Schedule")]
@@ -23,6 +24,10 @@ namespace DL444.Ucqu.Backend
             [UserIdentity] string? username,
             ILogger log)
         {
+            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
+            {
+                return new ForbidResult();
+            }
             if (username == null)
             {
                 return new UnauthorizedResult();
@@ -38,7 +43,8 @@ namespace DL444.Ucqu.Backend
             );
         }
 
-        private IGetFunctionHandlerService getHandler;
-        private string currentTerm;
+        private readonly IGetFunctionHandlerService getHandler;
+        private readonly string currentTerm;
+        private readonly IClientAuthenticationService clientAuthService;
     }
 }

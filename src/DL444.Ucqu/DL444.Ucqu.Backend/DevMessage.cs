@@ -12,7 +12,11 @@ namespace DL444.Ucqu.Backend
 {
     public class DevMessageFunction
     {
-        public DevMessageFunction(IDataAccessService dataService) => this.dataService = dataService;
+        public DevMessageFunction(IDataAccessService dataService, IClientAuthenticationService clientAuthService)
+        {
+            this.dataService = dataService;
+            this.clientAuthService = clientAuthService;
+        }
 
         [FunctionName("DevMessage")]
         public async Task<IActionResult> Run(
@@ -20,6 +24,10 @@ namespace DL444.Ucqu.Backend
             string platform,
             ILogger log)
         {
+            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
+            {
+                return new ForbidResult();
+            }
             TargetPlatforms selectedPlatform;
             switch (platform.ToUpperInvariant())
             {
@@ -62,6 +70,7 @@ namespace DL444.Ucqu.Backend
             }
         }
 
-        private IDataAccessService dataService;
+        private readonly IDataAccessService dataService;
+        private readonly IClientAuthenticationService clientAuthService;
     }
 }

@@ -11,7 +11,7 @@ namespace DL444.Ucqu.Backend
 {
     public class WellknownDataFunction
     {
-        public WellknownDataFunction(IWellknownDataService wellknown)
+        public WellknownDataFunction(IWellknownDataService wellknown, IClientAuthenticationService clientAuthService)
         {
             data = new WellknownData()
             {
@@ -20,6 +20,7 @@ namespace DL444.Ucqu.Backend
                 TermEndDate = wellknown.TermEndDate,
                 Schedule = wellknown.Schedule.ToList()
             };
+            this.clientAuthService = clientAuthService;
         }
 
         [FunctionName("WellknownData")]
@@ -27,9 +28,14 @@ namespace DL444.Ucqu.Backend
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "wellknown")] HttpRequest req,
             ILogger log)
         {
+            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
+            {
+                return new ForbidResult();
+            }
             return new OkObjectResult(new BackendResult<WellknownData>(data));
         }
 
-        private WellknownData data;
+        private readonly WellknownData data;
+        private readonly IClientAuthenticationService clientAuthService;
     }
 }

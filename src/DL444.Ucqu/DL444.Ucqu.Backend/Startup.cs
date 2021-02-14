@@ -79,6 +79,16 @@ namespace DL444.Ucqu.Backend
             int retry = config.GetValue<int>("Notification:Windows:Retry", 2);
             builder.Services.AddHttpClient<IPushNotificationService<WindowsPushNotification>, WindowsPushNotificationService>()
                 .AddTransientHttpErrorPolicy(policy => policy.WaitAndRetryAsync(retry, x => TimeSpan.FromSeconds(2 << x)));
+
+            bool clientCertificateValidationEnabled = config.GetValue("ClientAuthentication:Enabled", false);
+            if (clientCertificateValidationEnabled)
+            {
+                builder.Services.AddTransient<IClientAuthenticationService, KeyVaultClientAuthenticationService>();
+            }
+            else
+            {
+                builder.Services.AddTransient<IClientAuthenticationService, BypassClientAuthenticationService>();
+            }
         }
 
         public void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)

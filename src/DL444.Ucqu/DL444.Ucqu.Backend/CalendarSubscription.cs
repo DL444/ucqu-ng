@@ -15,12 +15,13 @@ namespace DL444.Ucqu.Backend
 {
     public class CalendarSubscriptionFunction
     {
-        public CalendarSubscriptionFunction(IUcquClient client, IDataAccessService dataService, ICalendarService calService, ILocalizationService locService)
+        public CalendarSubscriptionFunction(IUcquClient client, IDataAccessService dataService, ICalendarService calService, ILocalizationService locService, IClientAuthenticationService clientAuthService)
         {
             this.client = client;
             this.dataService = dataService;
             this.calService = calService;
             this.locService = locService;
+            this.clientAuthService = clientAuthService;
         }
 
         [FunctionName("CalendarSubscriptionGet")]
@@ -30,6 +31,10 @@ namespace DL444.Ucqu.Backend
             string? id,
             ILogger log)
         {
+            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
+            {
+                return new ForbidResult();
+            }
             if (username == null || id == null)
             {
                 return new BadRequestResult();
@@ -80,6 +85,10 @@ namespace DL444.Ucqu.Backend
             [UserIdentity] string? username,
             ILogger log)
         {
+            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
+            {
+                return new ForbidResult();
+            }
             if (username == null)
             {
                 return new UnauthorizedResult();
@@ -149,5 +158,6 @@ namespace DL444.Ucqu.Backend
         private readonly IDataAccessService dataService;
         private readonly ICalendarService calService;
         private readonly ILocalizationService locService;
+        private readonly IClientAuthenticationService clientAuthService;
     }
 }

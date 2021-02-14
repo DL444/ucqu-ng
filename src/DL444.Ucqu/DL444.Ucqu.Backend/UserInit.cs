@@ -13,11 +13,12 @@ namespace DL444.Ucqu.Backend
 {
     public class UserInitFunction
     {
-        public UserInitFunction(IDataAccessService dataService, ILocalizationService locService, IConfiguration config)
+        public UserInitFunction(IDataAccessService dataService, ILocalizationService locService, IConfiguration config, IClientAuthenticationService clientAuthService)
         {
             this.dataService = dataService;
             this.locService = locService;
             this.serviceBaseAddress = config.GetValue<string>("Host:ServiceBaseAddress");
+            this.clientAuthService = clientAuthService;
         }
 
         [FunctionName("UserInit")]
@@ -26,6 +27,10 @@ namespace DL444.Ucqu.Backend
             string id,
             ILogger log)
         {
+            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
+            {
+                return new ForbidResult();
+            }
             if (string.IsNullOrWhiteSpace(id))
             {
                 return new BadRequestResult();
@@ -48,8 +53,9 @@ namespace DL444.Ucqu.Backend
             }
         }
 
-        private IDataAccessService dataService;
-        private ILocalizationService locService;
-        private string serviceBaseAddress;
+        private readonly IDataAccessService dataService;
+        private readonly ILocalizationService locService;
+        private readonly string serviceBaseAddress;
+        private readonly IClientAuthenticationService clientAuthService;
     }
 }
