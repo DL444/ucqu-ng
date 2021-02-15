@@ -20,7 +20,7 @@ namespace DL444.Ucqu.Backend.Bindings
         public Type Type => typeof(string);
         public Task<object?> GetValueAsync() => Task.FromResult<object?>(identity);
         public string ToInvokeString() => identity ?? string.Empty;
-        private string? identity;
+        private readonly string? identity;
     }
 
     internal class UserIdentityBinding : IBinding
@@ -70,14 +70,14 @@ namespace DL444.Ucqu.Backend.Bindings
             };
         }
 
-        private ITokenService tokenService;
+        private readonly ITokenService tokenService;
     }
 
     internal class UserIdentityBindingProvider : IBindingProvider
     {
         public UserIdentityBindingProvider(ITokenService tokenService) => this.tokenService = tokenService;
         public Task<IBinding> TryCreateAsync(BindingProviderContext context) => Task.FromResult<IBinding>(new UserIdentityBinding(tokenService));
-        private ITokenService tokenService;
+        private readonly ITokenService tokenService;
     }
 
     internal class UserIdentityExtensionConfigProvider : IExtensionConfigProvider
@@ -85,6 +85,6 @@ namespace DL444.Ucqu.Backend.Bindings
         public UserIdentityExtensionConfigProvider(ITokenService tokenService) => this.tokenService = tokenService;
         public void Initialize(ExtensionConfigContext context)
             => context.AddBindingRule<UserIdentityAttribute>().Bind(new UserIdentityBindingProvider(tokenService));
-        private ITokenService tokenService;
+        private readonly ITokenService tokenService;
     }
 }

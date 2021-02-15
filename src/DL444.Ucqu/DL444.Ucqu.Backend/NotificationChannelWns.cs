@@ -16,28 +16,25 @@ namespace DL444.Ucqu.Backend
 {
     public class NotificationChannelWnsFunction
     {
-        public NotificationChannelWnsFunction(IPushDataAccessService pushDataService, IDataAccessService userDataService, IConfiguration config, IClientAuthenticationService clientAuthService)
+        public NotificationChannelWnsFunction(IPushDataAccessService pushDataService, IDataAccessService userDataService, IConfiguration config)
         {
             this.pushDataService = pushDataService;
             this.userDataService = userDataService;
             validChannelHost = config.GetValue<string>("Notification:Windows:ValidChannelHost");
-            this.clientAuthService = clientAuthService;
         }
 
         [FunctionName("NotificationChannelWns")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "notifyChannel/windows")] HttpRequest req,
+            [ClientAuthenticationResult] bool clientAuthSuccess,
             [UserIdentity] string? username,
             ILogger log)
         {
-            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
-            {
-                return new ForbidResult();
-            }
-            if (username == null)
+            if (!clientAuthSuccess || username == null)
             {
                 return new UnauthorizedResult();
             }
+
             NotificationChannelItem channel;
             try
             {
@@ -84,6 +81,5 @@ namespace DL444.Ucqu.Backend
         private readonly IPushDataAccessService pushDataService;
         private readonly IDataAccessService userDataService;
         private readonly string validChannelHost;
-        private readonly IClientAuthenticationService clientAuthService;
     }
 }

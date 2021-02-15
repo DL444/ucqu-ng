@@ -72,6 +72,7 @@ namespace DL444.Ucqu.Backend
 
             IWebJobsBuilder webJobsBuilder = builder.Services.AddWebJobs(_ => { });
             webJobsBuilder.AddExtension<Bindings.UserIdentityExtensionConfigProvider>();
+            webJobsBuilder.AddExtension<Bindings.ClientAuthenticationResultExtensionConfigProvider>();
         }
 
         public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)

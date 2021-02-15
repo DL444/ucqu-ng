@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using DL444.Ucqu.Backend.Bindings;
 using DL444.Ucqu.Backend.Models;
 using DL444.Ucqu.Backend.Services;
 using DL444.Ucqu.Models;
@@ -12,21 +13,18 @@ namespace DL444.Ucqu.Backend
 {
     public class DevMessageFunction
     {
-        public DevMessageFunction(IDataAccessService dataService, IClientAuthenticationService clientAuthService)
-        {
-            this.dataService = dataService;
-            this.clientAuthService = clientAuthService;
-        }
+        public DevMessageFunction(IDataAccessService dataService) => this.dataService = dataService;
 
         [FunctionName("DevMessage")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "DevMessage/{platform}")] HttpRequest req,
+            [ClientAuthenticationResult] bool clientAuthSuccess,
             string platform,
             ILogger log)
         {
-            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
+            if (!clientAuthSuccess)
             {
-                return new ForbidResult();
+                return new UnauthorizedResult();
             }
             TargetPlatforms selectedPlatform;
             switch (platform.ToUpperInvariant())
@@ -71,6 +69,5 @@ namespace DL444.Ucqu.Backend
         }
 
         private readonly IDataAccessService dataService;
-        private readonly IClientAuthenticationService clientAuthService;
     }
 }

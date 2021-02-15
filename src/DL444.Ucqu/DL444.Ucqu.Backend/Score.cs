@@ -11,27 +11,21 @@ namespace DL444.Ucqu.Backend
 {
     public class ScoreFunction
     {
-        public ScoreFunction(IGetFunctionHandlerService getHandler, IClientAuthenticationService clientAuthService)
-        {
-            this.getHandler = getHandler;
-            this.clientAuthService = clientAuthService;
-        }
+        public ScoreFunction(IGetFunctionHandlerService getHandler) => this.getHandler = getHandler;
 
         [FunctionName("Score")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Score/{secondMajor:int}")] HttpRequest req,
+            [ClientAuthenticationResult] bool clientAuthSuccess,
             int secondMajor,
             [UserIdentity] string? username,
             ILogger log)
         {
-            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
-            {
-                return new ForbidResult();
-            }
-            if (username == null)
+            if (!clientAuthSuccess || username == null)
             {
                 return new UnauthorizedResult();
             }
+
             bool isSecondMajor;
             if (secondMajor == 0 || secondMajor == 1)
             {
@@ -57,6 +51,5 @@ namespace DL444.Ucqu.Backend
         }
 
         private readonly IGetFunctionHandlerService getHandler;
-        private readonly IClientAuthenticationService clientAuthService;
     }
 }

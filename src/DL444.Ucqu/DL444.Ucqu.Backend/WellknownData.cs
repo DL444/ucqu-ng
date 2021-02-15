@@ -1,4 +1,5 @@
 using System.Linq;
+using DL444.Ucqu.Backend.Bindings;
 using DL444.Ucqu.Backend.Services;
 using DL444.Ucqu.Models;
 using Microsoft.AspNetCore.Http;
@@ -11,7 +12,7 @@ namespace DL444.Ucqu.Backend
 {
     public class WellknownDataFunction
     {
-        public WellknownDataFunction(IWellknownDataService wellknown, IClientAuthenticationService clientAuthService)
+        public WellknownDataFunction(IWellknownDataService wellknown)
         {
             data = new WellknownData()
             {
@@ -20,22 +21,21 @@ namespace DL444.Ucqu.Backend
                 TermEndDate = wellknown.TermEndDate,
                 Schedule = wellknown.Schedule.ToList()
             };
-            this.clientAuthService = clientAuthService;
         }
 
         [FunctionName("WellknownData")]
         public IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "wellknown")] HttpRequest req,
+            [ClientAuthenticationResult] bool clientAuthSuccess,
             ILogger log)
         {
-            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
+            if (!clientAuthSuccess)
             {
-                return new ForbidResult();
+                return new UnauthorizedResult();
             }
             return new OkObjectResult(new BackendResult<WellknownData>(data));
         }
 
         private readonly WellknownData data;
-        private readonly IClientAuthenticationService clientAuthService;
     }
 }

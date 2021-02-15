@@ -13,27 +13,24 @@ namespace DL444.Ucqu.Backend
 {
     public class DeleteUser
     {
-        public DeleteUser(IDataAccessService dataService, ILocalizationService locService, IClientAuthenticationService clientAuthService)
+        public DeleteUser(IDataAccessService dataService, ILocalizationService locService)
         {
             this.dataService = dataService;
             this.locService = locService;
-            this.clientAuthService = clientAuthService;
         }
 
         [FunctionName("DeleteUser")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "delete", Route = "user")] HttpRequest req,
+            [ClientAuthenticationResult] bool clientAuthSuccess,
             [UserIdentity] string? username,
             ILogger log)
         {
-            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
-            {
-                return new ForbidResult();
-            }
-            if (username == null)
+            if (!clientAuthSuccess || username == null)
             {
                 return new UnauthorizedResult();
             }
+
             DataAccessResult result = await dataService.DeleteUserAsync(username);
             if (result.Success)
             {
@@ -51,6 +48,5 @@ namespace DL444.Ucqu.Backend
 
         private readonly IDataAccessService dataService;
         private readonly ILocalizationService locService;
-        private readonly IClientAuthenticationService clientAuthService;
     }
 }

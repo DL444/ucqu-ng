@@ -11,23 +11,16 @@ namespace DL444.Ucqu.Backend
 {
     public class StudentInfoFunction
     {
-        public StudentInfoFunction(IGetFunctionHandlerService getHandler, IClientAuthenticationService clientAuthService)
-        {
-            this.getHandler = getHandler;
-            this.clientAuthService = clientAuthService;
-        }
+        public StudentInfoFunction(IGetFunctionHandlerService getHandler) => this.getHandler = getHandler;
 
         [FunctionName("StudentInfo")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
+            [ClientAuthenticationResult] bool clientAuthSuccess,
             [UserIdentity] string? username,
             ILogger log)
         {
-            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
-            {
-                return new ForbidResult();
-            }
-            if (username == null)
+            if (!clientAuthSuccess || username == null)
             {
                 return new UnauthorizedResult();
             }
@@ -42,6 +35,5 @@ namespace DL444.Ucqu.Backend
         }
 
         private readonly IGetFunctionHandlerService getHandler;
-        private readonly IClientAuthenticationService clientAuthService;
     }
 }

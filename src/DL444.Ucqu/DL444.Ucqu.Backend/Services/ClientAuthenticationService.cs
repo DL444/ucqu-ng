@@ -29,6 +29,10 @@ namespace DL444.Ucqu.Backend.Services
 
         public bool Validate(X509Certificate2 certificate)
         {
+            if (certificate == null)
+            {
+                return false;
+            }
             if (certificate.NotBefore > DateTime.Now || certificate.NotAfter < DateTime.Now)
             {
                 return false;

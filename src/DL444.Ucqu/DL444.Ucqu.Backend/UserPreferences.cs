@@ -16,24 +16,20 @@ namespace DL444.Ucqu.Backend
 {
     public class UserPreferencesFunction
     {
-        public UserPreferencesFunction(IDataAccessService dataService, ILocalizationService locService, IClientAuthenticationService clientAuthService)
+        public UserPreferencesFunction(IDataAccessService dataService, ILocalizationService locService)
         {
             this.dataService = dataService;
             this.locService = locService;
-            this.clientAuthService = clientAuthService;
         }
 
         [FunctionName("UserPreferencesGet")]
         public async Task<IActionResult> RunGet(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "preferences")] HttpRequest req,
+            [ClientAuthenticationResult] bool clientAuthSuccess,
             [UserIdentity] string? username,
             ILogger log)
         {
-            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
-            {
-                return new ForbidResult();
-            }
-            if (username == null)
+            if (!clientAuthSuccess || username == null)
             {
                 return new UnauthorizedResult();
             }
@@ -76,17 +72,15 @@ namespace DL444.Ucqu.Backend
         [FunctionName("UserPreferencesPost")]
         public async Task<IActionResult> RunPost(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "preferences")] HttpRequest req,
+            [ClientAuthenticationResult] bool clientAuthSuccess,
             [UserIdentity] string? username,
             ILogger log)
         {
-            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
-            {
-                return new ForbidResult();
-            }
-            if (username == null)
+            if (!clientAuthSuccess || username == null)
             {
                 return new UnauthorizedResult();
             }
+
             UserPreferences? inPreferences;
             try
             {
@@ -178,6 +172,5 @@ namespace DL444.Ucqu.Backend
 
         private readonly IDataAccessService dataService;
         private readonly ILocalizationService locService;
-        private readonly IClientAuthenticationService clientAuthService;
     }
 }

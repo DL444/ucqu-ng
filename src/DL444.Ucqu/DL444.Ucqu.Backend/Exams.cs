@@ -11,24 +11,20 @@ namespace DL444.Ucqu.Backend
 {
     public class ExamsFunction
     {
-        public ExamsFunction(IGetFunctionHandlerService getHandler, IWellknownDataService wellknown, IClientAuthenticationService clientAuthService)
+        public ExamsFunction(IGetFunctionHandlerService getHandler, IWellknownDataService wellknown)
         {
             this.getHandler = getHandler;
             this.currentTerm = wellknown.CurrentTerm;
-            this.clientAuthService = clientAuthService;
         }
 
         [FunctionName("Exams")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
+            [ClientAuthenticationResult] bool clientAuthSuccess,
             [UserIdentity] string? username,
             ILogger log)
         {
-            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
-            {
-                return new ForbidResult();
-            }
-            if (username == null)
+            if (!clientAuthSuccess || username == null)
             {
                 return new UnauthorizedResult();
             }
@@ -44,6 +40,5 @@ namespace DL444.Ucqu.Backend
 
         private readonly IGetFunctionHandlerService getHandler;
         private readonly string currentTerm;
-        private readonly IClientAuthenticationService clientAuthService;
     }
 }

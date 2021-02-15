@@ -1,6 +1,7 @@
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+using DL444.Ucqu.Backend.Bindings;
 using DL444.Ucqu.Backend.Models;
 using DL444.Ucqu.Backend.Services;
 using DL444.Ucqu.Client;
@@ -18,26 +19,26 @@ namespace DL444.Ucqu.Backend
 {
     public class SignInFunction
     {
-        public SignInFunction(ITokenService tokenService, IUcquClient client, IDataAccessService dataService, ILocalizationService localizationService, IConfiguration config, IClientAuthenticationService clientAuthService)
+        public SignInFunction(ITokenService tokenService, IUcquClient client, IDataAccessService dataService, ILocalizationService localizationService, IConfiguration config)
         {
             this.tokenService = tokenService;
             this.client = client;
             this.dataService = dataService;
             this.locService = localizationService;
             serviceBaseAddress = config.GetValue<string>("Host:ServiceBaseAddress");
-            this.clientAuthService = clientAuthService;
         }
 
         [FunctionName("SignIn")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "signIn/{createAccount:bool}")] HttpRequest req,
+            [ClientAuthenticationResult] bool clientAuthSuccess,
             [EventGrid(TopicEndpointUri = "EventPublish:TopicUri", TopicKeySetting = "EventPublish:TopicKey")] IAsyncCollector<EventGridEvent> userInitCommandCollector,
             bool createAccount,
             ILogger log)
         {
-            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
+            if (!clientAuthSuccess)
             {
-                return new ForbidResult();
+                return new UnauthorizedResult();
             }
             StudentCredential? credential = null;
             try
@@ -180,6 +181,5 @@ namespace DL444.Ucqu.Backend
         private readonly IDataAccessService dataService;
         private readonly ILocalizationService locService;
         private readonly string serviceBaseAddress;
-        private readonly IClientAuthenticationService clientAuthService;
     }
 }

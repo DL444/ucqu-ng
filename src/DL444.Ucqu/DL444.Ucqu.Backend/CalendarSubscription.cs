@@ -15,25 +15,25 @@ namespace DL444.Ucqu.Backend
 {
     public class CalendarSubscriptionFunction
     {
-        public CalendarSubscriptionFunction(IUcquClient client, IDataAccessService dataService, ICalendarService calService, ILocalizationService locService, IClientAuthenticationService clientAuthService)
+        public CalendarSubscriptionFunction(IUcquClient client, IDataAccessService dataService, ICalendarService calService, ILocalizationService locService)
         {
             this.client = client;
             this.dataService = dataService;
             this.calService = calService;
             this.locService = locService;
-            this.clientAuthService = clientAuthService;
         }
 
         [FunctionName("CalendarSubscriptionGet")]
         public async Task<IActionResult> RunGet(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Calendar/{username}/{id}")] HttpRequest req,
+            [ClientAuthenticationResult] bool clientAuthSuccess,
             string? username,
             string? id,
             ILogger log)
         {
-            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
+            if (!clientAuthSuccess)
             {
-                return new ForbidResult();
+                return new UnauthorizedResult();
             }
             if (username == null || id == null)
             {
@@ -82,14 +82,11 @@ namespace DL444.Ucqu.Backend
         [FunctionName("CalendarSubscriptionPost")]
         public async Task<IActionResult> RunPost(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "Calendar")] HttpRequest req,
+            [ClientAuthenticationResult] bool clientAuthSuccess,
             [UserIdentity] string? username,
             ILogger log)
         {
-            if (!clientAuthService.Validate(req.HttpContext.Connection.ClientCertificate))
-            {
-                return new ForbidResult();
-            }
-            if (username == null)
+            if (!clientAuthSuccess || username == null)
             {
                 return new UnauthorizedResult();
             }
@@ -158,6 +155,5 @@ namespace DL444.Ucqu.Backend
         private readonly IDataAccessService dataService;
         private readonly ICalendarService calService;
         private readonly ILocalizationService locService;
-        private readonly IClientAuthenticationService clientAuthService;
     }
 }
