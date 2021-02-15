@@ -34,7 +34,7 @@ ARM 模板中各项参数意义如下：
 - `credentialKey`  
     用于加密用户凭据的 AES 密钥。使用 Base64 编码。
 - `tokenIssuer`  
-    服务发放的 JWT 令牌中的 `iss` 字段。
+    服务发放的 JWT 令牌中的 `iss` 与 `aud` 字段。
 - `tokenSigningKey`  
     用于为服务发放的 JWT 令牌签名的 SHA-256 密钥。使用 Base64 编码。
 - `notificationWindowsPackageSid`  
