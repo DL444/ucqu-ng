@@ -48,7 +48,7 @@ namespace DL444.Ucqu.Backend.Services
             var containerId = config.GetValue<string>("Database:Container");
             container = dbClient.GetContainer(databaseId, containerId);
             this.encryptionService = encryptionService;
-            maxChannelCountPerPlatform = config.GetValue<int>("Notification:MaxChannelCountPerPlatform");
+            maxChannelCountPerPlatform = config.GetValue<int>("Notification:MaxChannelCountPerPlatform", 10);
         }
 
         public async Task<DataAccessResult<List<string>>> GetUsersAsync()

@@ -56,7 +56,7 @@ namespace DL444.Ucqu.Backend
 
             builder.Services.AddTransient<ICalendarService, CalendarService>();
 
-            int retry = config.GetValue<int>("Notification:Windows:Retry", 2);
+            int retry = config.GetValue<int>("Notification:Retry", 2);
             builder.Services.AddHttpClient<IPushNotificationService<WindowsPushNotification>, WindowsPushNotificationService>()
                 .AddTransientHttpErrorPolicy(policy => policy.WaitAndRetryAsync(retry, x => TimeSpan.FromSeconds(2 << x)));
 

@@ -28,9 +28,6 @@ namespace DL444.Ucqu.Backend.Services
         {
             this.httpClient = httpClient;
             this.dataService = dataService;
-            tokenRequestUri = config.GetValue<string>("Notification:Windows:TokenRequestUri");
-            tokenRequestScope = config.GetValue<string>("Notification:Windows:TokenRequestScope");
-            validChannelHost = config.GetValue<string>("Notification:Windows:ValidChannelHost");
             packageId = config.GetValue<string>("Notification:Windows:PackageSid");
             secret = config.GetValue<string>("Notification:Windows:Secret");
         }
@@ -159,9 +156,9 @@ namespace DL444.Ucqu.Backend.Services
 
         private readonly HttpClient httpClient;
         private readonly IPushDataAccessService dataService;
-        private readonly string tokenRequestUri;
-        private readonly string tokenRequestScope;
-        private readonly string validChannelHost;
+        private readonly string tokenRequestUri = "https://login.live.com/accesstoken.srf";
+        private readonly string tokenRequestScope = "notify.windows.com";
+        private readonly string validChannelHost = "notify.windows.com";
         private readonly string packageId;
         private readonly string secret;
     }

@@ -18,7 +18,7 @@ namespace DL444.Ucqu.Backend.Services
     {
         public KeyVaultClientAuthenticationService(IConfiguration config)
         {
-            disableChainValidation = config.GetValue<bool>("ClientAuthentication:DisableChainValidation");
+            disableChainValidation = config.GetValue<bool>("ClientAuthentication:DisableChainValidation", false);
             string certificateString = config.GetValue<string>("ClientAuthentication:CertificateReference");
             if (string.IsNullOrEmpty(certificateString))
             {

@@ -489,36 +489,20 @@
                                             "value": "10"
                                         },
                                         {
-                                            "name": "Notification__Windows__PackageSid",
-                                            "value": "[ucqu.keyVaultReference(variables('keyVaultName'), 'ucqu-wns-id')]"
+                                            "name": "Notification__Retry",
+                                            "value": "2"
                                         },
                                         {
-                                            "name": "Notification__Windows__Retry",
-                                            "value": "2"
+                                            "name": "Notification__Windows__PackageSid",
+                                            "value": "[ucqu.keyVaultReference(variables('keyVaultName'), 'ucqu-wns-id')]"
                                         },
                                         {
                                             "name": "Notification__Windows__Secret",
                                             "value": "[ucqu.keyVaultReference(variables('keyVaultName'), 'ucqu-wns-secret')]"
                                         },
                                         {
-                                            "name": "Notification__Windows__TokenRequestScope",
-                                            "value": "notify.windows.com"
-                                        },
-                                        {
-                                            "name": "Notification__Windows__TokenRequestUri",
-                                            "value": "https://login.live.com/accesstoken.srf"
-                                        },
-                                        {
-                                            "name": "Notification__Windows__ValidChannelHost",
-                                            "value": "notify.windows.com"
-                                        },
-                                        {
                                             "name": "ScoreRefreshTimer",
                                             "value": "0 */5 0-14,23 * * *"
-                                        },
-                                        {
-                                            "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
-                                            "value": "0"
                                         },
                                         {
                                             "name": "Term__CurrentTerm",
@@ -559,7 +543,7 @@
                                         {
                                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
                                             "value": "[ucqu.keyVaultReference(variables('keyVaultName'), 'ucqu-storage-connection')]"
-                                        },
+                                        },                                        
                                         {
                                             "name": "WEBSITE_CONTENTSHARE",
                                             "value": "[toLower(variables('backendFunctionName'))]"
