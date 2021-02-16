@@ -69,4 +69,10 @@ ARM 模板中各项参数意义如下：
 ## 生成并部署应用程序
 使用你选择的工具生成并部署 `DL444.Ucqu.Backend` 项目。详请参见[文档](https://docs.microsoft.com/en-us/azure/azure-functions/functions-develop-local)。
 
-至此，服务部署完成。
+当使用 Visual Studio Code 生成后端服务的发布版本时，将针对 `win-x86` 目标环境进行[预编译优化](https://docs.microsoft.com/en-us/dotnet/core/deploying/ready-to-run)，以降低函数计算的冷启动时间。如果你属于以下任意一种情况，请更改预编译配置或禁用预编译。
+- 部署目标不是 32 位 Windows 环境。
+- 生成用计算机不是 Windows 环境。
+
+要更改预编译配置，编辑项目中 `.vscode` 下的 `tasks.json` 文件，更改其中 `publish` 任务的命令行参数。参数详请参见[文档](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish)。  
+
+更改预编译配置会导致生成输出目录发生改变。因此还需要编辑 `.vscode` 下的 `settings.json` 文件中的 `azureFunctions.deploySubpath` 项，以反映输出目录的变化。

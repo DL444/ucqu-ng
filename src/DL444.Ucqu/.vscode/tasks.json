@@ -58,7 +58,10 @@
 				"--configuration",
 				"Release",
 				"/property:GenerateFullPaths=true",
-				"/consoleloggerparameters:NoSummary"
+				"/consoleloggerparameters:NoSummary",
+				"-p:PublishReadyToRun=true",
+				"--runtime",
+				"win-x86"
 			],
 			"type": "process",
 			"dependsOn": "clean release",
