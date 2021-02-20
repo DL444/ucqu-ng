@@ -1,6 +1,7 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace DL444.Ucqu.Backend.Services
@@ -13,12 +14,14 @@ namespace DL444.Ucqu.Backend.Services
 
     internal class TokenService : ITokenService
     {
-        public TokenService(string signingKey, string issuer, int tokenValidMinutes)
+        public TokenService(IConfiguration config)
         {
+            var signingKey = config.GetValue<string>("Token:SigningKey");
+            var issuer = config.GetValue<string>("Token:Issuer");
+            this.tokenValidMinutes = config.GetValue<int>("Token:ValidMinutes", 60);
             var key = new SymmetricSecurityKey(Convert.FromBase64String(signingKey));
             signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             this.issuer = issuer;
-            this.tokenValidMinutes = tokenValidMinutes;
         }
 
         public string CreateToken(string username)

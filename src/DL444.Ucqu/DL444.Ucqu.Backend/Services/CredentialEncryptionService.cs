@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using DL444.Ucqu.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace DL444.Ucqu.Backend.Services
 {
@@ -13,8 +14,9 @@ namespace DL444.Ucqu.Backend.Services
 
     internal class CredentialEncryptionService : ICredentialEncryptionService
     {
-        public CredentialEncryptionService(string key)
+        public CredentialEncryptionService(IConfiguration config)
         {
+            string key = config.GetValue<string>("Credential:EncryptionKey");
             this.key = Convert.FromBase64String(key);
         }
 

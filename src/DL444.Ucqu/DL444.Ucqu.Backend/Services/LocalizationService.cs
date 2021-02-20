@@ -15,8 +15,9 @@ namespace DL444.Ucqu.Backend.Services
 
     internal class LocalizationService : ILocalizationService
     {
-        public LocalizationService(IConfigurationSection localizationSection)
+        public LocalizationService(IConfiguration config)
         {
+            IConfigurationSection localizationSection = config.GetSection("Localization");
             DefaultCulture = localizationSection.GetValue<string>("DefaultCulture")
                 ?? throw new ArgumentException("Specified configuration section does not contain a default culture entry.");
             var stringSection = localizationSection.GetSection("Strings");

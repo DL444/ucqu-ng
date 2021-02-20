@@ -19,13 +19,9 @@ namespace DL444.Ucqu.Backend
             var context = builder.GetContext();
             var config = context.Configuration;
 
-            var tokenSigningKey = config.GetValue<string>("Token:SigningKey");
-            var tokenIssuer = config.GetValue<string>("Token:Issuer");
-            var tokenValidMins = config.GetValue<int>("Token:ValidMinutes", 60);
-            builder.Services.AddTransient<ITokenService>(_ => new TokenService(tokenSigningKey, tokenIssuer, tokenValidMins));
+            builder.Services.AddTransient<ITokenService, TokenService>();
 
-            var credentialKey = config.GetValue<string>("Credential:EncryptionKey");
-            builder.Services.AddTransient<ICredentialEncryptionService>(_ => new CredentialEncryptionService(credentialKey));
+            builder.Services.AddTransient<ICredentialEncryptionService, CredentialEncryptionService>();
 
             var host = config.GetValue<string>("Upstream:Host");
             bool useTls = config.GetValue<bool>("Upstream:UseTls", false);
@@ -40,15 +36,15 @@ namespace DL444.Ucqu.Backend
             });
 
             var dbConnection = config.GetValue<string>("Database:ConnectionString");
-            builder.Services.AddSingleton(new CosmosClient(dbConnection));
+            builder.Services.AddSingleton<CosmosClient>(_ => new CosmosClient(dbConnection));
 
             builder.Services.AddTransient<IDataAccessService, DataAccessService>();
 
             builder.Services.AddTransient<IPushDataAccessService, DataAccessService>();
 
-            builder.Services.AddSingleton((ILocalizationService)new LocalizationService(config.GetSection("Localization")));
+            builder.Services.AddSingleton<ILocalizationService, LocalizationService>();
 
-            builder.Services.AddSingleton((IWellknownDataService)new WellknownDataService(config));
+            builder.Services.AddSingleton<IWellknownDataService, WellknownDataService>();
 
             builder.Services.AddTransient<IGetFunctionHandlerService, GetFunctionHandlerService>();
 
