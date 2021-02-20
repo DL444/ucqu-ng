@@ -20,6 +20,6 @@ namespace DL444.Ucqu.Client
             this.httpClient = httpClient;
         }
 
-        private HttpClient httpClient;
+        private readonly HttpClient httpClient;
     }
 }
