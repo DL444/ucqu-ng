@@ -4,7 +4,6 @@
     <AzureFunctionsVersion>v3</AzureFunctionsVersion>
     <Nullable>enable</Nullable>
     <LangVersion>9.0</LangVersion>
-    <_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Ical.Net" Version="4.1.11" />
@@ -12,6 +11,7 @@
     <PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.25" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="2.1.1" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventGrid" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator" Version="1.2.1" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="3.1.12" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.8.0" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.11" />
@@ -19,6 +19,12 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.12" />
     <PackageReference Include="Azure.Cosmos" Version="4.0.0-preview3" />
+  </ItemGroup>
+  <ItemGroup>
+    <FunctionsPreservedDependencies Include="Microsoft.IdentityModel.Logging.dll" />
+    <FunctionsPreservedDependencies Include="Microsoft.IdentityModel.Tokens.dll" />
+    <FunctionsPreservedDependencies Include="System.IdentityModel.Tokens.Jwt.dll" />
+    <FunctionsPreservedDependencies Include="System.Text.Encoding.CodePages.dll" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
