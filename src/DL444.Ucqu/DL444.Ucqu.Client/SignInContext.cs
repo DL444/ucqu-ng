@@ -19,6 +19,7 @@ namespace DL444.Ucqu.Client
     {
         Success = 0,
         InvalidCredentials = 1,
-        NotRegistered = 2
+        NotRegistered = 2,
+        InvalidCredentialsUserInexist = 3
     }
 }

@@ -19,6 +19,7 @@
                 "CalendarExamEventSummary": "{0}考试",
                 "CalendarExamLocation": "{0}@{1}",
                 "CredentialErrorCannotSignIn": "帐户信息不正确，请重试",
+                "UserInexistCannotSignIn": "帐户信息不正确，帐户名为你的学号，请确认",
                 "AccountInexistCannotSignIn": "帐户不存在，继续登录将创建帐户，请确认",
                 "ScoreChangedNotificationTitleAdd": "出成绩了！",
                 "ScoreChangedNotificationTitleModify": "成绩更新",

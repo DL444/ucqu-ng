@@ -109,6 +109,10 @@ namespace DL444.Ucqu.Backend
             {
                 return new UnauthorizedObjectResult(new BackendResult<AccessToken>(locService.GetString("CredentialErrorCannotSignIn")));
             }
+            else if (signInContext.Result == Client.SignInResult.InvalidCredentialsUserInexist)
+            {
+                return new UnauthorizedObjectResult(new BackendResult<AccessToken>(locService.GetString("UserInexistCannotSignIn")));
+            }
             else
             {
                 if (signInContext.Result != Client.SignInResult.NotRegistered)

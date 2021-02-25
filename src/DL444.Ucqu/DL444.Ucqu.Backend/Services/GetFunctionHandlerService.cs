@@ -107,7 +107,7 @@ namespace DL444.Ucqu.Backend.Services
                     try
                     {
                         SignInContext signInContext = await client.SignInAsync(credentialResult.Resource.StudentId, credentialResult.Resource.PasswordHash);
-                        if (signInContext.Result == Client.SignInResult.InvalidCredentials)
+                        if (signInContext.Result == Client.SignInResult.InvalidCredentials || signInContext.Result == Client.SignInResult.InvalidCredentialsUserInexist)
                         {
                             // Cached credential is outdated.
                             return new UnauthorizedResult();
