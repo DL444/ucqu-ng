@@ -89,7 +89,7 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
             prevWidth = Window.Current.Bounds.Width;
             Window.Current.SizeChanged += CurrentWindow_SizeChanged;
 
-            if (e.Parameter is string argument)
+            if (e.Parameter is string argument && !string.IsNullOrEmpty(argument))
             {
                 Analytics.TrackEvent("Launched with parameter", new Dictionary<string, string>()
                 {

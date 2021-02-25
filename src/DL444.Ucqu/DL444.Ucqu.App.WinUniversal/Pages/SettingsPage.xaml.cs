@@ -53,12 +53,15 @@ namespace DL444.Ucqu.App.WinUniversal.Pages
         private async void ScoreChangedNotification_Toggled(object sender, RoutedEventArgs e)
         {
             bool value = ((ToggleSwitch)sender).IsOn;
-            Analytics.TrackEvent("Settings toggled", new Dictionary<string, string>()
+            if (value != ViewModel.IsScoreChangeNotificationEnabled)
             {
-                { "Settings", $"ScoreChangeNotification" },
-                { "Value", $"{value}" }
-            });
-            await ViewModel.SetScoreChangedNotificationEnabledAsync(value);
+                Analytics.TrackEvent("Settings toggled", new Dictionary<string, string>()
+                {
+                    { "Settings", $"ScoreChangeNotification" },
+                    { "Value", $"{value}" }
+                });
+                await ViewModel.SetScoreChangedNotificationEnabledAsync(value);
+            }
         }
     }
 }
