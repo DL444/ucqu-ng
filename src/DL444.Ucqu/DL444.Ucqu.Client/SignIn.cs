@@ -59,6 +59,10 @@ namespace DL444.Ucqu.Client
             {
                 return new SignInContext(SignInResult.InvalidCredentials, null, null);
             }
+            else if (responseString.Contains("该账号尚未分配角色", StringComparison.Ordinal))
+            {
+                return new SignInContext(SignInResult.InvalidCredentials, null, null);
+            }
             else
             {
                 return new SignInContext(SignInResult.Success, sessionId, username);
