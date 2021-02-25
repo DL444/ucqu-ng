@@ -62,7 +62,7 @@ namespace DL444.Ucqu.Backend
             {
                 DataAccessResult<StudentCredential> credentialFetchResult = await dataService.GetCredentialAsync(credential.StudentId);
                 bool shouldUpdateCredential = false;
-                Task<string>? initUserTask = null;
+                bool shouldInitializeUser = false;
                 if (credentialFetchResult.Success)
                 {
                     shouldUpdateCredential = !credentialFetchResult.Resource.PasswordHash.Equals(credential.PasswordHash, StringComparison.Ordinal);
@@ -73,7 +73,7 @@ namespace DL444.Ucqu.Backend
                     if (createAccount)
                     {
                         shouldUpdateCredential = true;
-                        initUserTask = StartInitializeUserAsync(signInContext, userInitCommandCollector, log);
+                        shouldInitializeUser = true;
                     }
                     else
                     {
@@ -95,9 +95,9 @@ namespace DL444.Ucqu.Backend
                 }
 
                 string token = tokenService.CreateToken(credential.StudentId);
-                if (initUserTask != null)
+                if (shouldInitializeUser)
                 {
-                    string location = await initUserTask;
+                    string location = await StartInitializeUserAsync(signInContext, userInitCommandCollector, log);
                     return new AcceptedResult(location, new BackendResult<AccessToken>(true, AccessToken.IncompleteToken(token, location), locService.GetString("UserInitPrepare")));
                 }
                 else
@@ -158,7 +158,7 @@ namespace DL444.Ucqu.Backend
             try
             {
                 var eventGridEvent = new EventGridEvent(
-                    id: $"UserInit={Guid.NewGuid()}",
+                    id: $"UserInit-{Guid.NewGuid()}",
                     subject: signInContext.SignedInUser,
                     data: new Models.UserInitializeCommand(signInContext, id),
                     eventType: "DL444.Ucqu.UserInit",
