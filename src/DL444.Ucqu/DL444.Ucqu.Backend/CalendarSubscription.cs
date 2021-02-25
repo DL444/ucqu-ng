@@ -26,15 +26,10 @@ namespace DL444.Ucqu.Backend
         [FunctionName("CalendarSubscriptionGet")]
         public async Task<IActionResult> RunGet(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Calendar/{username}/{id}")] HttpRequest req,
-            [ClientAuthenticationResult] bool clientAuthSuccess,
             string? username,
             string? id,
             ILogger log)
         {
-            if (!clientAuthSuccess)
-            {
-                return new UnauthorizedResult();
-            }
             if (username == null || id == null)
             {
                 return new BadRequestResult();
@@ -82,11 +77,10 @@ namespace DL444.Ucqu.Backend
         [FunctionName("CalendarSubscriptionPost")]
         public async Task<IActionResult> RunPost(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "Calendar")] HttpRequest req,
-            [ClientAuthenticationResult] bool clientAuthSuccess,
             [UserIdentity] string? username,
             ILogger log)
         {
-            if (!clientAuthSuccess || username == null)
+            if (username == null)
             {
                 return new UnauthorizedResult();
             }

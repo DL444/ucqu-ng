@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using DL444.Ucqu.Backend.Bindings;
 using DL444.Ucqu.Backend.Models;
 using DL444.Ucqu.Backend.Services;
 using DL444.Ucqu.Models;
@@ -18,14 +17,9 @@ namespace DL444.Ucqu.Backend
         [FunctionName("DevMessage")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "DevMessage/{platform}")] HttpRequest req,
-            [ClientAuthenticationResult] bool clientAuthSuccess,
             string platform,
             ILogger log)
         {
-            if (!clientAuthSuccess)
-            {
-                return new UnauthorizedResult();
-            }
             TargetPlatforms selectedPlatform;
             switch (platform.ToUpperInvariant())
             {

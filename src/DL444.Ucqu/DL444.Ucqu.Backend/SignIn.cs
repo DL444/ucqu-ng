@@ -1,7 +1,6 @@
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
-using DL444.Ucqu.Backend.Bindings;
 using DL444.Ucqu.Backend.Models;
 using DL444.Ucqu.Backend.Services;
 using DL444.Ucqu.Client;
@@ -31,15 +30,10 @@ namespace DL444.Ucqu.Backend
         [FunctionName("SignIn")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "signIn/{createAccount:bool}")] HttpRequest req,
-            [ClientAuthenticationResult] bool clientAuthSuccess,
             [EventGrid(TopicEndpointUri = "EventPublish:TopicUri", TopicKeySetting = "EventPublish:TopicKey")] IAsyncCollector<EventGridEvent> userInitCommandCollector,
             bool createAccount,
             ILogger log)
         {
-            if (!clientAuthSuccess)
-            {
-                return new UnauthorizedResult();
-            }
             StudentCredential? credential = null;
             try
             {

@@ -26,9 +26,6 @@ Azure 应用设置是加密存储的，因此将机要直接存放在应用设�
     "FUNCTIONS_EXTENSION_VERSION": "string",
     "APPINSIGHTS_INSTRUMENTATIONKEY": "string?",
     "AzureWebJobsDashboard": "string?",
-    "ClientAuthentication:Enabled": "bool?",
-    "ClientAuthentication:DisableChainValidation": "bool?",
-    "ClientAuthentication:CertificateReference": "string?",
     "WEBSITE_LOAD_USER_PROFILE": "int?",
     "Credential:EncryptionKey": "string",
     "Database:ConnectionString": "string",
@@ -70,21 +67,6 @@ Azure 应用设置是加密存储的，因此将机要直接存放在应用设�
     用于存储应用日志的存储帐户连接字符串。  
     若此设置不存在，存储帐户监控将被禁用。  
     注意存储帐户[不是](https://docs.microsoft.com/en-us/azure/azure-functions/configure-monitoring#disable-built-in-logging)推荐的监控方案。推荐的监控方案是连接 Application Insights. 若使用 Application Insight, 则不应该设置此项。
-
-### 客户端证书验证
-后端服务支持验证客户端发送的证书是否有效且与指定的证书一致。注意该功能不是为了验证最终用户的身份，而是为了避免第三方绕过[接口管理服务](https://docs.microsoft.com/en-us/azure/api-management/api-management-key-concepts)而直接调用后端应用程序。如果你不使用接口管理服务，则不应启用这部分设置。
-- `ClientAuthentication:Enabled`  
-    指定是否启用客户端证书验证。默认值为 `false`.  
-    注意启用本设置时，应当同时启用函数应用程序的[客户端证书设置](https://docs.microsoft.com/en-us/azure/app-service/app-service-web-configure-tls-mutual-auth#enable-client-certificates)。
-- `ClientAuthentication:DisableChainValidation`  
-    指定是否禁用证书链验证。默认值为 `false`.  
-    使用自签名证书时，请启用该项设置。
-- `ClientAuthentication:CertificateReference`  
-    指向要进行匹配的参考证书的 Key Vault 引用，或以 Base64 编码的证书数据。  
-    若启用客户端证书验证，则本项必须。
-- `WEBSITE_LOAD_USER_PROFILE`  
-    是否要加载操作系统的用户配置。  
-    在 Windows 环境下，证书数据读取依赖于用户配置。因此，若在 Windows 环境中部署该应用，且启用客户端证书验证，则请将此项设置为 `1`. 否则则不要设置。
 
 ### 凭据加密
 存储在 Cosmos DB 中的数据是自带加密的。但后端应用程序会对用户凭据进行二次加密，因而即使数据库受到未经授权的访问，用户凭据仍不会失密。

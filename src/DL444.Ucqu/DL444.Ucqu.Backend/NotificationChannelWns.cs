@@ -26,15 +26,13 @@ namespace DL444.Ucqu.Backend
         [FunctionName("NotificationChannelWns")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "notifyChannel/windows")] HttpRequest req,
-            [ClientAuthenticationResult] bool clientAuthSuccess,
             [UserIdentity] string? username,
             ILogger log)
         {
-            if (!clientAuthSuccess || username == null)
+            if (username == null)
             {
                 return new UnauthorizedResult();
             }
-
             NotificationChannelItem channel;
             try
             {

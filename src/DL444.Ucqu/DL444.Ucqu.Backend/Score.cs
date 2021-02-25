@@ -16,16 +16,14 @@ namespace DL444.Ucqu.Backend
         [FunctionName("Score")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Score/{secondMajor:int}")] HttpRequest req,
-            [ClientAuthenticationResult] bool clientAuthSuccess,
             int secondMajor,
             [UserIdentity] string? username,
             ILogger log)
         {
-            if (!clientAuthSuccess || username == null)
+            if (username == null)
             {
                 return new UnauthorizedResult();
             }
-
             bool isSecondMajor;
             if (secondMajor == 0 || secondMajor == 1)
             {

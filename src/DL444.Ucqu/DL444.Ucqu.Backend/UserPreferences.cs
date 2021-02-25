@@ -25,11 +25,10 @@ namespace DL444.Ucqu.Backend
         [FunctionName("UserPreferencesGet")]
         public async Task<IActionResult> RunGet(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "preferences")] HttpRequest req,
-            [ClientAuthenticationResult] bool clientAuthSuccess,
             [UserIdentity] string? username,
             ILogger log)
         {
-            if (!clientAuthSuccess || username == null)
+            if (username == null)
             {
                 return new UnauthorizedResult();
             }
@@ -72,15 +71,13 @@ namespace DL444.Ucqu.Backend
         [FunctionName("UserPreferencesPost")]
         public async Task<IActionResult> RunPost(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "preferences")] HttpRequest req,
-            [ClientAuthenticationResult] bool clientAuthSuccess,
             [UserIdentity] string? username,
             ILogger log)
         {
-            if (!clientAuthSuccess || username == null)
+            if (username == null)
             {
                 return new UnauthorizedResult();
             }
-
             UserPreferences? inPreferences;
             try
             {

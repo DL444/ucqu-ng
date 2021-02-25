@@ -56,19 +56,8 @@ namespace DL444.Ucqu.Backend
             builder.Services.AddHttpClient<IPushNotificationService<WindowsPushNotification>, WindowsPushNotificationService>()
                 .AddTransientHttpErrorPolicy(policy => policy.WaitAndRetryAsync(retry, x => TimeSpan.FromSeconds(2 << x)));
 
-            bool clientCertificateValidationEnabled = config.GetValue("ClientAuthentication:Enabled", false);
-            if (clientCertificateValidationEnabled)
-            {
-                builder.Services.AddTransient<IClientAuthenticationService, KeyVaultClientAuthenticationService>();
-            }
-            else
-            {
-                builder.Services.AddTransient<IClientAuthenticationService, BypassClientAuthenticationService>();
-            }
-
             IWebJobsBuilder webJobsBuilder = builder.Services.AddWebJobs(_ => { });
             webJobsBuilder.AddExtension<Bindings.UserIdentityExtensionConfigProvider>();
-            webJobsBuilder.AddExtension<Bindings.ClientAuthenticationResultExtensionConfigProvider>();
         }
 
         public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)

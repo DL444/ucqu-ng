@@ -20,11 +20,10 @@ namespace DL444.Ucqu.Backend
         [FunctionName("Schedule")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
-            [ClientAuthenticationResult] bool clientAuthSuccess,
             [UserIdentity] string? username,
             ILogger log)
         {
-            if (!clientAuthSuccess || username == null)
+            if (username == null)
             {
                 return new UnauthorizedResult();
             }

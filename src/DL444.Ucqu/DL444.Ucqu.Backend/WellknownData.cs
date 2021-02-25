@@ -1,5 +1,4 @@
 using System.Linq;
-using DL444.Ucqu.Backend.Bindings;
 using DL444.Ucqu.Backend.Services;
 using DL444.Ucqu.Models;
 using Microsoft.AspNetCore.Http;
@@ -26,13 +25,8 @@ namespace DL444.Ucqu.Backend
         [FunctionName("WellknownData")]
         public IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "wellknown")] HttpRequest req,
-            [ClientAuthenticationResult] bool clientAuthSuccess,
             ILogger log)
         {
-            if (!clientAuthSuccess)
-            {
-                return new UnauthorizedResult();
-            }
             return new OkObjectResult(new BackendResult<WellknownData>(data));
         }
 
